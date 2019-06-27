@@ -1,0 +1,8 @@
+{
+	"name" : "white-give",
+	"version" : "0.1.0",
+	"description" : "a white-give project"
+	"dependency" : {
+		"express" :"latest"
+	}
+}
