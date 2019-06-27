@@ -5,5 +5,9 @@
   "dependencies": {
     "express": "^4.17.1",
     "mysql": "latest"
-  }
+  },
+  "contributors":[
+  	{"name":"Wang Zhengfei","email":"goodapple8946@163.com"},
+  	{"name":"YcZh","email":"3037796513@qq.com"}
+  ]
 }
