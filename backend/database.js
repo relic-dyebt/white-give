@@ -1,5 +1,3 @@
-
-
 function Database() {
 
     var mysql = require('mysql');
@@ -16,13 +14,16 @@ function Database() {
         db.connect();
     }
 
-    this.queryStudent = function() {
-        db.query('SELECT * FROM Student', (err, res) => {
+    this.queryStudent = function(res) {
+        db.query('SELECT * FROM Student', (err, data) => {
             if (err) throw err;
-            for (var i in res) {
-                console.log(i + ': ' + res[i] + '\n');
-            }
-        })
+            res.writeHead(200,{"Content-Type":'text/plain;charset=utf-8','Access-Control-Allow-Origin':'*','Access-Control-Allow-Methods':'PUT,POST,GET,DELETE,OPTIONS'});
+            res.write(data[0].name + '\n');
+            res.write(data[0].introduction + '\n');
+            res.write(data[0].phone + '\n');
+            res.write(data[0].email + '\n');
+            res.end();
+        });
     }
 }
 
