@@ -1,18 +1,27 @@
 var express = require('express');
 var http = require('http');
 var url = require('url');
-var Database = require('./database');
+var mysql = require('mysql');
+
+var Student = require('./student');
+
+var student = new Student();
 
 var app = express();
-var db = new Database();
 
-db.init();
+var db = mysql.createConnection({
+    host: 'cdb-cp9aouco.bj.tencentcdb.com',
+    port: '10122',
+    user: 'root',
+    password: '123456+1s',
+    database: 'white-give'
+});
 
-http.createServer((req, res) => {
+db.connect();
 
-    var pathname = url.parse(req.url, true).pathname;
+http.createServer(app).listen(30000);
+
+app.get('/studentRegister', (req, res) => {
     var query = url.parse(req.url, true).query;
-
-    db.queryStudent(res);
-
-}).listen(30000);
+    student.register(db, query, res);
+});
