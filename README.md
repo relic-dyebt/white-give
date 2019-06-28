@@ -23,7 +23,8 @@ info:
     studentNumber
 ```
 返回值:
-```    { err: bool, msg: string }
+```
+{ err: bool, msg: string }
 ```
 示例:
 ```    
@@ -100,10 +101,11 @@ info:
     videoUrlList
 返回值:
     { err: bool, msg: string, workId: string }
-    ```
+```
 
 ----------------------------------------------------------------------------------------------------
 校团委创建比赛
+
 ```
 pathname:
     createMatch
@@ -115,4 +117,4 @@ info:
     coverUrl
 返回值:
     { err: bool, msg: string }
-    ```
+```
