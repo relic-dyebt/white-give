@@ -150,6 +150,42 @@ function Student() {
             }
         });
     }
+
+    //学生提交作品
+    this.submitWork = function(db, info, res) {
+        console.log('Student Submit Work');
+        
+        var ret = { err: null, msg: null };
+        var sql = 
+            'INSERT INTO `Work`(document_url_list, picture_url_list, video_url_list, expert_list, state, score) ' +
+            'VALUES(?, ?, ?, ?, ?, ?)';
+        var sqlParams = [
+            info.documentUrlList,
+            info.pictureUrlList,
+            info.videoUrlList,
+            null,
+            null,
+            null
+        ];
+        
+        console.log(sql);
+
+        //插入作品
+        db.query(sql, sqlParams, (err, data) => {
+            if (err) {
+                ret.err = true;
+                ret.msg = 'Database error(insert).'
+                res.send(JSON.stringify(ret));
+            }
+            else {
+                ret.err = false;
+                ret.msg = 'Submit work success.';
+                ret.workId = data.insertId;
+                console.log("work id: " + ret.workId);/////////////////////////
+                res.send(JSON.stringify(ret));
+            }
+        });
+    }
 }
 
 module.exports = Student;

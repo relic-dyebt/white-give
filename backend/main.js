@@ -39,6 +39,11 @@ app.get('/submitApplication', (req, res) => {
     student.submitApplication(db, info, res);
 });
 
+app.get('/submitWork', (req, res) => {
+    var info = JSON.parse(url.parse(req.url, true).query.info);
+    student.submitWork(db, info, res);
+});
+
 //校团委
 app.get('/createMatch', (req, res) => {
     var info = JSON.parse(url.parse(req.url, true).query.info);
