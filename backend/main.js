@@ -23,8 +23,17 @@ db.connect();
 
 http.createServer(app).listen(30000);
 
+//跨域
+app.use(function(req, res, next) {
+    res.header("Access-Control-Allow-Origin", "*");
+    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE');
+    res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+    next();
+});
+
 //学生
 app.get('/studentRegister', (req, res) => {
+    console.log(req.url);
     var info = JSON.parse(url.parse(req.url, true).query.info);
     student.register(db, info, res);
 });

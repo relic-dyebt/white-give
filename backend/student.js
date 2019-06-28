@@ -181,7 +181,6 @@ function Student() {
                 ret.err = false;
                 ret.msg = 'Submit work success.';
                 ret.workId = data.insertId;
-                console.log("work id: " + ret.workId);/////////////////////////
                 res.send(JSON.stringify(ret));
             }
         });
