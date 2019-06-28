@@ -5,6 +5,7 @@ HTTP请求格式：
 
 ----------------------------------------------------------------------------------------------------
 学生注册
+```
 pathname:
     studentRegister
 info: 
@@ -20,6 +21,7 @@ info:
     major,
     enrollmentYear,
     studentNumber
+```
 返回值:
     { err: bool, msg: string }
 示例:
