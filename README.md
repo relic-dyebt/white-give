@@ -5,6 +5,7 @@ HTTP请求格式：
 
 ----------------------------------------------------------------------------------------------------
 学生注册
+```
 pathname:
     studentRegister
 info: 
@@ -20,13 +21,19 @@ info:
     major,
     enrollmentYear,
     studentNumber
+```
 返回值:
-    { err: bool, msg: string }
+```
+{ err: bool, msg: string }
+```
 示例:
-    http://58.87.72.138:30000/studentRegister?info={"username":"xiaoming123","password":"ABC","name":"mingming","introduction":"im good","profileUrl":"okok","workList":"work1;work2;work3","phone":"911","email":"xiaoming@163.com","department":"software","major":"soft","enrollmentYear":"2015","studentNumber":"15240000"}
-
+```    
+http://58.87.72.138:30000/studentRegister?info=
+{"username":"xiaoming123","password":"ABC","name":"mingming","introduction":"im good","profileUrl":"okok","workList":"work1;work2;work3","phone":"911","email":"xiaoming@163.com","department":"software","major":"soft","enrollmentYear":"2015","studentNumber":"15240000"}
+```
 ----------------------------------------------------------------------------------------------------
 学生登录
+```
 pathname:
     studentLogin
 info: 
@@ -36,9 +43,10 @@ info:
     { err: bool, msg: string, data: object }
 示例:
     http://58.87.72.138:30000/studentLogin?info={"studentNumber":"15240000","password":"ABC"}
-
+```
 ----------------------------------------------------------------------------------------------------
 学生提交申请
+```
 pathname:
     submitApplication
 info: 
@@ -81,9 +89,10 @@ info:
     workId
 返回值:
     { err: bool, msg: string }
-
+```
 ----------------------------------------------------------------------------------------------------
 学生提交作品
+```
 pathname:
     submitWork
 info: 
@@ -92,9 +101,12 @@ info:
     videoUrlList
 返回值:
     { err: bool, msg: string, workId: string }
+```
 
 ----------------------------------------------------------------------------------------------------
 校团委创建比赛
+
+```
 pathname:
     createMatch
 info:
@@ -105,3 +117,4 @@ info:
     coverUrl
 返回值:
     { err: bool, msg: string }
+```
