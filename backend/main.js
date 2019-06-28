@@ -25,17 +25,22 @@ http.createServer(app).listen(30000);
 
 //学生
 app.get('/studentRegister', (req, res) => {
-    var query = url.parse(req.url, true).query;
-    student.register(db, query, res);
+    var info = JSON.parse(url.parse(req.url, true).query.info);
+    student.register(db, info, res);
 });
 
 app.get('/studentLogin', (req, res) => {
-    var query = url.parse(req.url, true).query;
-    student.login(db, query, res);
+    var info = JSON.parse(url.parse(req.url, true).query.info);
+    student.login(db, info, res);
+});
+
+app.get('/submitApplication', (req, res) => {
+    var info = JSON.parse(url.parse(req.url, true).query.info);
+    student.submitApplication(db, info, res);
 });
 
 //校团委
 app.get('/createMatch', (req, res) => {
-    var query = url.parse(req.url, true).query;
-    tw.createMatch(db, query, res);
+    var info = JSON.parse(url.parse(req.url, true).query.info);
+    tw.createMatch(db, info, res);
 });
