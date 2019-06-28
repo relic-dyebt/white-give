@@ -4,8 +4,10 @@ var url = require('url');
 var mysql = require('mysql');
 
 var Student = require('./student');
+var Tw = require('./tw');
 
 var student = new Student();
+var tw = new Tw();
 
 var app = express();
 
@@ -21,7 +23,19 @@ db.connect();
 
 http.createServer(app).listen(30000);
 
+//学生
 app.get('/studentRegister', (req, res) => {
     var query = url.parse(req.url, true).query;
     student.register(db, query, res);
+});
+
+app.get('/studentLogin', (req, res) => {
+    var query = url.parse(req.url, true).query;
+    student.login(db, query, res);
+});
+
+//校团委
+app.get('/createMatch', (req, res) => {
+    var query = url.parse(req.url, true).query;
+    tw.createMatch(db, query, res);
 });
