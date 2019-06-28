@@ -127,11 +127,11 @@ function Student() {
             info.c4Name, info.c4StudentNumber, info.c4EducationalBackground, info.c4Phone, info.c4Email,
             info.category,
             info.introduction,
-            info.innovation_list,
-            info.keyword_list,
+            info.innovationList,
+            info.keywordList,
             info.state,
-            info.match_id,
-            info.work_id
+            info.matchId,
+            info.workId
         ];
         
         console.log(sql);
