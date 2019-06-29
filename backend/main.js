@@ -3,11 +3,17 @@ var http = require('http');
 var url = require('url');
 var mysql = require('mysql');
 
+var Common = require('./common');
 var Student = require('./student');
 var Tw = require('./tw');
+var Expert = require('./expert');
+var System = require('./system');
 
+var common = new Common();
 var student = new Student();
 var tw = new Tw();
+var expert = new Expert();
+var system = new System();
 
 var app = express();
 
@@ -31,9 +37,14 @@ app.use(function(req, res, next) {
     next();
 });
 
+//通用
+app.get('/getMatchByDate', (req, res) => {
+    var info = JSON.parse(url.parse(req.url, true).query.info);
+    student.getMatchByDate(db, info, res);
+});
+
 //学生
 app.get('/studentRegister', (req, res) => {
-    console.log(req.url);
     var info = JSON.parse(url.parse(req.url, true).query.info);
     student.register(db, info, res);
 });
@@ -51,6 +62,11 @@ app.get('/submitApplication', (req, res) => {
 app.get('/submitWork', (req, res) => {
     var info = JSON.parse(url.parse(req.url, true).query.info);
     student.submitWork(db, info, res);
+});
+
+app.get('/studentGetApplicationByMatch', (req, res) => {
+    var info = JSON.parse(url.parse(req.url, true).query.info);
+    student.getApplicationByMatch(db, info, res);
 });
 
 //校团委

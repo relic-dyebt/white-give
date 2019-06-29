@@ -1,13 +1,14 @@
 function Student() {
+    
     //学生注册
     this.register = function(db, info, res) {
         console.log('Student Register');
 
-        //检查学号和用户名是否存在
+        //搜索学号或用户名
         var ret = { err: null, msg: null };
         var sql = 'SELECT COUNT(*) AS cnt FROM Student WHERE student_number = ? OR username = ?';
         var sqlParams = [ info.studentNumber, info.username ];
-        console.log(sql);
+        console.log(sql + '\n' + sqlParams.toString() + '\n');
 
         db.query(sql, sqlParams, (err, data) => {
             if (err) {
@@ -38,7 +39,7 @@ function Student() {
                     info.enrollmentYear,
                     info.studentNumber
                 ];
-                console.log(sql);
+                console.log(sql + '\n' + sqlParams.toString() + '\n');
 
                 //插入用户
                 db.query(sql, sqlParams, (err, data) => {
@@ -49,7 +50,7 @@ function Student() {
                     }
                     else {
                         ret.err = false;
-                        ret.msg = 'Register success.';
+                        ret.msg = 'Register successfully.';
                         res.send(JSON.stringify(ret));
                     }
                 });
@@ -61,13 +62,13 @@ function Student() {
     this.login = function(db, info, res) {
         console.log('Student Login');
 
-        //检查学号和密码是否合法
+        //搜索学号和密码
         var ret = { err: null, msg: null };
-        var sql = 'SELECT * FROM Student WHERE student_number = ? AND password = ?';
+        var sql = 'SELECT * FROM Student WHERE student_number = ? AND `password` = ?';
         var sqlParams = [ info.studentNumber, info.password ];
-        console.log(sql);
-        
-        db.query(sql, (err, data) => {
+        console.log(sql + '\n' + sqlParams.toString() + '\n');
+
+        db.query(sql, sqlParams, (err, data) => {
             if (err) {
                 ret.err = true;
                 ret.msg = 'Database error(SELECT).'
@@ -80,7 +81,7 @@ function Student() {
             }
             else {
                 ret.err = false;
-                ret.msg = 'Login success.';
+                ret.msg = 'Login successfully.';
                 ret.data = data[0];
                 res.send(JSON.stringify(ret));
             }
@@ -124,7 +125,7 @@ function Student() {
             info.matchId,
             info.workId
         ];
-        console.log(sql);
+        console.log(sql + '\n' + sqlParams.toString() + '\n');
 
         db.query(sql, sqlParams, (err, data) => {
             if (err) {
@@ -136,7 +137,7 @@ function Student() {
                 //更新相关学生
                 var sql = 'UPDATE Student SET application_list = concat(application_list, ?, ";") WHERE student_number = ?'
                 var sqlParams = [ data.insertId, info.studentNumber ];
-                console.log(sql);
+                console.log(sql + '\n' + sqlParams.toString() + '\n');
 
                 db.query(sql, sqlParams, (err, data) => {
                     if (err) {
@@ -146,7 +147,7 @@ function Student() {
                     }
                     else {
                         ret.err = false;
-                        ret.msg = 'Submit application success.';
+                        ret.msg = 'Submit application successfully.';
                         ret.applicationId = data.insertId;
                         res.send(JSON.stringify(ret));
                     }
@@ -174,7 +175,7 @@ function Student() {
             null,
             null
         ];
-        console.log(sql);
+        console.log(sql + '\n' + sqlParams.toString() + '\n');
 
         db.query(sql, sqlParams, (err, data) => {
             if (err) {
@@ -186,7 +187,7 @@ function Student() {
                 //更新相关申请
                 var sql = 'UPDATE Application SET work_id = ? WHERE id = ?';
                 var sqlParams = [ data.insertId, info.applicationId ];
-                console.log(sql);
+                console.log(sql + '\n' + sqlParams.toString() + '\n');
 
                 db.query(sql, sqlParams, (err, data) => {
                     if (err) {
@@ -198,7 +199,7 @@ function Student() {
                         //更新相关学生
                         var sql = 'UPDATE Student SET work_list = concat(work_list, ?, ";") WHERE student_number = ?'
                         var sqlParams = [ data.insertId, info.studentNumber ];
-                        console.log(sql);
+                        console.log(sql + '\n' + sqlParams.toString() + '\n');
 
                         db.query(sql, sqlParams, (err, data) => {
                             if (err) {
@@ -208,13 +209,44 @@ function Student() {
                             }
                             else {
                                 ret.err = false;
-                                ret.msg = 'Submit work success.';
+                                ret.msg = 'Submit work successfully.';
                                 ret.workId = data.insertId;
                                 res.send(JSON.stringify(ret));
                             }
                         });
                     }
                 });
+            }
+        });
+    }
+
+    //学生根据比赛获取已填写申请
+    this.studentGetApplicationByMatch = function(db, info, res) {
+        console.log('Student Get Application By Match');
+
+        //搜索申请
+        var ret = { err: null, msg: null };
+        var sql = 'SELECT * FROM Application WHERE student_number = ? AND match_id = ?';
+        var sqlParams = [ info.studentNumber, info.matchId ];
+        console.log(sql + '\n' + sqlParams.toString() + '\n');
+
+        db.query(sql, sqlParams, (err, data) => {
+            if (err) {
+                ret.err = true;
+                ret.msg = 'Database error(SELECT).'
+                res.send(JSON.stringify(ret));
+            }
+            else if (data.length == 0) {
+                ret.err = false;
+                ret.msg = 'Application not found.'
+                ret.data = null;
+                res.send(JSON.stringify(ret));
+            }
+            else {
+                ret.err = false;
+                ret.msg = 'Application found successfully.';
+                ret.data = data[0];
+                res.send(JSON.stringify(ret));
             }
         });
     }
