@@ -3,19 +3,16 @@ function Student() {
     this.register = function(db, info, res) {
         console.log('Student Register');
 
+        //检查学号和用户名是否存在
         var ret = { err: null, msg: null };
-        var sql =
-            'SELECT COUNT(*) AS cnt ' +
-            'FROM Student ' + 
-            'WHERE student_number = "' + info.studentNumber + '" OR username = "' + info.username + '"';
-
+        var sql = 'SELECT COUNT(*) AS cnt FROM Student WHERE student_number = ? OR username = ?';
+        var sqlParams = [ info.studentNumber, info.username ];
         console.log(sql);
 
-        //检查学号或用户名是否已存在
-        db.query(sql, (err, data) => {
+        db.query(sql, sqlParams, (err, data) => {
             if (err) {
                 ret.err = true;
-                ret.msg = 'Database error(select).'
+                ret.msg = 'Database error(SELECT).'
                 res.send(JSON.stringify(ret));
             }
             else if (data[0].cnt > 0) {
@@ -41,14 +38,13 @@ function Student() {
                     info.enrollmentYear,
                     info.studentNumber
                 ];
-
                 console.log(sql);
 
                 //插入用户
-                db.query(sql, sqlParams, err => {
+                db.query(sql, sqlParams, (err, data) => {
                     if (err) {
                         ret.err = true;
-                        ret.msg = 'Database error(insert).'
+                        ret.msg = 'Database error(INSERT).'
                         res.send(JSON.stringify(ret));
                     }
                     else {
@@ -65,19 +61,16 @@ function Student() {
     this.login = function(db, info, res) {
         console.log('Student Login');
 
+        //检查学号和密码是否合法
         var ret = { err: null, msg: null };
-        var sql =
-            'SELECT * ' +
-            'FROM Student ' + 
-            'WHERE student_number = "' + info.studentNumber + '" AND password = "' + info.password + '"';
-
+        var sql = 'SELECT * FROM Student WHERE student_number = ? AND password = ?';
+        var sqlParams = [ info.studentNumber, info.password ];
         console.log(sql);
         
-        //检查学号和密码是否匹配
         db.query(sql, (err, data) => {
             if (err) {
                 ret.err = true;
-                ret.msg = 'Database error(select).'
+                ret.msg = 'Database error(SELECT).'
                 res.send(JSON.stringify(ret));
             }
             else if (data.length == 0) {
@@ -89,9 +82,6 @@ function Student() {
                 ret.err = false;
                 ret.msg = 'Login success.';
                 ret.data = data[0];
-                
-                console.log(data[0]);
-
                 res.send(JSON.stringify(ret));
             }
         });
@@ -101,6 +91,7 @@ function Student() {
     this.submitApplication = function(db, info, res) {
         console.log('Student Submit Application');
         
+        //插入申请
         var ret = { err: null, msg: null };
         var sql = 
             'INSERT INTO Application(name, student_number, birthday, educational_background, major, enrollment_year, work_name, address, phone, email, ' + 
@@ -133,20 +124,33 @@ function Student() {
             info.matchId,
             info.workId
         ];
-        
         console.log(sql);
 
-        //插入申请
-        db.query(sql, sqlParams, err => {
+        db.query(sql, sqlParams, (err, data) => {
             if (err) {
                 ret.err = true;
-                ret.msg = 'Database error(insert).'
+                ret.msg = 'Database error(INSERT).'
                 res.send(JSON.stringify(ret));
             }
             else {
-                ret.err = false;
-                ret.msg = 'Submit application success.';
-                res.send(JSON.stringify(ret));
+                //更新相关学生
+                var sql = 'UPDATE Student SET application_list = concat(application_list, ?, ";") WHERE student_number = ?'
+                var sqlParams = [ data.insertId, info.studentNumber ];
+                console.log(sql);
+
+                db.query(sql, sqlParams, (err, data) => {
+                    if (err) {
+                        ret.err = true;
+                        ret.msg = 'Database error(UPDATE).'
+                        res.send(JSON.stringify(ret));
+                    }
+                    else {
+                        ret.err = false;
+                        ret.msg = 'Submit application success.';
+                        ret.applicationId = data.insertId;
+                        res.send(JSON.stringify(ret));
+                    }
+                });
             }
         });
     }
@@ -155,11 +159,14 @@ function Student() {
     this.submitWork = function(db, info, res) {
         console.log('Student Submit Work');
         
+        //插入作品
         var ret = { err: null, msg: null };
         var sql = 
-            'INSERT INTO `Work`(document_url_list, picture_url_list, video_url_list, expert_list, state, score) ' +
-            'VALUES(?, ?, ?, ?, ?, ?)';
+            'INSERT INTO `Work`(student_number, application_id, document_url_list, picture_url_list, video_url_list, expert_list, state, score) ' +
+            'VALUES(?, ?, ?, ?, ?, ?, ?, ?)';
         var sqlParams = [
+            info.studentNumber,
+            info.applicationId,
             info.documentUrlList,
             info.pictureUrlList,
             info.videoUrlList,
@@ -167,21 +174,47 @@ function Student() {
             null,
             null
         ];
-        
         console.log(sql);
 
-        //插入作品
         db.query(sql, sqlParams, (err, data) => {
             if (err) {
                 ret.err = true;
-                ret.msg = 'Database error(insert).'
+                ret.msg = 'Database error(INSERT).'
                 res.send(JSON.stringify(ret));
             }
             else {
-                ret.err = false;
-                ret.msg = 'Submit work success.';
-                ret.workId = data.insertId;
-                res.send(JSON.stringify(ret));
+                //更新相关申请
+                var sql = 'UPDATE Application SET work_id = ? WHERE id = ?';
+                var sqlParams = [ data.insertId, info.applicationId ];
+                console.log(sql);
+
+                db.query(sql, sqlParams, (err, data) => {
+                    if (err) {
+                        ret.err = true;
+                        ret.msg = 'Database error(UPDATE).'
+                        res.send(JSON.stringify(ret));
+                    }
+                    else {
+                        //更新相关学生
+                        var sql = 'UPDATE Student SET work_list = concat(work_list, ?, ";") WHERE student_number = ?'
+                        var sqlParams = [ data.insertId, info.studentNumber ];
+                        console.log(sql);
+
+                        db.query(sql, sqlParams, (err, data) => {
+                            if (err) {
+                                ret.err = true;
+                                ret.msg = 'Database error(UPDATE).'
+                                res.send(JSON.stringify(ret));
+                            }
+                            else {
+                                ret.err = false;
+                                ret.msg = 'Submit work success.';
+                                ret.workId = data.insertId;
+                                res.send(JSON.stringify(ret));
+                            }
+                        });
+                    }
+                });
             }
         });
     }

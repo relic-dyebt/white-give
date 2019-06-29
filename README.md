@@ -88,7 +88,7 @@ info:
     matchId,
     workId
 返回值:
-    { err: bool, msg: string }
+    { err: bool, msg: string, applicationId: string }
 ```
 ----------------------------------------------------------------------------------------------------
 学生提交作品
@@ -96,11 +96,12 @@ info:
 pathname:
     submitWork
 info: 
+    applicationId,
     documentUrlList,
     pictureUrlList,
     videoUrlList
 返回值:
-    { err: bool, msg: string, workId: string }
+    { err: bool, msg: string }
 ```
 
 ----------------------------------------------------------------------------------------------------
@@ -116,5 +117,5 @@ info:
     introduction,
     coverUrl
 返回值:
-    { err: bool, msg: string }
+    { err: bool, msg: string, workId: string }
 ```
