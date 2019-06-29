@@ -14,7 +14,6 @@ info:
 返回值:
     { err: bool, msg: string, data: array }
     (日期格式："1970-01-01")
-    (若无符合日期条件的比赛，则 data = [])
 ```
 
 ----------------------------------------------------------------------------------------------------
@@ -103,6 +102,7 @@ info:
     workId
 返回值:
     { err: bool, msg: string, applicationId: string }
+    (申请state取值: "auditing", "passed", "failed")
 ```
 ----------------------------------------------------------------------------------------------------
 学生提交作品
@@ -145,4 +145,31 @@ info:
     coverUrl
 返回值:
     { err: bool, msg: string, workId: string }
+```
+
+----------------------------------------------------------------------------------------------------
+校团委根据审核状态获取申请
+
+```
+pathname:
+    getApplicationByState
+info:
+    state
+返回值:
+    { err: bool, msg: string, data: array }
+    (若查询state为任意，可令state = null)
+```
+
+----------------------------------------------------------------------------------------------------
+校团委设置申请审核状态
+
+```
+pathname:
+    setApplicationState
+info:
+    id,
+    state
+返回值:
+    { err: bool, msg: string }
+    (申请state取值: "auditing", "passed", "failed")
 ```

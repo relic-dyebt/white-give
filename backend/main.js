@@ -3,17 +3,11 @@ var http = require('http');
 var url = require('url');
 var mysql = require('mysql');
 
-var Common = require('./common');
-var Student = require('./student');
-var Tw = require('./tw');
-var Expert = require('./expert');
-var System = require('./system');
-
-var common = new Common();
-var student = new Student();
-var tw = new Tw();
-var expert = new Expert();
-var system = new System();
+var common = require('./common');
+var student = require('./student');
+var tw = require('./tw');
+var expert = require('./expert');
+var system = require('./system');
 
 var app = express();
 
@@ -40,7 +34,17 @@ app.use(function(req, res, next) {
 //通用
 app.get('/getMatchByDate', (req, res) => {
     var info = JSON.parse(url.parse(req.url, true).query.info);
-    student.getMatchByDate(db, info, res);
+    common.getMatchByDate(db, info, res);
+});
+
+app.get('/getWorkByApplication', (req, res) => {
+    var info = JSON.parse(url.parse(req.url, true).query.info);
+    common.getWorkByApplication(db, info, res);
+});
+
+app.get('/getApplicationByWork', (req, res) => {
+    var info = JSON.parse(url.parse(req.url, true).query.info);
+    common.getApplicationByWork(db, info, res);
 });
 
 //学生
@@ -73,4 +77,14 @@ app.get('/studentGetApplicationByMatch', (req, res) => {
 app.get('/createMatch', (req, res) => {
     var info = JSON.parse(url.parse(req.url, true).query.info);
     tw.createMatch(db, info, res);
+});
+
+app.get('/getApplicationByState', (req, res) => {
+    var info = JSON.parse(url.parse(req.url, true).query.info);
+    tw.getApplicationByState(db, info, res);
+});
+
+app.get('/setApplicationState', (req, res) => {
+    var info = JSON.parse(url.parse(req.url, true).query.info);
+    tw.setApplicationState(db, info, res);
 });
