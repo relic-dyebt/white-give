@@ -23,6 +23,8 @@ db.connect();
 
 http.createServer(app).listen(30000);
 
+console.log("Server is running.");
+
 //跨域
 app.use(function(req, res, next) {
     res.header("Access-Control-Allow-Origin", "*");
