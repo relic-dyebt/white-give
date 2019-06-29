@@ -208,3 +208,26 @@ module.exports.studentGetApplicationByMatch = function(db, info, res) {
         }
     });
 }
+
+//学生修改密码
+module.exports.studentSetPassword = function(db, info, res) {
+    console.log('Student Set Password');
+
+    //更改密码
+    var ret = { err: null, msg: null };
+    var sql = 'UPDATE Student SET `password` = ? WHERE student_number = ?';
+    var sqlParams = [ info.password, info.studentNumber ];
+    console.log(sql + '\n' + sqlParams.toString() + '\n');
+
+    db.query(sql, sqlParams, (err, data) => {
+        if (err) {
+            ret.err = true;
+            ret.msg = 'Database error(UPDATE).';
+            res.send(JSON.stringify(ret));
+        } else {
+            ret.err = false;
+            ret.msg = 'Set password successfully.';
+            res.send(JSON.stringify(ret));
+        }
+    });
+}

@@ -77,3 +77,26 @@ module.exports.login = function(db, info, res) {
         }
     });
 }
+
+//专家修改密码
+module.exports.expertSetPassword = function(db, info, res) {
+    console.log('Expert Set Password');
+
+    //更改密码
+    var ret = { err: null, msg: null };
+    var sql = 'UPDATE Expert SET `password` = ? WHERE email = ?';
+    var sqlParams = [ info.password, info.email ];
+    console.log(sql + '\n' + sqlParams.toString() + '\n');
+
+    db.query(sql, sqlParams, (err, data) => {
+        if (err) {
+            ret.err = true;
+            ret.msg = 'Database error(UPDATE).';
+            res.send(JSON.stringify(ret));
+        } else {
+            ret.err = false;
+            ret.msg = 'Set password successfully.';
+            res.send(JSON.stringify(ret));
+        }
+    });
+}

@@ -60,6 +60,11 @@ app.get('/studentLogin', (req, res) => {
     student.login(db, info, res);
 });
 
+app.get('/studentSetPassword', (req, res) => {
+    var info = JSON.parse(url.parse(req.url, true).query.info);
+    student.studentSetPassword(db, info, res);
+});
+
 app.get('/submitApplication', (req, res) => {
     var info = JSON.parse(url.parse(req.url, true).query.info);
     student.submitApplication(db, info, res);
@@ -84,6 +89,11 @@ app.get('/expertRegister', (req, res) => {
 app.get('/expertLogin', (req, res) => {
     var info = JSON.parse(url.parse(req.url, true).query.info);
     expert.login(db, info, res);
+});
+
+app.get('/expertSetPassword', (req, res) => {
+    var info = JSON.parse(url.parse(req.url, true).query.info);
+    student.expertSetPassword(db, info, res);
 });
 
 //校团委
