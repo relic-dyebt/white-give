@@ -39,14 +39,14 @@ app.get('/getMatchByDate', (req, res) => {
     common.getMatchByDate(db, info, res);
 });
 
-app.get('/getWorkByApplication', (req, res) => {
+app.get('/getWork', (req, res) => {
     var info = JSON.parse(url.parse(req.url, true).query.info);
-    common.getWorkByApplication(db, info, res);
+    common.getWork(db, info, res);
 });
 
-app.get('/getApplicationByWork', (req, res) => {
+app.get('/getApplication', (req, res) => {
     var info = JSON.parse(url.parse(req.url, true).query.info);
-    common.getApplicationByWork(db, info, res);
+    common.getApplication(db, info, res);
 });
 
 //学生
@@ -72,7 +72,18 @@ app.get('/submitWork', (req, res) => {
 
 app.get('/studentGetApplicationByMatch', (req, res) => {
     var info = JSON.parse(url.parse(req.url, true).query.info);
-    student.getApplicationByMatch(db, info, res);
+    student.studentGetApplicationByMatch(db, info, res);
+});
+
+//专家
+app.get('/expertRegister', (req, res) => {
+    var info = JSON.parse(url.parse(req.url, true).query.info);
+    expert.register(db, info, res);
+});
+
+app.get('/expertLogin', (req, res) => {
+    var info = JSON.parse(url.parse(req.url, true).query.info);
+    expert.login(db, info, res);
 });
 
 //校团委

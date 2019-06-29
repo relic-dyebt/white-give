@@ -17,7 +17,7 @@ module.exports.createMatch = function(db, info, res) {
     ];
     console.log(sql + '\n' + sqlParams.toString() + '\n');
     
-    db.query(sql, sqlParams, err => {
+    db.query(sql, sqlParams, (err, data) => {
         if (err) {
             ret.err = true;
             ret.msg = 'Database error(INSERT).';
@@ -25,6 +25,7 @@ module.exports.createMatch = function(db, info, res) {
         } else {
             ret.err = false;
             ret.msg = 'Create match successfully.';
+            ret.matchId = data.insertId;
             res.send(JSON.stringify(ret));
         }
     });

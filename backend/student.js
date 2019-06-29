@@ -38,7 +38,7 @@ module.exports.register = function(db, info, res) {
             ];
             console.log(sql + '\n' + sqlParams.toString() + '\n');
 
-            //插入用户
+            //插入学生
             db.query(sql, sqlParams, (err, data) => {
                 if (err) {
                     ret.err = true;
@@ -180,7 +180,7 @@ module.exports.submitWork = function(db, info, res) {
     });
 }
 
-//学生根据比赛获取已填写申请
+//学生根据比赛获取申请
 module.exports.studentGetApplicationByMatch = function(db, info, res) {
     console.log('Student Get Application By Match');
 

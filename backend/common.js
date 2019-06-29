@@ -15,8 +15,7 @@ module.exports.getMatchByDate = function(db, info, res) {
             ret.err = true;
             ret.msg = 'Database error(SELECT).';
             res.send(JSON.stringify(ret));
-        }
-        else {
+        } else {
             ret.err = false;
             ret.msg = 'Get match successfully.';
             ret.data = data;
@@ -40,8 +39,7 @@ module.exports.getWork = function(db, info, res) {
             ret.err = true;
             ret.msg = 'Database error(SELECT).';
             res.send(JSON.stringify(ret));
-        }
-        else {
+        } else {
             ret.err = false;
             ret.msg = 'Get work successfully.';
             ret.data = data[0];
