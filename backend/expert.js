@@ -2,7 +2,7 @@ var util = require('./util');
 
 //专家注册
 module.exports.register = function(db, info, res) {
-    console.log('Expert Register');
+    console.log('Expert - Register\n' + util.getTime());
 
     //搜索邮箱
     var ret = { err: null, msg: null };
@@ -21,8 +21,8 @@ module.exports.register = function(db, info, res) {
             res.send(JSON.stringify(ret));
         } else {
             var sql = 
-                'INSERT INTO Expert(username, password, name, introduction, profile_url, phone, email) ' +
-                util.values(7);
+                'INSERT INTO Expert(username, password, name, introduction, profile_url, phone, email, category) ' +
+                util.values(8);
             var sqlParams = [
                 info.username,
                 info.password,
@@ -30,7 +30,8 @@ module.exports.register = function(db, info, res) {
                 info.introduction,
                 info.profileUrl,
                 info.phone,
-                info.email
+                info.email,
+                info.category
             ];
             console.log(sql + '\n' + sqlParams.toString() + '\n');
 
@@ -52,7 +53,7 @@ module.exports.register = function(db, info, res) {
 
 //专家登录
 module.exports.login = function(db, info, res) {
-    console.log('Student Login');
+    console.log('Student - Login\n' + util.getTime());
 
     //搜索邮箱和密码
     var ret = { err: null, msg: null };
@@ -80,7 +81,7 @@ module.exports.login = function(db, info, res) {
 
 //专家修改密码
 module.exports.expertSetPassword = function(db, info, res) {
-    console.log('Expert Set Password');
+    console.log('Expert - Set password\n' + util.getTime());
 
     //更改密码
     var ret = { err: null, msg: null };
