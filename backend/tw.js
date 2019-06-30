@@ -6,7 +6,7 @@ module.exports.createMatch = function(db, info, res) {
 
     var ret = { err: null, msg: null };
     var sql = 
-        'INSERT INTO `Match`(name, start_date, end_date, introduction, cover_url) ' +
+        'INSERT INTO `Match`(name, startDate, endDate, introduction, coverUrl) ' +
         util.values(5);
     var sqlParams = [
         info.name,

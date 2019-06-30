@@ -7,7 +7,7 @@ module.exports.register = function(db, info, res) {
 
     //搜索学号或用户名
     var ret = { err: null, msg: null };
-    var sql = 'SELECT COUNT(*) AS cnt FROM Student WHERE student_number = ? OR username = ?';
+    var sql = 'SELECT COUNT(*) AS cnt FROM Student WHERE studentNumber = ? OR username = ?';
     var sqlParams = [ info.studentNumber, info.username ];
     console.log(sql + '\n' + sqlParams.toString() + '\n');
 
@@ -22,7 +22,7 @@ module.exports.register = function(db, info, res) {
             res.send(JSON.stringify(ret));
         } else {
             var sql = 
-                'INSERT INTO Student(username, password, name, introduction, profile_url, phone, email, department, major, enrollment_year, student_number) ' +
+                'INSERT INTO Student(username, password, name, introduction, profileUrl, phone, email, department, major, enrollmentYear, studentNumber) ' +
                 util.values(11);
             var sqlParams = [
                 info.username,
@@ -61,7 +61,7 @@ module.exports.login = function(db, info, res) {
 
     //搜索学号和密码
     var ret = { err: null, msg: null };
-    var sql = 'SELECT * FROM Student WHERE student_number = ? AND `password` = ?';
+    var sql = 'SELECT * FROM Student WHERE studentNumber = ? AND `password` = ?';
     var sqlParams = [ info.studentNumber, info.password ];
     console.log(sql + '\n' + sqlParams.toString() + '\n');
 
@@ -90,18 +90,18 @@ module.exports.submitApplication = function(db, info, res) {
     //插入申请
     var ret = { err: null, msg: null };
     var sql = 
-        'INSERT INTO Application(department, application_category, name, student_number, birthday, educational_background, major, enrollment_year, work_name, address, phone, email, ' + 
-        'c1_name, c1_student_number, c1_educational_background, c1_phone, c1_email, ' +
-        'c2_name, c2_student_number, c2_educational_background, c2_phone, c2_email, ' +
-        'c3_name, c3_student_number, c3_educational_background, c3_phone, c3_email, ' +
-        'c4_name, c4_student_number, c4_educational_background, c4_phone, c4_email, ' +
-        'category, introduction, innovation, keyword, state, match_id, work_id) ' +
+        'INSERT INTO Application(department, applicationCategory, name, studentNumber, birthday, eduBackground, major, enrollmentYear, workName, address, phone, email, ' + 
+        'c1Name, c1StudentNumber, c1EduBackground, c1Phone, c1Email, ' +
+        'c2Name, c2StudentNumber, c2EduBackground, c2Phone, c2Email, ' +
+        'c3Name, c3StudentNumber, c3EduBackground, c3Phone, c3Email, ' +
+        'c4Name, c4StudentNumber, c4EduBackground, c4Phone, c4Email, ' +
+        'category, introduction, innovation, keyword, state, matchId, workId) ' +
         util.values(39);
     var sqlParams = [
         info.department,
         info.appCategory,
         info.name,
-        info.student_number,
+        info.studentNumber,
         info.birthday,
         info.eduBackground,
         info.major,
@@ -148,7 +148,7 @@ module.exports.submitWork = function(db, info, res) {
     //插入作品
     var ret = { err: null, msg: null };
     var sql = 
-        'INSERT INTO `Work`(student_number, application_id, document_url_list, picture_url_list, video_url_list) ' +
+        'INSERT INTO `Work`(studentNumber, applicationId, documentUrlList, pictureUrlList, videoUrlList) ' +
         util.values(5);
     var sqlParams = [
         info.studentNumber,
@@ -166,7 +166,7 @@ module.exports.submitWork = function(db, info, res) {
             res.send(JSON.stringify(ret));
         } else {
             //更新相关申请
-            var sql = 'UPDATE Application SET work_id = ? WHERE id = ?';
+            var sql = 'UPDATE Application SET workId = ? WHERE id = ?';
             var sqlParams = [ data.insertId, info.applicationId ];
             console.log(sql + '\n' + sqlParams.toString() + '\n');
 
@@ -192,7 +192,7 @@ module.exports.studentGetApplicationByMatch = function(db, info, res) {
 
     //搜索申请
     var ret = { err: null, msg: null };
-    var sql = 'SELECT * FROM Application WHERE student_number = ? AND match_id = ?';
+    var sql = 'SELECT * FROM Application WHERE studentNumber = ? AND matchId = ?';
     var sqlParams = [ info.studentNumber, info.matchId ];
     console.log(sql + '\n' + sqlParams.toString() + '\n');
 
@@ -221,7 +221,7 @@ module.exports.studentSetPassword = function(db, info, res) {
 
     //更改密码
     var ret = { err: null, msg: null };
-    var sql = 'UPDATE Student SET `password` = ? WHERE student_number = ?';
+    var sql = 'UPDATE Student SET `password` = ? WHERE studentNumber = ?';
     var sqlParams = [ info.password, info.studentNumber ];
     console.log(sql + '\n' + sqlParams.toString() + '\n');
 

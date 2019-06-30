@@ -6,7 +6,7 @@ module.exports.getMatchByDate = function(db, info, res) {
 
     //搜索比赛
     var ret = { err: null, msg: null };
-    var sql = 'SELECT * FROM Match WHERE start_date > ? AND end_date < ?';
+    var sql = 'SELECT * FROM Match WHERE startDate > ? AND endDate < ?';
     var sqlParams = [ info.earliestDate, info.latestDate ];
     console.log(sql + '\n' + sqlParams.toString() + '\n');
 

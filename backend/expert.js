@@ -21,7 +21,7 @@ module.exports.register = function(db, info, res) {
             res.send(JSON.stringify(ret));
         } else {
             var sql = 
-                'INSERT INTO Expert(username, password, name, introduction, profile_url, phone, email, category) ' +
+                'INSERT INTO Expert(username, password, name, introduction, profileUrl, phone, email, category) ' +
                 util.values(8);
             var sqlParams = [
                 info.username,
