@@ -2,7 +2,7 @@ var util = require('./util');
 
 //根据时间获取比赛
 module.exports.getMatchByDate = function(db, info, res) {
-    console.log('Common Get Match By Date');
+    console.log('Common - Get match by date.\n' + util.getTime());
 
     //搜索比赛
     var ret = { err: null, msg: null };
@@ -24,9 +24,9 @@ module.exports.getMatchByDate = function(db, info, res) {
     });
 }
 
-//获取作品
-module.exports.getWork = function(db, info, res) {
-    console.log('Common Get Work');
+//根据ID获取作品
+module.exports.getWorkById = function(db, info, res) {
+    console.log('Common - Get work\n' + util.getTime());
 
     //搜索作品
     var ret = { err: null, msg: null };
@@ -48,9 +48,9 @@ module.exports.getWork = function(db, info, res) {
     });
 }
 
-//获取申请
-module.exports.getApplication = function(db, info, res) {
-    console.log('Common Get Application');
+//根据ID获取申请
+module.exports.getApplicationById = function(db, info, res) {
+    console.log('Common - Get application\n' + util.getTime());
 
     //搜索申请
     var ret = { err: null, msg: null };

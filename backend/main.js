@@ -3,6 +3,7 @@ var http = require('http');
 var url = require('url');
 var mysql = require('mysql');
 
+var util = require('./util');
 var common = require('./common');
 var student = require('./student');
 var tw = require('./tw');
@@ -23,7 +24,7 @@ db.connect();
 
 http.createServer(app).listen(30000);
 
-console.log("Server is running.");
+console.log('Server is running.\n' + util.getTime() + '\n');
 
 //跨域
 app.use(function(req, res, next) {
@@ -39,14 +40,14 @@ app.get('/getMatchByDate', (req, res) => {
     common.getMatchByDate(db, info, res);
 });
 
-app.get('/getWork', (req, res) => {
+app.get('/getWorkById', (req, res) => {
     var info = JSON.parse(url.parse(req.url, true).query.info);
-    common.getWork(db, info, res);
+    common.getWorkById(db, info, res);
 });
 
-app.get('/getApplication', (req, res) => {
+app.get('/getApplicationById', (req, res) => {
     var info = JSON.parse(url.parse(req.url, true).query.info);
-    common.getApplication(db, info, res);
+    common.getApplicationById(db, info, res);
 });
 
 //学生

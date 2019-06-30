@@ -4,10 +4,18 @@
   "description": "a white-give project",
   "dependencies": {
     "express": "^4.17.1",
-    "mysql": "latest"
+    "mysql": "^2.17.1",
+    "nodemailer": "^6.2.1",
+    "nodemailer-smtp-transport": "^2.7.4"
   },
-  "contributors":[
-  	{"name":"Wang Zhengfei","email":"goodapple8946@163.com"},
-  	{"name":"YcZh","email":"3037796513@qq.com"}
+  "contributors": [
+    {
+      "name": "Wang Zhengfei",
+      "email": "goodapple8946@163.com"
+    },
+    {
+      "name": "YcZh",
+      "email": "3037796513@qq.com"
+    }
   ]
 }

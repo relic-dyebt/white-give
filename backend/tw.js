@@ -2,7 +2,7 @@ var util = require('./util');
 
 //创建比赛
 module.exports.createMatch = function(db, info, res) {
-    console.log('Tw Create Match');
+    console.log('Tw - Create match\n' + util.getTime());
 
     var ret = { err: null, msg: null };
     var sql = 
@@ -33,14 +33,14 @@ module.exports.createMatch = function(db, info, res) {
 
 //根据审核状态获取申请
 module.exports.getApplicationByState = function(db, info, res) {
-    console.log('Tw Get Application By State');
+    console.log('Tw - Get application by state\n' + util.getTime());
 
     var ret = { err: null, msg: null };
     var sql = 'SELECT * FROM Application' + (info.state ? ' WHERE state = ?' : '');
     var sqlParams = [ info.state ];
     console.log(sql + '\n' + sqlParams.toString() + '\n');
     
-    db.query(sql, sqlParams, err => {
+    db.query(sql, sqlParams, (err, data) => {
         if (err) {
             ret.err = true;
             ret.msg = 'Database error(SELECT).';
@@ -48,6 +48,7 @@ module.exports.getApplicationByState = function(db, info, res) {
         } else {
             ret.err = false;
             ret.msg = 'Get application successfully.';
+            ret.data = data;
             res.send(JSON.stringify(ret));
         }
     });
@@ -55,14 +56,14 @@ module.exports.getApplicationByState = function(db, info, res) {
 
 //设置申请审核状态
 module.exports.setApplicationState = function(db, info, res) {
-    console.log('Tw Set Application State');
+    console.log('Tw - Set application state\n' + util.getTime());
 
     var ret = { err: null, msg: null };
     var sql = 'UPDATE Application SET state = ? WHERE id = ?';
     var sqlParams = [ info.state, info.id ];
     console.log(sql + '\n' + sqlParams.toString() + '\n');
     
-    db.query(sql, sqlParams, err => {
+    db.query(sql, sqlParams, (err, data) => {
         if (err) {
             ret.err = true;
             ret.msg = 'Database error(UPDATE).';
