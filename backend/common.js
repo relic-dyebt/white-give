@@ -8,10 +8,9 @@ module.exports.getMatchByDate = function(db, info, res) {
     var ret = { err: null, msg: null };
     var sql = 'SELECT * FROM Match WHERE startDate > ? AND endDate < ?';
     var sqlParams = [ info.earliestDate, info.latestDate ];
-    console.log(sql + '\n' + sqlParams.toString() + '\n');
-
     db.query(sql, sqlParams, (err, data) => {
         if (err) {
+            console.log(err);
             ret.err = true;
             ret.msg = 'Database error(SELECT).';
             res.send(JSON.stringify(ret));
@@ -32,10 +31,9 @@ module.exports.getWorkById = function(db, info, res) {
     var ret = { err: null, msg: null };
     var sql = 'SELECT * FROM Work WHERE id = ?';
     var sqlParams = [ info.id ];
-    console.log(sql + '\n' + sqlParams.toString() + '\n');
-
     db.query(sql, sqlParams, (err, data) => {
         if (err) {
+            console.log(err);
             ret.err = true;
             ret.msg = 'Database error(SELECT).';
             res.send(JSON.stringify(ret));
@@ -56,10 +54,9 @@ module.exports.getApplicationById = function(db, info, res) {
     var ret = { err: null, msg: null };
     var sql = 'SELECT * FROM Application WHERE id = ?';
     var sqlParams = [ info.id ];
-    console.log(sql + '\n' + sqlParams.toString() + '\n');
-
     db.query(sql, sqlParams, (err, data) => {
         if (err) {
+            console.log(err);
             ret.err = true;
             ret.msg = 'Database error(SELECT).';
             res.send(JSON.stringify(ret));

@@ -1,3 +1,5 @@
+var formidable = require('formidable');
+
 var util = require('./util');
 var system = require('./system');
 
@@ -9,10 +11,9 @@ module.exports.register = function(db, info, res) {
     var ret = { err: null, msg: null };
     var sql = 'SELECT COUNT(*) AS cnt FROM Student WHERE studentNumber = ? OR username = ?';
     var sqlParams = [ info.studentNumber, info.username ];
-    console.log(sql + '\n' + sqlParams.toString() + '\n');
-
     db.query(sql, sqlParams, (err, data) => {
         if (err) {
+            console.log(err);
             ret.err = true;
             ret.msg = 'Database error(SELECT).';
             res.send(JSON.stringify(ret));
@@ -21,8 +22,9 @@ module.exports.register = function(db, info, res) {
             ret.msg = 'Duplicate student number or username.';
             res.send(JSON.stringify(ret));
         } else {
+            //插入学生
             var sql = 
-                'INSERT INTO Student(username, password, name, introduction, profileUrl, phone, email, department, major, enrollmentYear, studentNumber) ' +
+                'INSERT INTO Student ' +
                 util.values(11);
             var sqlParams = [
                 info.username,
@@ -37,11 +39,9 @@ module.exports.register = function(db, info, res) {
                 info.enrollmentYear,
                 info.studentNumber
             ];
-            console.log(sql + '\n' + sqlParams.toString() + '\n');
-
-            //插入学生
             db.query(sql, sqlParams, (err, data) => {
                 if (err) {
+                    console.log(err);
                     ret.err = true;
                     ret.msg = 'Database error(INSERT).';
                     res.send(JSON.stringify(ret));
@@ -63,10 +63,9 @@ module.exports.login = function(db, info, res) {
     var ret = { err: null, msg: null };
     var sql = 'SELECT * FROM Student WHERE studentNumber = ? AND `password` = ?';
     var sqlParams = [ info.studentNumber, info.password ];
-    console.log(sql + '\n' + sqlParams.toString() + '\n');
-
     db.query(sql, sqlParams, (err, data) => {
         if (err) {
+            console.log(err);
             ret.err = true;
             ret.msg = 'Database error(SELECT).';
             res.send(JSON.stringify(ret));
@@ -86,18 +85,13 @@ module.exports.login = function(db, info, res) {
 //学生提交申请
 module.exports.submitApplication = function(db, info, res) {
     console.log('Student - Submit application\n' + util.getTime());
-    
+
     //插入申请
     var ret = { err: null, msg: null };
     var sql = 
-        'INSERT INTO Application(department, applicationCategory, name, studentNumber, birthday, eduBackground, major, enrollmentYear, workName, address, phone, email, ' + 
-        'c1Name, c1StudentNumber, c1EduBackground, c1Phone, c1Email, ' +
-        'c2Name, c2StudentNumber, c2EduBackground, c2Phone, c2Email, ' +
-        'c3Name, c3StudentNumber, c3EduBackground, c3Phone, c3Email, ' +
-        'c4Name, c4StudentNumber, c4EduBackground, c4Phone, c4Email, ' +
-        'category, introduction, innovation, keyword, state, matchId, workId) ' +
-        util.values(39);
+        'INSERT INTO Application ' + util.values(40);
     var sqlParams = [
+        0,
         info.department,
         info.appCategory,
         info.name,
@@ -119,13 +113,12 @@ module.exports.submitApplication = function(db, info, res) {
         info.innovation,
         info.keyword,
         info.state,
+        info.fileUrl,
         info.matchId,
-        info.workId
     ];
-    console.log(sql + '\n' + sqlParams.toString() + '\n');
-
     db.query(sql, sqlParams, (err, data) => {
         if (err) {
+            console.log(err);
             ret.err = true;
             ret.msg = 'Database error(INSERT).';
             res.send(JSON.stringify(ret));
@@ -136,52 +129,8 @@ module.exports.submitApplication = function(db, info, res) {
             res.send(JSON.stringify(ret));
 
             //邀请专家，并创建评审表
-            system.inviteExpert(db, data.insertId);
-        }
-    });
-}
-
-//学生提交作品
-module.exports.submitWork = function(db, info, res) {
-    console.log('Student - Submit work\n' + util.getTime());
-    
-    //插入作品
-    var ret = { err: null, msg: null };
-    var sql = 
-        'INSERT INTO `Work`(studentNumber, applicationId, documentUrlList, pictureUrlList, videoUrlList) ' +
-        util.values(5);
-    var sqlParams = [
-        info.studentNumber,
-        info.applicationId,
-        info.documentUrlList,
-        info.pictureUrlList,
-        info.videoUrlList
-    ];
-    console.log(sql + '\n' + sqlParams.toString() + '\n');
-
-    db.query(sql, sqlParams, (err, data) => {
-        if (err) {
-            ret.err = true;
-            ret.msg = 'Database error(INSERT).';
-            res.send(JSON.stringify(ret));
-        } else {
-            //更新相关申请
-            var sql = 'UPDATE Application SET workId = ? WHERE id = ?';
-            var sqlParams = [ data.insertId, info.applicationId ];
-            console.log(sql + '\n' + sqlParams.toString() + '\n');
-
-            db.query(sql, sqlParams, (err, data) => {
-                if (err) {
-                    ret.err = true;
-                    ret.msg = 'Database error(UPDATE).'
-                    res.send(JSON.stringify(ret));
-                } else {
-                    ret.err = false;
-                    ret.msg = 'Submit work successfully.';
-                    ret.workId = data.insertId;
-                    res.send(JSON.stringify(ret));
-                }
-            });
+            var info = { applicationId: data.insertId };
+            system.inviteExpert(db, info, res);
         }
     });
 }
@@ -194,10 +143,9 @@ module.exports.studentGetApplicationByMatch = function(db, info, res) {
     var ret = { err: null, msg: null };
     var sql = 'SELECT * FROM Application WHERE studentNumber = ? AND matchId = ?';
     var sqlParams = [ info.studentNumber, info.matchId ];
-    console.log(sql + '\n' + sqlParams.toString() + '\n');
-
     db.query(sql, sqlParams, (err, data) => {
         if (err) {
+            console.log(err);
             ret.err = true;
             ret.msg = 'Database error(SELECT).';
             res.send(JSON.stringify(ret));
@@ -223,10 +171,9 @@ module.exports.studentSetPassword = function(db, info, res) {
     var ret = { err: null, msg: null };
     var sql = 'UPDATE Student SET `password` = ? WHERE studentNumber = ?';
     var sqlParams = [ info.password, info.studentNumber ];
-    console.log(sql + '\n' + sqlParams.toString() + '\n');
-
     db.query(sql, sqlParams, (err, data) => {
         if (err) {
+            console.log(err);
             ret.err = true;
             ret.msg = 'Database error(UPDATE).';
             res.send(JSON.stringify(ret));

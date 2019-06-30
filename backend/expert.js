@@ -8,10 +8,9 @@ module.exports.register = function(db, info, res) {
     var ret = { err: null, msg: null };
     var sql = 'SELECT COUNT(*) AS cnt FROM Expert WHERE email = ?';
     var sqlParams = [ info.email ];
-    console.log(sql + '\n' + sqlParams.toString() + '\n');
-
     db.query(sql, sqlParams, (err, data) => {
         if (err) {
+            console.log(err);
             ret.err = true;
             ret.msg = 'Database error(SELECT).';
             res.send(JSON.stringify(ret));
@@ -20,10 +19,12 @@ module.exports.register = function(db, info, res) {
             ret.msg = 'Duplicate email.';
             res.send(JSON.stringify(ret));
         } else {
+            //插入专家
             var sql = 
-                'INSERT INTO Expert(username, password, name, introduction, profileUrl, phone, email, category) ' +
+                'INSERT INTO Expert ' +
                 util.values(8);
             var sqlParams = [
+                0,
                 info.username,
                 info.password,
                 info.name,
@@ -33,11 +34,9 @@ module.exports.register = function(db, info, res) {
                 info.email,
                 info.category
             ];
-            console.log(sql + '\n' + sqlParams.toString() + '\n');
-
-            //插入专家
             db.query(sql, sqlParams, (err, data) => {
                 if (err) {
+                    console.log(err);
                     ret.err = true;
                     ret.msg = 'Database error(INSERT).';
                     res.send(JSON.stringify(ret));
@@ -59,10 +58,9 @@ module.exports.login = function(db, info, res) {
     var ret = { err: null, msg: null };
     var sql = 'SELECT * FROM Expert WHERE email = ? AND `password` = ?';
     var sqlParams = [ info.email, info.password ];
-    console.log(sql + '\n' + sqlParams.toString() + '\n');
-
     db.query(sql, sqlParams, (err, data) => {
         if (err) {
+            console.log(err);
             ret.err = true;
             ret.msg = 'Database error(SELECT).';
             res.send(JSON.stringify(ret));
@@ -87,10 +85,9 @@ module.exports.expertSetPassword = function(db, info, res) {
     var ret = { err: null, msg: null };
     var sql = 'UPDATE Expert SET `password` = ? WHERE email = ?';
     var sqlParams = [ info.password, info.email ];
-    console.log(sql + '\n' + sqlParams.toString() + '\n');
-
     db.query(sql, sqlParams, (err, data) => {
         if (err) {
+            console.log(err);
             ret.err = true;
             ret.msg = 'Database error(UPDATE).';
             res.send(JSON.stringify(ret));

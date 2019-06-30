@@ -2,6 +2,7 @@ var express = require('express');
 var http = require('http');
 var url = require('url');
 var mysql = require('mysql');
+var mutipart= require('connect-multiparty');
 
 var util = require('./util');
 var common = require('./common');
@@ -12,6 +13,7 @@ var system = require('./system');
 var genpdf = require('./genpdf');
 
 var app = express();
+var mutipartMiddeware = mutipart();
 
 var db = mysql.createConnection({
     host: 'cdb-cp9aouco.bj.tencentcdb.com',
@@ -34,6 +36,11 @@ app.use(function(req, res, next) {
     res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
     next();
 });
+
+//上传文件路径
+app.use(mutipart({
+    uploadDir:'/var/ftp/pub/data/work'
+}));
 
 //通用
 app.get('/getMatchByDate', (req, res) => {
@@ -70,11 +77,6 @@ app.get('/studentSetPassword', (req, res) => {
 app.get('/submitApplication', (req, res) => {
     var info = JSON.parse(url.parse(req.url, true).query.info);
     student.submitApplication(db, info, res);
-});
-
-app.get('/submitWork', (req, res) => {
-    var info = JSON.parse(url.parse(req.url, true).query.info);
-    student.submitWork(db, info, res);
 });
 
 app.get('/studentGetApplicationByMatch', (req, res) => {
@@ -117,4 +119,9 @@ app.get('/setApplicationState', (req, res) => {
 app.get('/getPdfApplication',(req,res)=> {
     var info = JSON.parse(url.parse(req.url, true).query.info);
     genpdf.getPdfApplication(db,info,res);
+});
+
+//系统
+app.post('/upload', mutipartMiddeware, (req, res) => {
+    system.upload(req.files, res);
 });

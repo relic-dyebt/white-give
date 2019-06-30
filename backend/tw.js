@@ -4,21 +4,22 @@ var util = require('./util');
 module.exports.createMatch = function(db, info, res) {
     console.log('Tw - Create match\n' + util.getTime());
 
+    //插入比赛
     var ret = { err: null, msg: null };
     var sql = 
-        'INSERT INTO `Match`(name, startDate, endDate, introduction, coverUrl) ' +
+        'INSERT INTO `Match` ' +
         util.values(5);
     var sqlParams = [
+        0,
         info.name,
         info.startDate,
         info.endDate,
         info.introduction,
         info.coverUrl
     ];
-    console.log(sql + '\n' + sqlParams.toString() + '\n');
-    
     db.query(sql, sqlParams, (err, data) => {
         if (err) {
+            console.log(err);
             ret.err = true;
             ret.msg = 'Database error(INSERT).';
             res.send(JSON.stringify(ret));
@@ -35,13 +36,13 @@ module.exports.createMatch = function(db, info, res) {
 module.exports.getApplicationByState = function(db, info, res) {
     console.log('Tw - Get application by state\n' + util.getTime());
 
+    //搜索申请
     var ret = { err: null, msg: null };
     var sql = 'SELECT * FROM Application' + (info.state ? ' WHERE state = ?' : '');
     var sqlParams = [ info.state ];
-    console.log(sql + '\n' + sqlParams.toString() + '\n');
-    
     db.query(sql, sqlParams, (err, data) => {
         if (err) {
+            console.log(err);
             ret.err = true;
             ret.msg = 'Database error(SELECT).';
             res.send(JSON.stringify(ret));
@@ -58,13 +59,13 @@ module.exports.getApplicationByState = function(db, info, res) {
 module.exports.setApplicationState = function(db, info, res) {
     console.log('Tw - Set application state\n' + util.getTime());
 
+    //更改申请
     var ret = { err: null, msg: null };
     var sql = 'UPDATE Application SET state = ? WHERE id = ?';
     var sqlParams = [ info.state, info.id ];
-    console.log(sql + '\n' + sqlParams.toString() + '\n');
-    
     db.query(sql, sqlParams, (err, data) => {
         if (err) {
+            console.log(err);
             ret.err = true;
             ret.msg = 'Database error(UPDATE).';
             res.send(JSON.stringify(ret));

@@ -3,55 +3,81 @@ var smtpTransport = require('nodemailer-smtp-transport');
 
 var util = require('./util');
 
-//系统给参与评审的专家发送评审邀请
-module.exports.inviteExpert = function(db, applicationId) {
+//邀请专家参与评审
+module.exports.inviteExpert = function(db, info, res) {
     console.log('System - Invite expert\n' + util.getTime());
 
     //搜索申请
     var sql = 'SELECT * FROM Application WHERE id = ?';
-    var sqlParams = [ applicationId ];
-    console.log(sql + '\n' + sqlParams.toString() + '\n');
-
+    var sqlParams = [ info.applicationId ];
     db.query(sql, sqlParams, (err, data) => {
         if (err) {
             console.log(err);
         } else {
-            //搜索专家
-            var sql = 'SELECT * FROM Expert WHERE category = ? ORDER BY RAND()';
-            var sqlParams = [ data[0].category ];
-            console.log(sql + '\n' + sqlParams.toString() + '\n');
+            var matchId = data[0].matchId;
+            var category = data[0].category;
 
+            //搜索比赛
+            var sql = 'SELECT * FROM `Match` WHERE id = ?';
+            var sqlParams = [ matchId ];
             db.query(sql, sqlParams, (err, data) => {
                 if (err) {
                     console.log(err);
                 } else {
-                    //发送邮件
-                    var msg = '邀请您来参加评审吧，为学校的科技工作出一份力！';
-                    var send = nodemailer.createTransport(smtpTransport({
-                        service: '163',
-                        auth: {
-                            user: 'goodapple8946@163.com',
-                            pass: 'whitegive123'
-                        }
-                    }));
-                    for (var i = 0; i < 3 && i < data.length; i++) {
-                        console.log(i);
-                        send.sendMail({
-                            from: 'goodapple8946@163.com',
-                            to: data[i].email,
-                            subject: '科技作品评审',
-                            html: msg
-                        }, (err, res) => {
-                            if (err) {
-                                console.log(err);
-                            } else {
-                                console.log('Send invatation to expert successfully.')
+                    var name = data[0].name;
+
+                    //搜索专家
+                    var sql = 'SELECT * FROM Expert WHERE category = ? ORDER BY RAND()';
+                    var sqlParams = [ category ];
+                    db.query(sql, sqlParams, (err, data) => {
+                        if (err) {
+                            console.log(err);
+                        } else {
+                            var msg = '北航校团委邀请您参与比赛《' + name + '》的评审工作！';
+                            var send = nodemailer.createTransport(smtpTransport({
+                                service: '163',
+                                auth: {
+                                    user: 'goodapple8946@163.com',
+                                    pass: 'whitegive123'
+                                }
+                            }));
+                            for (var i = 0; i < 3 && i < data.length; i++) {
+                                var email = data[i].email;
+                                var expertId = data[i].id;
+
+                                //插入评审
+                                var sql = 'INSERT INTO Assessment ' + util.values(5);
+                                var sqlParams = [ 0, expertId, info.applicationId, "auditing", 0 ];
+                                db.query(sql, sqlParams, (err, data) => {
+                                    if (err) {
+                                        console.log(err);
+                                    } else {
+
+                                        //发送邮件
+                                        send.sendMail({
+                                            from: 'goodapple8946@163.com',
+                                            to: email,
+                                            subject: '比赛评审工作邀请',
+                                            html: msg
+                                        }, (err, res) => {
+                                            if (err) {
+                                                console.log(err);
+                                            } else {
+                                                console.log('Invite expert successfully.')
+                                            }
+                                        });
+                                    }
+                                });
                             }
-                        });
-                    }
+                        }
+                    });
                 }
             });
         }
     });
 }
 
+//上传文件
+module.exports.upload = function(files, res) {
+    console.log('System - Upload\n' + util.getTime());
+}
