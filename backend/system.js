@@ -91,12 +91,31 @@ module.exports.upload = function(files, res) {
         if (err) {
             console.log(err);
             ret.err = true;
-            ret.msg = 'Rename failed.';
+            ret.msg = 'Upload failed.';
             res.send(JSON.stringify(ret));
         } else {
             ret.err = false;
             ret.msg = 'Upload Successfully.';
             ret.url = newPath;
+            res.send(JSON.stringify(ret));
+        }
+    });
+}
+
+//根据URL删除文件
+module.exports.deleteByUrl = function(info, res) {
+    console.log('System - Delete\n' + util.getTime());
+
+    //删除文件
+    fs.unlink(info.url, err => {
+        if (err) {
+            console.log(err);
+            ret.err = true;
+            ret.msg = 'Remove failed.';
+            res.send(JSON.stringify(ret));
+        } else {
+            ret.err = false;
+            ret.msg = 'Upload Successfully.';
             res.send(JSON.stringify(ret));
         }
     });
