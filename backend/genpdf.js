@@ -30,9 +30,43 @@ module.exports.getPdfApplication=function (db, info,res) {
 
             doc.loadZip(zip);
             doc.setData({
-                "work_id": application.id,
-
-
+                "id": application.id,
+                "department": application.department,
+                "appCategory":application.appCategory,
+                "name": application.name,
+                "studentNumber": application.studentNumber,
+                "birthday":application.birthday,
+                "eduBackground":application.eduBackground,
+                "major":application.major,
+                "enrollmentYear":application.enrollmentYear,
+                "workName":application.workName,
+                "address":application.address,
+                "phone":application.phone,
+                "email":application.email,
+                "c1Name":application.c1Name,
+                "c1StudentNumber":application.c1StudentNumber,
+                "c1EduBackground":application.c1EduBackground,
+                "c1Email":application.c1Email,
+                "c1Phone":application.c1Phone,
+                "c2Name":application.c2Name,
+                "c2StudentNumber":application.c2StudentNumber,
+                "c2EduBackground":application.c2EduBackground,
+                "c2Email":application.c2Email,
+                "c2Phone":application.c2Phone,
+                "c3Name":application.c3Name,
+                "c3StudentNumber":application.c3StudentNumber,
+                "c3EduBackground":application.c3EduBackground,
+                "c3Email":application.c3Email,
+                "c3Phone":application.c3Phone,
+                "c4Name":application.c4Name,
+                "c4StudentNumber":application.c4StudentNumber,
+                "c4EduBackground":application.c4EduBackground,
+                "c4Email":application.c4Email,
+                "c4Phone":application.c4Phone,
+                "category":application.category,
+                "introduction":application.introduction,
+                "innovation":application.innovation,
+                "keyword":application.keyword
             });
 
             try {
