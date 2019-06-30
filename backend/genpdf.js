@@ -89,7 +89,7 @@ module.exports.getPdfApplication=function (db, info,res) {
             }
 
             var buf = doc.getZip().generate({ type: 'nodebuffer' });
-            
+
             toPdf(buf).then(
                 (pdfBuffer) => {
                     fs.writeFileSync(path.join(__dirname, '../data/application/'+application.studentNumber.toString()+'_'+application.name+ '申请表格.pdf'), pdfBuffer)
