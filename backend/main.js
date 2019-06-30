@@ -39,7 +39,7 @@ app.use(function(req, res, next) {
 
 //上传文件路径
 app.use(mutipart({
-    uploadDir:'/var/ftp/pub/data/work'
+    uploadDir:'/var/ftp/pub/data/temp'
 }));
 
 //通用

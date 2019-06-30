@@ -1,5 +1,6 @@
 var nodemailer = require('nodemailer');
 var smtpTransport = require('nodemailer-smtp-transport');
+var fs = require('fs');
 
 var util = require('./util');
 
@@ -80,4 +81,23 @@ module.exports.inviteExpert = function(db, info, res) {
 //上传文件
 module.exports.upload = function(files, res) {
     console.log('System - Upload\n' + util.getTime());
+
+    //移动并重命名文件
+    var ret = { err: null, msg: null };
+    var oldPath = files.fileUpload.path;
+    var newPath = oldPath.replace('/temp/', '/work/');
+
+    fs.rename(oldPath, newPath, err => {
+        if (err) {
+            console.log(err);
+            ret.err = true;
+            ret.msg = 'Rename failed.';
+            res.send(JSON.stringify(ret));
+        } else {
+            ret.err = false;
+            ret.msg = 'Upload Successfully.';
+            ret.url = newPath;
+            res.send(JSON.stringify(ret));
+        }
+    });
 }
