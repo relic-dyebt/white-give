@@ -125,3 +125,8 @@ app.get('/getPdfApplication',(req,res)=> {
 app.post('/upload', mutipartMiddeware, (req, res) => {
     system.upload(req.files, res);
 });
+
+app.get('/deleteByUrl', mutipartMiddeware, (req, res) => {
+    var info = JSON.parse(url.parse(req.url, true).query.info);
+    system.deleteByUrl(info, res);
+});
