@@ -25,7 +25,6 @@ module.exports.getPdfApplication=function (db, info,res) {
             res.send(JSON.stringify(ret));
         } else {
             ret.err=false;
-            console.log(data[0]);
             res.send(JSON.stringify((ret)));
             var application =data[0];
 
