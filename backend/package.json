@@ -4,10 +4,12 @@
   "description": "a white-give project",
   "dependencies": {
     "express": "^4.17.1",
-    "mysql": "latest"
+    "mysql": "latest",
+    "jszip": "2.5.0"
   },
   "contributors":[
   	{"name":"Wang Zhengfei","email":"goodapple8946@163.com"},
-  	{"name":"YcZh","email":"3037796513@qq.com"}
+  	{"name":"YcZh","email":"3037796513@qq.com"},
+    {"name":"Peng Yikang","email": "13121227586@163.com"}
   ]
 }

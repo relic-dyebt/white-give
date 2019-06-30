@@ -8,6 +8,7 @@ var student = require('./student');
 var tw = require('./tw');
 var expert = require('./expert');
 var system = require('./system');
+var genpdf = require('./genpdf');
 
 var app = express();
 
@@ -110,4 +111,9 @@ app.get('/getApplicationByState', (req, res) => {
 app.get('/setApplicationState', (req, res) => {
     var info = JSON.parse(url.parse(req.url, true).query.info);
     tw.setApplicationState(db, info, res);
+});
+
+app.get('/getPdfApplication',(req,res)=> {
+    var info = JSON.parse(url.parse(req.url, true).query.info);
+    genpdf.getPdfApplication(db,info,res);
 });
