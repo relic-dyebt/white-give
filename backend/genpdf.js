@@ -92,7 +92,8 @@ module.exports.getPdfApplication=function (db, info,res) {
 
             toPdf(buf).then(
                 (pdfBuffer) => {
-                    fs.writeFileSync(path.join(__dirname, '../data/application/'+application.studentNumber.toString()+'_'+application.name+ '申请表格.pdf'), pdfBuffer)
+                    fs.writeFileSync(path.join(__dirname, '../data/application/'+
+                        application.studentNumber.toString()+'_'+application.name+ '申请表格'+application.id.toString()+'.pdf'), pdfBuffer)
                 }, (err) => {
                     console.log(err)
                 }
