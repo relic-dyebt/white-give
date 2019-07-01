@@ -10,7 +10,7 @@ var util = require('./util');
 
 var toPdf = require("office-to-pdf");
 
-module.exports.getPdfApplication=function (db, info,res) {
+module.exports.generatePdf=function (db, info,res) {
     console.log('generate pdf file');
     var ret = { err: null, msg: null };
     var sql = 'SELECT * FROM Application WHERE id=?';
