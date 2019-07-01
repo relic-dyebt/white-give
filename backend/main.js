@@ -3,7 +3,7 @@ var http = require('http');
 var url = require('url');
 var mysql = require('mysql');
 var mutipart= require('connect-multiparty');
-
+var genpdf = require('./genpdf');
 var util = require('./util');
 var common = require('./common');
 var student = require('./student');
