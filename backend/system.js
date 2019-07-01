@@ -2,7 +2,16 @@ var nodemailer = require('nodemailer');
 var smtpTransport = require('nodemailer-smtp-transport');
 var fs = require('fs');
 var path = require('path');
+var JSZip = require('jszip');
+var Docxtemplater = require('docxtemplater');
+var toPdf = require("office-to-pdf");
+
 var util = require('./util');
+
+var content = fs.readFileSync(path.join(__dirname, '../data/template/doc.docx'), 'binary');
+
+var zip = new JSZip(content);
+var doc = new Docxtemplater();
 
 //邀请专家参与评审
 module.exports.inviteExpert = function(db, info, res, num) {
@@ -78,8 +87,6 @@ module.exports.inviteExpert = function(db, info, res, num) {
     });
 }
 
-//申请评审完成
-
 //上传文件
 module.exports.upload = function(files, res) {
     console.log('System - Upload\n' + util.getTime());
@@ -106,13 +113,11 @@ module.exports.upload = function(files, res) {
 
 //下载文件
 module.exports.download = function(info, res) {
-    var fileName = info.fileName;
-    var filePath = path.join(__dirname, fileName);
-    var stats = fs.statSync(filePath);
+    var stats = fs.statSync(info.url);
     if (stats.isFile()) {
         res.set({
             'Content-Type': 'application/octet-stream',
-            'Content-Disposition': 'attachment; filename=' + fileName,
+            'Content-Disposition': 'attachment;filename=' + info.fileName,
             'Content-Length': stats.size
         });
         fs.createReadStream(filePath).pipe(res);
@@ -136,6 +141,91 @@ module.exports.deleteByUrl = function(info, res) {
             ret.err = false;
             ret.msg = 'Upload Successfully.';
             res.send(JSON.stringify(ret));
+        }
+    });
+}
+
+//生成PDF
+module.exports.generatePdf = function (db, info, res) {
+    console.log('System - Generate PDF\n' + util.getTime());
+    
+    //搜索申请
+    var ret = { err: null, msg: null };
+    var sql = 'SELECT * FROM Application WHERE id = ?';
+    var sqlParams = [ info.appId ];
+    db.query(sql, sqlParams, (err, data) => {
+        if (err) {
+            console.log(err);
+            ret.err = true;
+            ret.msg = 'Database error(SELECT).';
+            res.send(JSON.stringify(ret));
+        } else {
+            var application = data[0];
+            doc.loadZip(zip);
+            doc.setData({
+                "id": application.id,
+                "department": application.department,
+                "appCategory": application.appCategory,
+                "name": application.name,
+                "studentNumber": application.studentNumber,
+                "birthday": application.birthday,
+                "eduBackground": application.eduBackground,
+                "major": application.major,
+                "enrollmentYear": application.enrollmentYear,
+                "workName": application.workName,
+                "address": application.address,
+                "phone": application.phone,
+                "email": application.email,
+                "c1Name": application.c1Name,
+                "c1StudentNumber": application.c1StudentNumber,
+                "c1EduBackground": application.c1EduBackground,
+                "c1Email": application.c1Email,
+                "c1Phone": application.c1Phone,
+                "c2Name": application.c2Name,
+                "c2StudentNumber": application.c2StudentNumber,
+                "c2EduBackground": application.c2EduBackground,
+                "c2Email": application.c2Email,
+                "c2Phone": application.c2Phone,
+                "c3Name": application.c3Name,
+                "c3StudentNumber": application.c3StudentNumber,
+                "c3EduBackground": application.c3EduBackground,
+                "c3Email": application.c3Email,
+                "c3Phone": application.c3Phone,
+                "c4Name": application.c4Name,
+                "c4StudentNumber": application.c4StudentNumber,
+                "c4EduBackground": application.c4EduBackground,
+                "c4Email": application.c4Email,
+                "c4Phone": application.c4Phone,
+                "category": application.category,
+                "introduction": application.introduction,
+                "innovation": application.innovation,
+                "keyword": application.keyword
+            });
+            try {
+                doc.render();
+            } catch (ex) {
+                console.log(ex);
+                ret.err = true;
+                ret.msg = 'Generate PDF Failed.';
+                res.send(JSON.stringify(ret));
+            }
+            var buf = doc.getZip().generate({ type: 'nodebuffer' });
+            var url = '/var/ftp/pub/data/application/' + application.studentNumber + '_' + application.name + '_' + application.id + '.pdf';
+            toPdf(buf).then(pdfBuffer => {
+                    fs.writeFileSync(url, pdfBuffer)
+                }, err => {
+                    if (err) {
+                        console.log(err);
+                        ret.err = true;
+                        ret.msg = 'Generate PDF Failed.';
+                        res.send(JSON.stringify(ret));
+                    } else {
+                        ret.err = false;
+                        ret.msg = 'Generate PDF Successfully.';
+                        ret.url = url;
+                        res.send(JSON.stringify(ret));
+                    }
+            });
         }
     });
 }

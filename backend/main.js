@@ -142,13 +142,13 @@ app.get('/download', (req, res) => {
     system.download(info, res);
 });
 
-app.get('/deleteByUrl', mutipartMiddeware, (req, res) => {
+app.get('/delete', mutipartMiddeware, (req, res) => {
     var info = JSON.parse(url.parse(req.url, true).query.info);
-    system.deleteByUrl(info, res);
+    system.delete(info, res);
 });
 
 //生成PDF
-app.get('/getPdfApplication', (req, res) => {
+app.get('/generatePdf', (req, res) => {
     var info = JSON.parse(url.parse(req.url, true).query.info);
-    genpdf.getPdfApplication(db, info, res);
+    genpdf.generatePdf(db, info, res);
 });
