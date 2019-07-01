@@ -10,7 +10,6 @@ var student = require('./student');
 var tw = require('./tw');
 var expert = require('./expert');
 var system = require('./system');
-var genpdf = require('./genpdf');
 var path = require('path');
 var fs = require('fs');
 var app = express();
