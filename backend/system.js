@@ -102,6 +102,23 @@ module.exports.upload = function(files, res) {
     });
 }
 
+//下载文件
+module.exports.download = function(info, res) {
+    var fileName = info.fileName;
+    var filePath = path.join(__dirname, fileName);
+    var stats = fs.statSync(filePath);
+    if (stats.isFile()) {
+        res.set({
+            'Content-Type': 'application/octet-stream',
+            'Content-Disposition': 'attachment; filename=' + fileName,
+            'Content-Length': stats.size
+        });
+        fs.createReadStream(filePath).pipe(res);
+    } else {
+        res.end(404);
+    }
+}
+
 //根据URL删除文件
 module.exports.deleteByUrl = function(info, res) {
     console.log('System - Delete\n' + util.getTime());

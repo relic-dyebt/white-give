@@ -132,26 +132,14 @@ app.post('/upload', mutipartMiddeware, (req, res) => {
     system.upload(req.files, res);
 });
 
+app.get('/download', (req, res) => {
+    var info = JSON.parse(url.parse(req.url, true).query.info);
+    system.download(info, res);
+});
+
 app.get('/deleteByUrl', mutipartMiddeware, (req, res) => {
     var info = JSON.parse(url.parse(req.url, true).query.info);
     system.deleteByUrl(info, res);
-});
-
-app.get('/downloadFile', (req, res)=> {
-    var info = JSON.parse(url.parse(req.url, true).query.info);
-    var fileName = info.fileName;
-    var filePath = path.join(__dirname, fileName);
-    var stats = fs.statSync(filePath);
-    if(stats.isFile()){
-        res.set({
-            'Content-Type': 'application/octet-stream',
-            'Content-Disposition': 'attachment; filename='+fileName,
-            'Content-Length': stats.size
-        });
-        fs.createReadStream(filePath).pipe(res);
-    } else {
-        res.end(404);
-    }
 });
 
 //生成PDF
