@@ -89,12 +89,11 @@ module.exports.getPdfApplication=function (db, info,res) {
             }
 
             var buf = doc.getZip().generate({ type: 'nodebuffer' });
-            /* buf is a nodejs buffer, you can either write it to a file or do anything else with it.*/
-            fs.writeFileSync(path.join(__dirname, '../data/application/申请'+application.id.toString()+ '.docx'), buf);
 
             toPdf(buf).then(
                 (pdfBuffer) => {
-                    fs.writeFileSync(path.join(__dirname, '../data/application/申请'+application.id.toString()+ '.pdf'), pdfBuffer)
+                    fs.writeFileSync(path.join(__dirname, '../data/application/'+
+                        application.studentNumber.toString()+'_'+application.name+ '_申请表格'+application.id.toString()+'.pdf'), pdfBuffer)
                 }, (err) => {
                     console.log(err)
                 }

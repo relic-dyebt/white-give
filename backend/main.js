@@ -11,7 +11,8 @@ var tw = require('./tw');
 var expert = require('./expert');
 var system = require('./system');
 var genpdf = require('./genpdf');
-
+var path = require('path');
+var fs = require('fs');
 var app = express();
 var mutipartMiddeware = mutipart();
 
@@ -136,8 +137,24 @@ app.get('/deleteByUrl', mutipartMiddeware, (req, res) => {
     system.deleteByUrl(info, res);
 });
 
+app.get('/downloadFile', (req, res)=> {
+    var info = JSON.parse(url.parse(req.url, true).query.info);
+    var fileName = info.fileName;
+    var filePath = path.join(__dirname, fileName);
+    var stats = fs.statSync(filePath);
+    if(stats.isFile()){
+        res.set({
+            'Content-Type': 'application/octet-stream',
+            'Content-Disposition': 'attachment; filename='+fileName,
+            'Content-Length': stats.size
+        });
+        fs.createReadStream(filePath).pipe(res);
+    } else {
+        res.end(404);
+    }
+});
+
 //生成PDF
 app.get('/getPdfApplication', (req, res) => {
     var info = JSON.parse(url.parse(req.url, true).query.info);
     genpdf.getPdfApplication(db, info, res);
-});
