@@ -62,7 +62,7 @@ module.exports.setApplicationState = function(db, info, res) {
     //更改申请
     var ret = { err: null, msg: null };
     var sql = 'UPDATE Application SET state = ? WHERE id = ?';
-    var sqlParams = [ info.state, info.id ];
+    var sqlParams = [ info.state, info.applicationId ];
     db.query(sql, sqlParams, (err, data) => {
         if (err) {
             console.log(err);
@@ -73,6 +73,11 @@ module.exports.setApplicationState = function(db, info, res) {
             ret.err = false;
             ret.msg = 'Set application state successfully.';
             res.send(JSON.stringify(ret));
+            
+            //邀请专家，并创建评审表
+            if (info.state == 'accepted') {
+                system.inviteExpert(db, info, res);
+            }
         }
     });
 }

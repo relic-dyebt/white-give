@@ -127,10 +127,6 @@ module.exports.submitApplication = function(db, info, res) {
             ret.msg = 'Submit application successfully.';
             ret.applicationId = data.insertId;
             res.send(JSON.stringify(ret));
-
-            //邀请专家，并创建评审表
-            var info = { applicationId: data.insertId };
-            system.inviteExpert(db, info, res);
         }
     });
 }
@@ -167,7 +163,7 @@ module.exports.studentGetApplicationByMatch = function(db, info, res) {
 module.exports.studentSetPassword = function(db, info, res) {
     console.log('Student - Set password\n' + util.getTime());
 
-    //更改密码
+    //更新密码
     var ret = { err: null, msg: null };
     var sql = 'UPDATE Student SET `password` = ? WHERE studentNumber = ?';
     var sqlParams = [ info.password, info.studentNumber ];

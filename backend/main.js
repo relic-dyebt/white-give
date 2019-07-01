@@ -97,7 +97,17 @@ app.get('/expertLogin', (req, res) => {
 
 app.get('/expertSetPassword', (req, res) => {
     var info = JSON.parse(url.parse(req.url, true).query.info);
-    student.expertSetPassword(db, info, res);
+    expert.expertSetPassword(db, info, res);
+});
+
+app.get('/expertGetApplicationByState', (req, res) => {
+    var info = JSON.parse(url.parse(req.url, true).query.info);
+    expert.expertGetApplicationByState(db, info, res);
+});
+
+app.get('/expertSetApplicationScore', (req, res) => {
+    var info = JSON.parse(url.parse(req.url, true).query.info);
+    expert.expertSetApplicationScore(db, info, res);
 });
 
 //校团委
@@ -116,11 +126,6 @@ app.get('/setApplicationState', (req, res) => {
     tw.setApplicationState(db, info, res);
 });
 
-app.get('/getPdfApplication',(req,res)=> {
-    var info = JSON.parse(url.parse(req.url, true).query.info);
-    genpdf.getPdfApplication(db,info,res);
-});
-
 //系统
 app.post('/upload', mutipartMiddeware, (req, res) => {
     system.upload(req.files, res);
@@ -129,4 +134,10 @@ app.post('/upload', mutipartMiddeware, (req, res) => {
 app.get('/deleteByUrl', mutipartMiddeware, (req, res) => {
     var info = JSON.parse(url.parse(req.url, true).query.info);
     system.deleteByUrl(info, res);
+});
+
+//生成PDF
+app.get('/getPdfApplication', (req, res) => {
+    var info = JSON.parse(url.parse(req.url, true).query.info);
+    genpdf.getPdfApplication(db, info, res);
 });
