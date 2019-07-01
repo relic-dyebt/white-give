@@ -112,9 +112,9 @@ module.exports.submitApplication = function(db, info, res) {
         info.introduction,
         info.innovation,
         info.keyword,
-        info.state,
         info.fileUrl,
         info.matchId,
+        'submitted'
     ];
     db.query(sql, sqlParams, (err, data) => {
         if (err) {

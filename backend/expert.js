@@ -99,13 +99,13 @@ module.exports.expertSetPassword = function(db, info, res) {
     });
 }
 
-//专家根据审核状态获取申请
-module.exports.expertGetApplicationByState = function(db, info, res) {
-    console.log('Expert - Get application by state\n' + util.getTime());
+//专家根据评审审核状态获取申请
+module.exports.expertGetApplicationByAssessmentState = function(db, info, res) {
+    console.log('Expert - Get application by assessment state\n' + util.getTime());
 
     //搜索申请
     var ret = { err: null, msg: null };
-    var sql = 'SELECT * FROM Application WHERE id IN(SELECT applicationId FROM Assessment WHERE expertId = ?)' + (info.state ? ' AND state = ?' : '');
+    var sql = 'SELECT * FROM Application WHERE id IN(SELECT applicationId FROM Assessment WHERE expertId = ?' + (info.state ? ' AND state = ?)' : ')');
     var sqlParams = [ info.expertId, info.state ];
     db.query(sql, sqlParams, (err, data) => {
         if (err) {
@@ -122,14 +122,14 @@ module.exports.expertGetApplicationByState = function(db, info, res) {
     });
 }
 
-//专家设置申请评分
-module.exports.expertSetApplicationScore = function(db, info, res) {
-    console.log('Expert - Set application score\n' + util.getTime());
+//专家设置评审评分
+module.exports.expertSetAssessmentScore = function(db, info, res) {
+    console.log('Expert - Set assessment score\n' + util.getTime());
 
     //更新评审
     var ret = { err: null, msg: null };
-    var sql = 'UPDATE Assessment SET score = ?, state = "scored" WHERE expertId = ? AND applicationId = ?';
-    var sqlParams = [ info.score, info.expertId, info.applicationId ];
+    var sql = 'UPDATE Assessment SET score = ?, state = ? WHERE expertId = ? AND applicationId = ?';
+    var sqlParams = [ info.score, 'scored', info.expertId, info.applicationId ];
     db.query(sql, sqlParams, (err, data) => {
         if (err) {
             console.log(err);
@@ -138,9 +138,36 @@ module.exports.expertSetApplicationScore = function(db, info, res) {
             res.send(JSON.stringify(ret));
         } else {
             ret.err = false;
-            ret.msg = 'Set application score successfully.';
+            ret.msg = 'Set assessment score successfully.';
             ret.data = data;
             res.send(JSON.stringify(ret));
+        }
+    });
+}
+
+//专家接受/拒绝审核
+module.exports.expertAcceptAssessment = function(db, info, res) {
+    console.log('Expert - ' + (info.accept ? 'accept' : 'refuse') + ' assessment\n' + util.getTime());
+
+    //更改申请
+    var ret = { err: null, msg: null };
+    var sql = 'UPDATE Assessment SET state = ? WHERE expertId = ? AND applicationId = ?';
+    var sqlParams = [ info.accept ? 'scoring' : 'refused', info.expertId, info.applicationId ];
+    db.query(sql, sqlParams, (err, data) => {
+        if (err) {
+            console.log(err);
+            ret.err = true;
+            ret.msg = 'Database error(UPDATE).';
+            res.send(JSON.stringify(ret));
+        } else {
+            ret.err = false;
+            ret.msg = 'Accept/Refuse successfully.';
+            res.send(JSON.stringify(ret));
+            
+            //邀请专家，并创建评审表
+            if (!info.accept) {
+                system.inviteExpert(db, info, res, 1);
+            }
         }
     });
 }

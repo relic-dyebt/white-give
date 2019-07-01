@@ -101,14 +101,19 @@ app.get('/expertSetPassword', (req, res) => {
     expert.expertSetPassword(db, info, res);
 });
 
-app.get('/expertGetApplicationByState', (req, res) => {
+app.get('/expertGetApplicationByAssessmentState', (req, res) => {
     var info = JSON.parse(url.parse(req.url, true).query.info);
-    expert.expertGetApplicationByState(db, info, res);
+    expert.expertGetApplicationByAssessmentState(db, info, res);
 });
 
 app.get('/expertSetApplicationScore', (req, res) => {
     var info = JSON.parse(url.parse(req.url, true).query.info);
     expert.expertSetApplicationScore(db, info, res);
+});
+
+app.get('/expertAcceptAssessment', (req, res) => {
+    var info = JSON.parse(url.parse(req.url, true).query.info);
+    expert.expertAcceptAssessment(db, info, res);
 });
 
 //校团委
@@ -146,3 +151,4 @@ app.get('/deleteByUrl', mutipartMiddeware, (req, res) => {
 app.get('/getPdfApplication', (req, res) => {
     var info = JSON.parse(url.parse(req.url, true).query.info);
     genpdf.getPdfApplication(db, info, res);
+});

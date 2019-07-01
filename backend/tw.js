@@ -59,7 +59,7 @@ module.exports.getApplicationByState = function(db, info, res) {
 module.exports.setApplicationState = function(db, info, res) {
     console.log('Tw - Set application state\n' + util.getTime());
 
-    //更改申请
+    //更新申请
     var ret = { err: null, msg: null };
     var sql = 'UPDATE Application SET state = ? WHERE id = ?';
     var sqlParams = [ info.state, info.applicationId ];
@@ -76,7 +76,7 @@ module.exports.setApplicationState = function(db, info, res) {
             
             //邀请专家，并创建评审表
             if (info.state == 'accepted') {
-                system.inviteExpert(db, info, res);
+                system.inviteExpert(db, info, res, 3);
             }
         }
     });

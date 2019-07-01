@@ -5,7 +5,7 @@ var path = require('path');
 var util = require('./util');
 
 //邀请专家参与评审
-module.exports.inviteExpert = function(db, info, res) {
+module.exports.inviteExpert = function(db, info, res, num) {
     console.log('System - Invite expert\n' + util.getTime());
 
     //搜索申请
@@ -42,13 +42,13 @@ module.exports.inviteExpert = function(db, info, res) {
                                     pass: 'whitegive123'
                                 }
                             }));
-                            for (var i = 0; i < 3 && i < data.length; i++) {
+                            for (var i = 0; i < num && i < data.length; i++) {
                                 var email = data[i].email;
                                 var expertId = data[i].id;
 
                                 //插入评审
                                 var sql = 'INSERT INTO Assessment ' + util.values(5);
-                                var sqlParams = [ 0, expertId, info.applicationId, "auditing", 0 ];
+                                var sqlParams = [ 0, expertId, info.applicationId, "accepted", 0 ];
                                 db.query(sql, sqlParams, (err, data) => {
                                     if (err) {
                                         console.log(err);
@@ -77,6 +77,8 @@ module.exports.inviteExpert = function(db, info, res) {
         }
     });
 }
+
+//申请评审完成
 
 //上传文件
 module.exports.upload = function(files, res) {
