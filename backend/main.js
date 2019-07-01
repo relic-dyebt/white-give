@@ -11,7 +11,8 @@ var tw = require('./tw');
 var expert = require('./expert');
 var system = require('./system');
 var genpdf = require('./genpdf');
-
+var path = require('path');
+var fs = require('fs');
 var app = express();
 var mutipartMiddeware = mutipart();
 
@@ -129,4 +130,22 @@ app.post('/upload', mutipartMiddeware, (req, res) => {
 app.get('/deleteByUrl', mutipartMiddeware, (req, res) => {
     var info = JSON.parse(url.parse(req.url, true).query.info);
     system.deleteByUrl(info, res);
+});
+//下载
+app.get('/downloadFile', (req, res)=> {
+    // 实现文件下载
+    var info = JSON.parse(url.parse(req.url, true).query.info);
+    var fileName = info.fileName;
+    var filePath = path.join(__dirname, fileName);
+    var stats = fs.statSync(filePath);
+    if(stats.isFile()){
+        res.set({
+            'Content-Type': 'application/octet-stream',
+            'Content-Disposition': 'attachment; filename='+fileName,
+            'Content-Length': stats.size
+        });
+        fs.createReadStream(filePath).pipe(res);
+    } else {
+        res.end(404);
+    }
 });

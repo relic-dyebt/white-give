@@ -1,7 +1,7 @@
 var nodemailer = require('nodemailer');
 var smtpTransport = require('nodemailer-smtp-transport');
 var fs = require('fs');
-
+var path = require('path');
 var util = require('./util');
 
 //邀请专家参与评审
