@@ -86,47 +86,64 @@ module.exports.login = function(db, info, res) {
 module.exports.submitApplication = function(db, info, res) {
     console.log('Student - Submit application\n' + util.getTime());
 
-    //插入申请
+    //搜索学生
     var ret = { err: null, msg: null };
-    var sql = 
-        'INSERT INTO Application ' + util.values(40);
-    var sqlParams = [
-        0,
-        info.department,
-        info.appCategory,
-        info.name,
-        info.studentNumber,
-        info.birthday,
-        info.eduBackground,
-        info.major,
-        info.enrollmentYear,
-        info.workName,
-        info.address,
-        info.phone,
-        info.email,
-        info.c1Name, info.c1StudentNumber, info.c1eduBackground, info.c1Phone, info.c1Email,
-        info.c2Name, info.c2StudentNumber, info.c2eduBackground, info.c2Phone, info.c2Email,
-        info.c3Name, info.c3StudentNumber, info.c3eduBackground, info.c3Phone, info.c3Email,
-        info.c4Name, info.c4StudentNumber, info.c4eduBackground, info.c4Phone, info.c4Email,
-        info.category,
-        info.introduction,
-        info.innovation,
-        info.keyword,
-        info.fileUrl,
-        info.matchId,
-        'submitted'
-    ];
+    var sql = 'SELECT * FROM Student WHERE studentNumber = ?';
+    var sqlParams = [ info.studentNumber ];
     db.query(sql, sqlParams, (err, data) => {
         if (err) {
             console.log(err);
             ret.err = true;
             ret.msg = 'Database error(INSERT).';
             res.send(JSON.stringify(ret));
-        } else {
-            ret.err = false;
-            ret.msg = 'Submit application successfully.';
-            ret.applicationId = data.insertId;
+        } else if (data.length == 0) {
+            console.log(err);
+            ret.err = true;
+            ret.msg = 'Wrong student number.';
             res.send(JSON.stringify(ret));
+        } else {
+            
+            //插入申请
+            var sql = 'INSERT INTO Application ' + util.values(40);
+            var sqlParams = [
+                0,
+                info.department,
+                info.appCategory,
+                info.name,
+                info.studentNumber,
+                info.birthday,
+                info.eduBackground,
+                info.major,
+                info.enrollmentYear,
+                info.workName,
+                info.address,
+                info.phone,
+                info.email,
+                info.c1Name, info.c1StudentNumber, info.c1eduBackground, info.c1Phone, info.c1Email,
+                info.c2Name, info.c2StudentNumber, info.c2eduBackground, info.c2Phone, info.c2Email,
+                info.c3Name, info.c3StudentNumber, info.c3eduBackground, info.c3Phone, info.c3Email,
+                info.c4Name, info.c4StudentNumber, info.c4eduBackground, info.c4Phone, info.c4Email,
+                info.category,
+                info.introduction,
+                info.innovation,
+                info.keyword,
+                info.fileUrl,
+                info.matchId,
+                'submitted'
+            ];
+            db.query(sql, sqlParams, (err, data) => {
+                if (err) {
+                    console.log(err);
+                    ret.err = true;
+                    ret.msg = 'Database error(INSERT).';
+                    res.send(JSON.stringify(ret));
+                } else {
+                    ret.err = false;
+                    ret.msg = 'Submit application successfully.';
+                    ret.applicationId = data.insertId;
+                    res.send(JSON.stringify(ret));
+                }
+            });
         }
     });
 }
