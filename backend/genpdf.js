@@ -8,12 +8,13 @@ var zip = new JSZip(content);
 var doc = new Docxtemplater();
 var util = require('./util');
 
+var toPdf = require("office-to-pdf");
 
-module.exports.generatePdf=function (db, info,res) {
+module.exports.getPdfApplication=function (db, info,res) {
     console.log('generate pdf file');
     var ret = { err: null, msg: null };
     var sql = 'SELECT * FROM Application WHERE id=?';
-        var sqlParams = [ info.appId];
+    var sqlParams = [ info.appId];
     console.log(sql + '\n' + sqlParams.toString() + '\n');
 
     db.query(sql, sqlParams, (err, data) => {
@@ -24,7 +25,6 @@ module.exports.generatePdf=function (db, info,res) {
             res.send(JSON.stringify(ret));
         } else {
             ret.err=false;
-            console.log(data[0]);
             res.send(JSON.stringify((ret)));
             var application =data[0];
 
@@ -89,8 +89,15 @@ module.exports.generatePdf=function (db, info,res) {
             }
 
             var buf = doc.getZip().generate({ type: 'nodebuffer' });
-            /* buf is a nodejs buffer, you can either write it to a file or do anything else with it.*/
-            fs.writeFileSync(path.join(__dirname, '../data/out/申请'+application.id.toString()+ '.docx'), buf);
+
+            toPdf(buf).then(
+                (pdfBuffer) => {
+                    fs.writeFileSync(path.join(__dirname, '../data/application/'+
+                        application.studentNumber.toString()+'_'+application.name+ '_申请表格'+application.id.toString()+'.pdf'), pdfBuffer)
+                }, (err) => {
+                    console.log(err)
+                }
+            )
 
         }
     });
