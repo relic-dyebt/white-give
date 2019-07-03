@@ -23,25 +23,79 @@
 <div class="login" id="login">
 	<el-card class="box-card">
 		<h2 style="color: black">统一身份认证中心</h2>
-		<el-form label-width="20%" :model="info" style="margin-top: 20%">
-		<el-form-item label="学号">
-			<el-input
-			  placeholder="请输入学号"
-			  v-model="info.studentNumber"
-			  :disabled="false" style="width: 100%">
-			<i slot="prefix" class="el-input__icon el-icon-user-solid"></i>
-		</el-form-item>
-		<el-form-item label="密码">
-			<el-input
-			  placeholder="请输入密码"
-			  v-model="info.password"
-			  :disabled="false" show-password style="width: 100%">
-			<i slot="prefix" class="el-input__icon el-icon-s-home"></i>
-		</el-form-item>
-		<el-form-item>
-		<el-button type="primary" @click="submit">登录</el-button>
-		</el-form-item>
-		</el-form>
+
+
+		<el-radio-group v-model="role" size="medium" @change="currRole">
+			<el-radio-button label="学生" ></el-radio-button>
+			<el-radio-button label="专家"></el-radio-button>
+			<el-radio-button label="团委"></el-radio-button>
+		</el-radio-group>
+		<div v-if="role=='学生'">
+			<el-form label-width="20%" :model="info" style="margin-top: 20%">
+				<el-form-item label="学号">
+					<el-input
+							placeholder="请输入学号"
+							v-model="info.studentNumber"
+							:disabled="false" style="width: 100%">
+						<i slot="prefix" class="el-input__icon el-icon-user-solid"></i>
+				</el-form-item>
+				<el-form-item label="密码">
+					<el-input
+							placeholder="请输入密码"
+							v-model="info.password"
+							:disabled="false" show-password style="width: 100%">
+						<i slot="prefix" class="el-input__icon el-icon-s-home"></i>
+				</el-form-item>
+				<el-form-item>
+					<el-button type="primary" @click="submit">登录</el-button>
+				</el-form-item>
+			</el-form>
+
+		</div>
+		<div v-else-if="role=='专家'">
+			<el-form label-width="20%" :model="info" style="margin-top: 20%">
+				<el-form-item label="邮箱">
+					<el-input
+							placeholder="请输入邮箱"
+							v-model="info.studentNumber"
+							:disabled="false" style="width: 100%">
+						<i slot="prefix" class="el-input__icon el-icon-user-solid"></i>
+				</el-form-item>
+				<el-form-item label="密码">
+					<el-input
+							placeholder="请输入密码"
+							v-model="info.password"
+							:disabled="false" show-password style="width: 100%">
+						<i slot="prefix" class="el-input__icon el-icon-s-home"></i>
+				</el-form-item>
+				<el-form-item>
+					<el-button type="primary" @click="submit">登录</el-button>
+				</el-form-item>
+			</el-form>
+
+		</div>
+		<div v-else>
+			<el-form label-width="20%" :model="info" style="margin-top: 20%">
+				<el-form-item label="用户名">
+					<el-input
+							placeholder="请输入用户名"
+							v-model="info.studentNumber"
+							:disabled="false" style="width: 100%">
+						<i slot="prefix" class="el-input__icon el-icon-user-solid"></i>
+				</el-form-item>
+				<el-form-item label="密码">
+					<el-input
+							placeholder="请输入密码"
+							v-model="info.password"
+							:disabled="false" show-password style="width: 100%">
+						<i slot="prefix" class="el-input__icon el-icon-s-home"></i>
+				</el-form-item>
+				<el-form-item>
+					<el-button type="primary" @click="submit">登录</el-button>
+				</el-form-item>
+			</el-form>
+		</div>
+
 		
 	</el-card>
 
@@ -56,15 +110,23 @@
   new Vue({
     el: '#login',
     data: function() {
-		return { 
+		return {
 			info: {"password":"root1234","studentNumber":"16211000"},
+			role:'学生'
 		}
     },
+
 	methods: {
+    	currRole(selVal){
+    		this.role=selVal;
+    		console.log(this.role);
+
+		},
 		submit(){
 			var _self=this;
 			console.log(_self.info.password);
-					
+			console.log(_self.role);
+
 			$.ajax({
 				url: "http://58.87.72.138:30000/studentLogin",
 				type: "get",
@@ -76,6 +138,9 @@
 				success: function(res){
 					console.log(res);
 					if(res.err == false){
+
+						sessionStorage.setItem('stuId',res.data.studentNumber);
+						sessionStorage.setItem('username',res.data.username);
 						_self.$message({
 							message: 'Hi	' + res.data.username,
 							type: 'success',
