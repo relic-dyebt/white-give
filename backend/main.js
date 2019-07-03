@@ -4,8 +4,6 @@ var url = require('url');
 var mysql = require('mysql');
 var mutipart= require('connect-multiparty');
 
-var Cookies = require('cookies');
-
 var genpdf = require('./genpdf');
 var util = require('./util');
 var common = require('./common');
@@ -27,9 +25,7 @@ var db = mysql.createConnection({
 });
 
 db.connect();
-
 http.createServer(app).listen(30000);
-
 console.log('Server is running.\n' + util.getTime() + '\n');
 
 //跨域
@@ -37,12 +33,6 @@ app.use((req, res, next) => {
     res.header("Access-Control-Allow-Origin", "*");
     res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE');
     res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-    next();
-});
-
-//cookies
-app.use((req,res,next) => {
-    req.cookies=new Cookies(req,res)
     next();
 });
 

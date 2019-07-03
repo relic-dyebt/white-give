@@ -74,6 +74,7 @@ module.exports.login = function(db, info, res) {
             ret.msg = 'Wrong student number or password.';
             res.send(JSON.stringify(ret));
         } else {
+            res.cookie('studentLogin', info.studentNumber, { maxAge: 86400000 });
             ret.err = false;
             ret.msg = 'Login successfully.';
             ret.data = data[0];
@@ -101,6 +102,7 @@ module.exports.logout = function(db, info, res) {
             ret.msg = 'Wrong student number.';
             res.send(JSON.stringify(ret));
         } else {
+            res.cookie('studentLogin', 'true', { maxAge: 0 });
             ret.err = false;
             ret.msg = 'Logout successfully.';
             ret.data = data[0];
