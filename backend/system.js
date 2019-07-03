@@ -26,6 +26,7 @@ module.exports.inviteExpert = function(db, info, res, num) {
         } else {
             var matchId = data[0].matchId;
             var category = data[0].category;
+            var applicationId = data[0].applicationId;
 
             //搜索比赛
             var sql = 'SELECT * FROM `Match` WHERE id = ?';
@@ -36,14 +37,14 @@ module.exports.inviteExpert = function(db, info, res, num) {
                 } else {
                     var name = data[0].name;
 
-                    //搜索专家
+                    //搜索专家（随机顺序）
                     var sql = 'SELECT * FROM Expert WHERE category = ? ORDER BY RAND()';
                     var sqlParams = [ category ];
                     db.query(sql, sqlParams, (err, data) => {
                         if (err) {
                             console.log(err);
                         } else {
-                            var msg = '北航校团委邀请您参与比赛《' + name + '》的评审工作！';
+                            //SMTP客户端对象
                             var send = nodemailer.createTransport(smtpTransport({
                                 service: '163',
                                 auth: {
@@ -58,18 +59,28 @@ module.exports.inviteExpert = function(db, info, res, num) {
                                 //插入评审
                                 var sql = 'INSERT INTO Assessment ' + util.values(5);
                                 var sqlParams = [ 0, expertId, info.applicationId, "accepted", 0 ];
-                                db.query(sql, sqlParams, (err, data) => {
+                                db.query(sql, sqlParams, err => {
                                     if (err) {
                                         console.log(err);
                                     } else {
-
-                                        //发送邮件
-                                        send.sendMail({
+                                        var acceptUrl = 'http://58.87.72.138:30000/expertAcceptAssessment?info={"expertId":"' + expertId + '","applicationId":"' + applicationId + '","accept":"' + true + '"}';
+                                        var refuseUrl = 'http://58.87.72.138:30000/expertAcceptAssessment?info={"expertId":"' + expertId + '","applicationId":"' + applicationId + '","accept":"' + false + '"}';
+                                        
+                                        //邮件对象
+                                        var mail = {
                                             from: 'goodapple8946@163.com',
                                             to: email,
                                             subject: '比赛评审工作邀请',
-                                            html: msg
-                                        }, (err, res) => {
+                                            html:
+                                            '<p>北航校团委邀请您参与评审工作！</p>' +
+                                            '<p>接受：</p>' + 
+                                            '<p>' + acceptUrl + '</p>' +
+                                            '<p>拒绝：</p>' + 
+                                            '<p>' + refuseUrl + '</p>'
+                                        };
+
+                                        //发送邮件
+                                        send.sendMail(mail, err => {
                                             if (err) {
                                                 console.log(err);
                                             } else {
@@ -91,24 +102,28 @@ module.exports.inviteExpert = function(db, info, res, num) {
 module.exports.upload = function(files, res) {
     console.log('System - Upload\n' + util.getTime());
 
-    //移动并重命名文件
     var ret = { err: null, msg: null };
-    var oldPath = files.fileUpload.path;
-    var newPath = oldPath.replace('/temp/', '/work/');
+    //移动并重命名文件
+    for (var i in files) {
+        console.log(files[i]);
 
-    fs.rename(oldPath, newPath, err => {
-        if (err) {
-            console.log(err);
-            ret.err = true;
-            ret.msg = 'Upload failed.';
-            res.send(JSON.stringify(ret));
-        } else {
-            ret.err = false;
-            ret.msg = 'Upload Successfully.';
-            ret.url = newPath;
-            res.send(JSON.stringify(ret));
-        }
-    });
+        var oldPath = files[i].path;
+        var newPath = files[i].path.replace('temp', 'work');
+
+        fs.rename(oldPath, newPath, err => {
+            if (err) {
+                console.log(err);
+                ret.err = true;
+                ret.msg = 'File ' + i + ' Upload failed.';
+                res.send(JSON.stringify(ret));
+            } else {
+                ret.err = false;
+                ret.msg = 'File ' + i + 'Upload Successfully.';
+                ret.url = newPath;
+                res.send(JSON.stringify(ret));
+            }
+        });
+    }
 }
 
 //下载文件

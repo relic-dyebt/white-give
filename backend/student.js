@@ -27,6 +27,7 @@ module.exports.register = function(db, info, res) {
                 'INSERT INTO Student ' +
                 util.values(11);
             var sqlParams = [
+                info.studentNumber,
                 info.username,
                 info.password,
                 info.name,
@@ -36,8 +37,7 @@ module.exports.register = function(db, info, res) {
                 info.email,
                 info.department,
                 info.major,
-                info.enrollmentYear,
-                info.studentNumber
+                info.enrollmentYear
             ];
             db.query(sql, sqlParams, (err, data) => {
                 if (err) {
@@ -76,6 +76,33 @@ module.exports.login = function(db, info, res) {
         } else {
             ret.err = false;
             ret.msg = 'Login successfully.';
+            ret.data = data[0];
+            res.send(JSON.stringify(ret));
+        }
+    });
+}
+
+//学生注销
+module.exports.logout = function(db, info, res) {
+    console.log('Student - Logout\n' + util.getTime());
+
+    //搜索学号
+    var ret = { err: null, msg: null };
+    var sql = 'SELECT * FROM Student WHERE studentNumber = ?';
+    var sqlParams = [ info.studentNumber ];
+    db.query(sql, sqlParams, (err, data) => {
+        if (err) {
+            console.log(err);
+            ret.err = true;
+            ret.msg = 'Database error(SELECT).';
+            res.send(JSON.stringify(ret));
+        } else if (data.length == 0) {
+            ret.err = true;
+            ret.msg = 'Wrong student number.';
+            res.send(JSON.stringify(ret));
+        } else {
+            ret.err = false;
+            ret.msg = 'Logout successfully.';
             ret.data = data[0];
             res.send(JSON.stringify(ret));
         }

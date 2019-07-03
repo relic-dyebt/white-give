@@ -1,3 +1,4 @@
+var system = require('./system');
 var util = require('./util');
 
 //专家注册
@@ -147,27 +148,47 @@ module.exports.expertSetAssessmentScore = function(db, info, res) {
 
 //专家接受/拒绝审核
 module.exports.expertAcceptAssessment = function(db, info, res) {
-    console.log('Expert - ' + (info.accept ? 'accept' : 'refuse') + ' assessment\n' + util.getTime());
+    console.log('Expert - ' + (info.accept == 'true' ? 'Accept' : 'Refuse') + ' assessment\n' + util.getTime());
 
-    //更改申请
+    //搜索审核
     var ret = { err: null, msg: null };
-    var sql = 'UPDATE Assessment SET state = ? WHERE expertId = ? AND applicationId = ?';
-    var sqlParams = [ info.accept ? 'scoring' : 'refused', info.expertId, info.applicationId ];
+    var sql = 'SELECT * FROM Assessment WHERE expertId = ? AND applicationId = ?';
+    var sqlParams = [ info.expertId, info.applicationId ];
     db.query(sql, sqlParams, (err, data) => {
         if (err) {
             console.log(err);
             ret.err = true;
-            ret.msg = 'Database error(UPDATE).';
+            ret.msg = 'Database error(SELECT).';
+            res.send(JSON.stringify(ret));
+        } else if (data.length == 0) {
+            ret.err = true;
+            ret.msg = 'Unknown assessment.';
+            res.send(JSON.stringify(ret));
+        } else if (data[0].state != 'auditing') {
+            ret.err = true;
+            ret.msg = 'Assessment has already been accepted or refused.';
             res.send(JSON.stringify(ret));
         } else {
-            ret.err = false;
-            ret.msg = 'Accept/Refuse successfully.';
-            res.send(JSON.stringify(ret));
-            
-            //邀请专家，并创建评审表
-            if (!info.accept) {
-                system.inviteExpert(db, info, res, 1);
-            }
+            //更新审核
+            var sql = 'UPDATE Assessment SET state = ? WHERE expertId = ? AND applicationId = ?';
+            var sqlParams = [ info.accept == 'true' ? 'scoring' : 'refused', info.expertId, info.applicationId ];
+            db.query(sql, sqlParams, (err, data) => {
+                if (err) {
+                    console.log(err);
+                    ret.err = true;
+                    ret.msg = 'Database error(UPDATE).';
+                    res.send(JSON.stringify(ret));
+                } else {
+                    ret.err = false;
+                    ret.msg = (info.accept == 'true' ? 'Accept' : 'Refuse') + ' successfully.';
+                    res.send(JSON.stringify(ret));
+                    
+                    //邀请专家，并创建评审表
+                    if (info.accept == 'false') {
+                        system.inviteExpert(db, info, res, 1);
+                    }
+                }
+            });
         }
     });
 }
