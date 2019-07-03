@@ -13,8 +13,21 @@ var content = fs.readFileSync(path.join(__dirname, '../data/template/doc.docx'),
 var zip = new JSZip(content);
 var doc = new Docxtemplater();
 
+//比赛开始
+module.exports.matchStart = function(db) {
+    sql = 'UPDATE Application SET state = "auditing" WHERE state = "submitted" AND matchId IN (SELECT `Match`.id FROM `Match` WHERE endDate = ?)';
+    sqlParams = [ util.getDate() ];
+    db.query(sql, sqlParams, err => {
+        if (err) {
+            console.log(err);
+        } else {
+            console.log('Match start, application state update.');
+        }
+    });
+}
+
 //邀请专家参与评审
-module.exports.inviteExpert = function(db, info, res, num) {
+module.exports.inviteExpert = function(db, info, num) {
     console.log('System - Invite expert\n' + util.getTime());
 
     //搜索申请
@@ -102,28 +115,36 @@ module.exports.inviteExpert = function(db, info, res, num) {
 module.exports.upload = function(files, res) {
     console.log('System - Upload\n' + util.getTime());
 
-    var ret = { err: null, msg: null };
+    var ret = { err: null, msg: null, documentUrl: [], pictureUrl: [], videoUrl: [] };
+
     //移动并重命名文件
     for (var i in files) {
         console.log(files[i]);
 
-        var oldPath = files[i].path;
-        var newPath = files[i].path.replace('temp', 'work');
-
-        fs.rename(oldPath, newPath, err => {
-            if (err) {
-                console.log(err);
-                ret.err = true;
-                ret.msg = 'File ' + i + ' Upload failed.';
-                res.send(JSON.stringify(ret));
-            } else {
-                ret.err = false;
-                ret.msg = 'File ' + i + 'Upload Successfully.';
-                ret.url = newPath;
-                res.send(JSON.stringify(ret));
+        if (files[i].path) {
+            var file = files[i];
+            var oldPath = file.path;
+            var newPath = file.path.replace('temp', 'work');
+            fs.rename(oldPath, newPath, err => { if (err) console.log(err); });
+            if (file.fieldName == 'document' && file.originalFilename != '')
+                ret.documentUrl.push(newPath);
+            else if (file.fieldName == 'image' && file.originalFilename != '')
+                ret.pictureUrl.push(newPath);
+            else if (file.fieldName == 'video' && file.originalFilename != '')
+                ret.videoUrl.push(newPath);
+        }
+        else
+            for (var j in files[i]) {
+                var file = files[i][j];
+                var oldPath = file.path;
+                var newPath = file.path.replace('temp', 'work');
+                fs.rename(oldPath, newPath, err => { if (err) console.log(err); });
+                ret.pictureUrl.push(newPath);
             }
-        });
     }
+    ret.err = false;
+    ret.msg = 'File upload accomplished.';
+    res.send(JSON.stringify(ret));
 }
 
 //下载文件

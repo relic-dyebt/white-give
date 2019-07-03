@@ -20,3 +20,13 @@ module.exports.getTime = function() {
     if(second < 10) second = '0' + second;
     return year + '-' + month + '-' + date + ' ' + hour + ':' + minute + ':' + second;
 }
+
+module.exports.getDate = function() {
+    var date = new Date();
+    var year = date.getFullYear();
+    var month = (date.getMonth() + 1);
+    if (month < 10) month = '0' + month;
+    var date = date.getDate();
+    if (date < 10) date = '0' + date;
+    return year + '-' + month + '-' + date;
+}
