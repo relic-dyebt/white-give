@@ -4,7 +4,7 @@ var url = require('url');
 var mysql = require('mysql');
 var mutipart= require('connect-multiparty');
 
-var Cookies = require('cookies');
+var CronJob = require('cron').CronJob;
 
 var genpdf = require('./genpdf');
 var util = require('./util');
@@ -27,9 +27,7 @@ var db = mysql.createConnection({
 });
 
 db.connect();
-
 http.createServer(app).listen(30000);
-
 console.log('Server is running.\n' + util.getTime() + '\n');
 
 //跨域
@@ -37,12 +35,6 @@ app.use((req, res, next) => {
     res.header("Access-Control-Allow-Origin", "*");
     res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE');
     res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-    next();
-});
-
-//cookies
-app.use((req,res,next) => {
-    req.cookies=new Cookies(req,res)
     next();
 });
 
@@ -67,6 +59,11 @@ app.get('/getApplicationById', (req, res) => {
     common.getApplicationById(db, info, res);
 });
 
+app.get('/getExpertByCategory', (req, res) => {
+    var info = JSON.parse(url.parse(req.url, true).query.info);
+    common.getExpertByCategory(db, info, res);
+});
+
 //学生
 app.get('/studentRegister', (req, res) => {
     var info = JSON.parse(url.parse(req.url, true).query.info);
@@ -76,6 +73,11 @@ app.get('/studentRegister', (req, res) => {
 app.get('/studentLogin', (req, res) => {
     var info = JSON.parse(url.parse(req.url, true).query.info);
     student.login(db, info, res);
+});
+
+app.get('/studentLogout', (req, res) => {
+    var info = JSON.parse(url.parse(req.url, true).query.info);
+    student.logout(db, info, res);
 });
 
 app.get('/studentSetPassword', (req, res) => {
@@ -104,6 +106,11 @@ app.get('/expertLogin', (req, res) => {
     expert.login(db, info, res);
 });
 
+app.get('/expertLogout', (req, res) => {
+    var info = JSON.parse(url.parse(req.url, true).query.info);
+    expert.logout(db, info, res);
+});
+
 app.get('/expertSetPassword', (req, res) => {
     var info = JSON.parse(url.parse(req.url, true).query.info);
     expert.expertSetPassword(db, info, res);
@@ -125,6 +132,16 @@ app.get('/expertAcceptAssessment', (req, res) => {
 });
 
 //校团委
+app.get('/twLogin', (req, res) => {
+    var info = JSON.parse(url.parse(req.url, true).query.info);
+    tw.login(db, info, res);
+});
+
+app.get('/twLogout', (req, res) => {
+    var info = JSON.parse(url.parse(req.url, true).query.info);
+    tw.logout(db, info, res);
+});
+
 app.get('/createMatch', (req, res) => {
     var info = JSON.parse(url.parse(req.url, true).query.info);
     tw.createMatch(db, info, res);
@@ -160,6 +177,9 @@ app.get('/generatePdf', (req, res) => {
     var info = JSON.parse(url.parse(req.url, true).query.info);
     genpdf.generatePdf(db, info, res);
 });
+
+//定时检测比赛开始
+new CronJob('59 59 23 */1 * *', system.matchStart(db));
 
 //测试
 //test.test();

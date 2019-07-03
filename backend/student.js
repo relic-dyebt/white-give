@@ -39,7 +39,7 @@ module.exports.register = function(db, info, res) {
                 info.major,
                 info.enrollmentYear
             ];
-            db.query(sql, sqlParams, (err, data) => {
+            db.query(sql, sqlParams, err => {
                 if (err) {
                     console.log(err);
                     ret.err = true;
@@ -154,8 +154,10 @@ module.exports.submitApplication = function(db, info, res) {
                 info.introduction,
                 info.innovation,
                 info.keyword,
-                info.fileUrl,
                 info.matchId,
+                info.documentUrl,
+                info.imageUrl,
+                info.videoUrl,
                 'submitted'
             ];
             db.query(sql, sqlParams, (err, data) => {
@@ -211,7 +213,7 @@ module.exports.studentSetPassword = function(db, info, res) {
     var ret = { err: null, msg: null };
     var sql = 'UPDATE Student SET `password` = ? WHERE studentNumber = ?';
     var sqlParams = [ info.password, info.studentNumber ];
-    db.query(sql, sqlParams, (err, data) => {
+    db.query(sql, sqlParams, err => {
         if (err) {
             console.log(err);
             ret.err = true;
