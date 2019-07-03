@@ -1,0 +1,50 @@
+<!-- import CSS -->
+<link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
+<!-- import Vue before Element -->
+<script src="https://unpkg.com/vue/dist/vue.js"></script>
+<!-- import JavaScript -->
+<script src="https://unpkg.com/element-ui/lib/index.js"></script>
+<!-- import JQuery -->
+<script src="https://cdn.staticfile.org/jquery/3.1.1/jquery.min.js"></script>
+
+<div id="upload">
+<button @click="download">
+下载
+</button>
+</div>
+
+<script>
+	new Vue({
+    el: '#upload',
+    data: function(){
+		return { 
+			url: '',
+		}
+    },
+	methods: {
+		download: function(){
+			var _self = this;
+			$.ajax({  
+				url: 'http://58.87.72.138:30000/download' ,  
+				type: 'POST',  
+				data: formData,  
+				async: false,  
+				cache: false,  
+				contentType: false,  
+				processData: false,  
+				success: function (res) {
+					console.log(res);
+					var data = JSON.parse(res);
+					console.log(data);
+					_self.url = data.url;
+					console.log(_self.url);
+					
+				},  
+				error: function (err) {  
+					console.log(err);  
+				}  
+		   });  
+		}
+	}
+  })
+</script>

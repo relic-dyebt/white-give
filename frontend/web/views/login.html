@@ -7,7 +7,7 @@
 	<link rel="stylesheet" href="../css/login.css">
 	<!-- import Vue before Element -->
 	<script src="https://unpkg.com/vue/dist/vue.js"></script>
-	<!-- import JavaScript -->
+	<!-- import         JavaScript -->
 	<script src="https://unpkg.com/element-ui/lib/index.js"></script>
 	<!-- import JQuery -->
 	<script src="https://cdn.staticfile.org/jquery/3.1.1/jquery.min.js"></script>
@@ -49,6 +49,7 @@
 				</el-form-item>
 				<el-form-item>
 					<el-button type="primary" @click="studentLogin">登录</el-button>
+					<el-button type="primary" @click="register">注册参赛</el-button>
 				</el-form-item>
 			</el-form>
 
@@ -58,7 +59,7 @@
 				<el-form-item label="邮箱">
 					<el-input
 							placeholder="请输入邮箱"
-							v-model="info.studentNumber"
+							v-model="info.email"
 							:disabled="false" style="width: 100%">
 						<i slot="prefix" class="el-input__icon el-icon-user-solid"></i>
 				</el-form-item>
@@ -71,6 +72,7 @@
 				</el-form-item>
 				<el-form-item>
 					<el-button type="primary" @click="expertLogin">登录</el-button>
+					<el-button type="primary" @click="register">注册参赛</el-button>
 				</el-form-item>
 			</el-form>
 
@@ -80,7 +82,7 @@
 				<el-form-item label="用户名">
 					<el-input
 							placeholder="请输入用户名"
-							v-model="info.studentNumber"
+							v-model="info.username"
 							:disabled="false" style="width: 100%">
 						<i slot="prefix" class="el-input__icon el-icon-user-solid"></i>
 				</el-form-item>
@@ -93,6 +95,7 @@
 				</el-form-item>
 				<el-form-item>
 					<el-button type="primary" @click="twLogin">登录</el-button>
+					<el-button type="primary" @click="register">注册参赛</el-button>
 				</el-form-item>
 			</el-form>
 		</div>
@@ -120,15 +123,13 @@
 	methods: {
     	currRole(selVal){
     		this.role=selVal;
-    		console.log(this.role);
-
+			sessionStorage.setItem('role', this.role);
+		},
+		register(){
+    		window.location.href="register.html";
 		},
 		studentLogin(){
 			var _self=this;
-			console.log(_self.info.password);
-			console.log(_self.role);
-
-
 			$.ajax({
 				url: "http://58.87.72.138:30000/studentLogin",
 				type: "get",
@@ -139,10 +140,11 @@
 				},
 				success: function(res){
 					console.log(res);
-					if(res.err == false){
 
+					if(res.err == false){
 						sessionStorage.setItem('stuId',res.data.studentNumber);
 						sessionStorage.setItem('username',res.data.username);
+						sessionStorage.setItem('role', _self.role);
 						_self.$message({
 							message: 'Hi	' + res.data.username,
 							type: 'success',
@@ -150,7 +152,7 @@
 						});
 
 						setTimeout(() => {
-							window.location.href="../index.html";
+							window.location.href="main.html";
 						}, 1000);
 					}
 					else{
@@ -175,7 +177,7 @@
 
 
 			$.ajax({
-				url: "http://58.87.72.138:30000/studentLogin",
+				url: "http://58.87.72.138:30000/expertLogin",
 				type: "get",
 				dataType: 'json',
 				contentType:"application/json",
@@ -186,8 +188,9 @@
 					console.log(res);
 					if(res.err == false){
 
-						sessionStorage.setItem('stuId',res.data.studentNumber);
+						sessionStorage.setItem('expertId',res.data.id);
 						sessionStorage.setItem('username',res.data.username);
+						sessionStorage.setItem('role', _self.role);
 						_self.$message({
 							message: 'Hi	' + res.data.username,
 							type: 'success',
@@ -195,7 +198,7 @@
 						});
 
 						setTimeout(() => {
-							window.location.href="../index.html";
+							window.location.href="main.html";
 						}, 1000);
 					}
 					else{
@@ -213,14 +216,14 @@
 
 			})
 		},
-		Login(){
+		twLogin(){
 			var _self=this;
 			console.log(_self.info.password);
 			console.log(_self.role);
 
 
 			$.ajax({
-				url: "http://58.87.72.138:30000/studentLogin",
+				url: "http://58.87.72.138:30000/twLogin",
 				type: "get",
 				dataType: 'json',
 				contentType:"application/json",
@@ -230,9 +233,9 @@
 				success: function(res){
 					console.log(res);
 					if(res.err == false){
-
-						sessionStorage.setItem('stuId',res.data.studentNumber);
+						sessionStorage.setItem('twId',res.data.id);
 						sessionStorage.setItem('username',res.data.username);
+						sessionStorage.setItem('role', _self.role);
 						_self.$message({
 							message: 'Hi	' + res.data.username,
 							type: 'success',
@@ -240,7 +243,7 @@
 						});
 
 						setTimeout(() => {
-							window.location.href="../index.html";
+							window.location.href="main.html";
 						}, 1000);
 					}
 					else{
