@@ -1,12 +1,12 @@
 var util = require('./util');
 
 //根据时间获取比赛
-module.exports.getMatch = function(db, info, res) {
+module.exports.getMatch = function(db, res) {
     console.log('Common - Get match.\n' + util.getTime());
 
     //搜索比赛
     var ret = { err: null, msg: null };
-    var sql = 'SELECT * FROM Match';
+    var sql = 'SELECT * FROM `Match`';
     var sqlParams = [];
     db.query(sql, sqlParams, (err, data) => {
         if (err) {

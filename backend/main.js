@@ -45,8 +45,7 @@ app.use(mutipart({
 
 //通用
 app.get('/getMatch', (req, res) => {
-    var info = JSON.parse(url.parse(req.url, true).query.info);
-    common.getMatch(db, info, res);
+    common.getMatch(db, res);
 });
 
 app.get('/getWorkById', (req, res) => {
@@ -114,6 +113,11 @@ app.get('/expertLogin', (req, res) => {
 app.get('/expertLogout', (req, res) => {
     var info = JSON.parse(url.parse(req.url, true).query.info);
     expert.logout(db, info, res);
+});
+
+app.get('/expertModifyInfo', (req, res) => {
+    var info = JSON.parse(url.parse(req.url, true).query.info);
+    expert.modifyInfo(db, info, res);
 });
 
 app.get('/expertSetPassword', (req, res) => {
