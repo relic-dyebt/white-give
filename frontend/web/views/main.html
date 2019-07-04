@@ -336,6 +336,7 @@
                 }
             },
             modifyInfo() {
+                var _self = this;
                 switch (this.role) {
                     case "学生":
                         $.ajax({
@@ -349,17 +350,17 @@
                             success: function(res){
                                 console.log(res);
                                 if(res.err == false){
-                                    sessionStorage.setItem('username',this.userInfo.username);
-                                    sessionStorage.setItem('stdudentNumber',this.userInfo.studentNumber);
-                                    sessionStorage.setItem('username',this.userInfo.username);
-                                    sessionStorage.setItem('name',this.userInfo.name);
-                                    sessionStorage.setItem('introduction',this.userInfo.introduction);
-                                    sessionStorage.setItem('profileUrl',this.userInfo.profileUrl);
-                                    sessionStorage.setItem('phone',this.userInfo.phone);
-                                    sessionStorage.setItem('email',this.userInfo.email);
-                                    sessionStorage.setItem('department',this.userInfo.department);
-                                    sessionStorage.setItem('major',this.userInfo.major);
-                                    sessionStorage.setItem('enrollmentYear',this.userInfo.enrollmentYear);
+                                    sessionStorage.setItem('username',_self.userInfo.username);
+                                    sessionStorage.setItem('stdudentNumber',_self.userInfo.studentNumber);
+                                    sessionStorage.setItem('username',_self.userInfo.username);
+                                    sessionStorage.setItem('name',_self.userInfo.name);
+                                    sessionStorage.setItem('introduction',_self.userInfo.introduction);
+                                    sessionStorage.setItem('profileUrl',_self.userInfo.profileUrl);
+                                    sessionStorage.setItem('phone',_self.userInfo.phone);
+                                    sessionStorage.setItem('email',_self.userInfo.email);
+                                    sessionStorage.setItem('department',_self.userInfo.department);
+                                    sessionStorage.setItem('major',_self.userInfo.major);
+                                    sessionStorage.setItem('enrollmentYear',_self.userInfo.enrollmentYear);
 
                                     _self.$message({
                                         message: '修改成功',
