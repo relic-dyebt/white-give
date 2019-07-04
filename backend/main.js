@@ -188,9 +188,9 @@ app.get('/generatePdf', (req, res) => {
 });
 
 //定时检测
-new CronJob('0 */1 * * * *', system.joinEnd(db), null, false);
-new CronJob('0 */1 * * * *', system.auditEnd(db), null, false);
-new CronJob('0 */1 * * * *', system.scoreEnd(db), null, false);
+new CronJob('0 */5 * * * *', system.joinEnd(db));
+new CronJob('0 */5 * * * *', system.auditEnd(db));
+new CronJob('0 */5 * * * *', system.scoreEnd(db));
 
 //测试
 //test.test();

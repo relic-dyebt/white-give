@@ -5,35 +5,62 @@ var path = require('path');
 var JSZip = require('jszip');
 var Docxtemplater = require('docxtemplater');
 var toPdf = require("office-to-pdf");
-var crypto = require('crypto');
 
 var util = require('./util');
 
+//学生报名开始
+module.exports.joinStart = function(db) {
+
+    //修改比赛
+    sql = 'UPDATE `Match` SET state = "joining" WHERE state = "created" AND joinTime < ?';
+    sqlParams = [ util.getTime() ];
+    db.query(sql, sqlParams, err => { if (err) console.log(err); });
+}
+
 //学生报名结束、校团委初审开始
 module.exports.joinEnd = function(db) {
-    sql = 'UPDATE Application SET state = "auditing" WHERE state = "submitted" AND matchId IN (SELECT `Match`.id FROM `Match` WHERE LEFT(auditTime, 16) = ?)';
-    sqlParams = [ util.getTime().substr(0,16) ];
+
+    //修改比赛
+    sql = 'UPDATE `Match` SET state = "auditing" WHERE state = "joining" AND auditTime < ?';
+    sqlParams = [ util.getTime() ];
+    db.query(sql, sqlParams, err => { if (err) console.log(err); });
+
+    //修改申请
+    sql = 'UPDATE Application SET state = "auditing" WHERE state = "submitted" AND matchId IN (SELECT `Match`.id FROM `Match` WHERE auditTime < ?)';
+    sqlParams = [ util.getTime() ];
     db.query(sql, sqlParams, err => { if (err) console.log(err); });
 }
 
 //校团委初审结束、专家审核开始
 module.exports.auditEnd = function(db) {
-    sql = 'UPDATE Application SET state = "refused" WHERE state = "auditing" AND matchId IN (SELECT `Match`.id FROM `Match` WHERE LEFT(auditTime, 16) = ?)'
-    sqlParams = [ util.getTime().substr(0,16) ];
+    
+    //修改比赛
+    sql = 'UPDATE `Match` SET state = "scoring" WHERE state = "auditing" AND auditTime < ?';
+    sqlParams = [ util.getTime() ];
+    db.query(sql, sqlParams, err => { if (err) console.log(err); });
+
+    //修改申请
+    sql = 'UPDATE Application SET state = "refused" WHERE state = "auditing" AND matchId IN (SELECT `Match`.id FROM `Match` WHERE auditTime < ?)'
+    sqlParams = [ util.getTime() ];
     db.query(sql, sqlParams, err => { if (err) console.log(err); });
 }
 
 //专家审核结束
 module.exports.scoreEnd = function(db) {
 
+    //修改比赛
+    sql = 'UPDATE `Match` SET state = "scored" WHERE state = "scoring" AND auditTime < ?';
+    sqlParams = [ util.getTime() ];
+    db.query(sql, sqlParams, err => { if (err) console.log(err); });
+
     //专家自动拒绝评审
-    sql = 'UPDATE Assessment SET state = "refused" WHERE state = "auditing" AND applicationId IN (SELECT Application.id FROM Application WHERE matchId IN (SELECT `Match`.id FROM `Match` WHERE LEFT(auditTime, 16) = ?))'
-    sqlParams = [ util.getTime().substr(0,16) ];
+    sql = 'UPDATE Assessment SET state = "refused" WHERE state = "auditing" AND applicationId IN (SELECT Application.id FROM Application WHERE matchId IN (SELECT `Match`.id FROM `Match` WHERE auditTime < ?))'
+    sqlParams = [ util.getTime() ];
     db.query(sql, sqlParams, err => { if (err) console.log(err); });
 
     //申请评审完成
-    sql = 'UPDATE Application SET state = "scored" WHERE state = "scoring" AND matchId IN (SELECT `Match`.id FROM `Match` WHERE LEFT(auditTime, 16) = ?)'
-    sqlParams = [ util.getTime().substr(0,16) ];
+    sql = 'UPDATE Application SET state = "scored" WHERE state = "scoring" AND matchId IN (SELECT `Match`.id FROM `Match` WHERE auditTime < ?)'
+    sqlParams = [ util.getTime() ];
     db.query(sql, sqlParams, err => { if (err) console.log(err); });
 }
 
@@ -130,8 +157,6 @@ module.exports.upload = function(files, res) {
 
     //移动并重命名文件
     for (var i in files) {
-        console.log(files[i]);
-
         if (files[i].path) {
             var file = files[i];
             var oldPath = file.path;
