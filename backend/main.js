@@ -4,13 +4,16 @@ var url = require('url');
 var mysql = require('mysql');
 var mutipart= require('connect-multiparty');
 
+var CronJob = require('cron').CronJob;
+
+var genpdf = require('./genpdf');
 var util = require('./util');
 var common = require('./common');
 var student = require('./student');
 var tw = require('./tw');
 var expert = require('./expert');
 var system = require('./system');
-var genpdf = require('./genpdf');
+var test = require('./test');
 
 var app = express();
 var mutipartMiddeware = mutipart();
@@ -24,13 +27,11 @@ var db = mysql.createConnection({
 });
 
 db.connect();
-
 http.createServer(app).listen(30000);
-
 console.log('Server is running.\n' + util.getTime() + '\n');
 
 //跨域
-app.use(function(req, res, next) {
+app.use((req, res, next) => {
     res.header("Access-Control-Allow-Origin", "*");
     res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE');
     res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
@@ -43,9 +44,9 @@ app.use(mutipart({
 }));
 
 //通用
-app.get('/getMatchByDate', (req, res) => {
+app.get('/getMatch', (req, res) => {
     var info = JSON.parse(url.parse(req.url, true).query.info);
-    common.getMatchByDate(db, info, res);
+    common.getMatch(db, info, res);
 });
 
 app.get('/getWorkById', (req, res) => {
@@ -58,6 +59,11 @@ app.get('/getApplicationById', (req, res) => {
     common.getApplicationById(db, info, res);
 });
 
+app.get('/getExpertByCategory', (req, res) => {
+    var info = JSON.parse(url.parse(req.url, true).query.info);
+    common.getExpertByCategory(db, info, res);
+});
+
 //学生
 app.get('/studentRegister', (req, res) => {
     var info = JSON.parse(url.parse(req.url, true).query.info);
@@ -67,6 +73,16 @@ app.get('/studentRegister', (req, res) => {
 app.get('/studentLogin', (req, res) => {
     var info = JSON.parse(url.parse(req.url, true).query.info);
     student.login(db, info, res);
+});
+
+app.get('/studentLogout', (req, res) => {
+    var info = JSON.parse(url.parse(req.url, true).query.info);
+    student.logout(db, info, res);
+});
+
+app.get('/studentModifyInfo', (req, res) => {
+    var info = JSON.parse(url.parse(req.url, true).query.info);
+    student.modifyInfo(db, info, res);
 });
 
 app.get('/studentSetPassword', (req, res) => {
@@ -95,12 +111,42 @@ app.get('/expertLogin', (req, res) => {
     expert.login(db, info, res);
 });
 
+app.get('/expertLogout', (req, res) => {
+    var info = JSON.parse(url.parse(req.url, true).query.info);
+    expert.logout(db, info, res);
+});
+
 app.get('/expertSetPassword', (req, res) => {
     var info = JSON.parse(url.parse(req.url, true).query.info);
-    student.expertSetPassword(db, info, res);
+    expert.expertSetPassword(db, info, res);
+});
+
+app.get('/expertGetApplicationByAssessmentState', (req, res) => {
+    var info = JSON.parse(url.parse(req.url, true).query.info);
+    expert.expertGetApplicationByAssessmentState(db, info, res);
+});
+
+app.get('/expertSetApplicationScore', (req, res) => {
+    var info = JSON.parse(url.parse(req.url, true).query.info);
+    expert.expertSetApplicationScore(db, info, res);
+});
+
+app.get('/expertAcceptAssessment', (req, res) => {
+    var info = JSON.parse(url.parse(req.url, true).query.info);
+    expert.expertAcceptAssessment(db, info, res);
 });
 
 //校团委
+app.get('/twLogin', (req, res) => {
+    var info = JSON.parse(url.parse(req.url, true).query.info);
+    tw.login(db, info, res);
+});
+
+app.get('/twLogout', (req, res) => {
+    var info = JSON.parse(url.parse(req.url, true).query.info);
+    tw.logout(db, info, res);
+});
+
 app.get('/createMatch', (req, res) => {
     var info = JSON.parse(url.parse(req.url, true).query.info);
     tw.createMatch(db, info, res);
@@ -116,17 +162,31 @@ app.get('/setApplicationState', (req, res) => {
     tw.setApplicationState(db, info, res);
 });
 
-app.get('/getPdfApplication',(req,res)=> {
-    var info = JSON.parse(url.parse(req.url, true).query.info);
-    genpdf.getPdfApplication(db,info,res);
-});
-
 //系统
 app.post('/upload', mutipartMiddeware, (req, res) => {
     system.upload(req.files, res);
 });
 
-app.get('/deleteByUrl', mutipartMiddeware, (req, res) => {
+app.get('/download', (req, res) => {
     var info = JSON.parse(url.parse(req.url, true).query.info);
-    system.deleteByUrl(info, res);
+    system.download(info, res);
 });
+
+app.get('/delete', mutipartMiddeware, (req, res) => {
+    var info = JSON.parse(url.parse(req.url, true).query.info);
+    system.delete(info, res);
+});
+
+//生成PDF
+app.get('/generatePdf', (req, res) => {
+    var info = JSON.parse(url.parse(req.url, true).query.info);
+    genpdf.generatePdf(db, info, res);
+});
+
+//定时检测
+new CronJob('0 */1 * * * *', system.joinEnd(db), null, false);
+new CronJob('0 */1 * * * *', system.auditEnd(db), null, false);
+new CronJob('0 */1 * * * *', system.scoreEnd(db), null, false);
+
+//测试
+//test.test();

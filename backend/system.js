@@ -1,11 +1,44 @@
 var nodemailer = require('nodemailer');
 var smtpTransport = require('nodemailer-smtp-transport');
 var fs = require('fs');
+var path = require('path');
+var JSZip = require('jszip');
+var Docxtemplater = require('docxtemplater');
+var toPdf = require("office-to-pdf");
+var crypto = require('crypto');
 
 var util = require('./util');
 
+//学生报名结束、校团委初审开始
+module.exports.joinEnd = function(db) {
+    sql = 'UPDATE Application SET state = "auditing" WHERE state = "submitted" AND matchId IN (SELECT `Match`.id FROM `Match` WHERE LEFT(auditTime, 16) = ?)';
+    sqlParams = [ util.getTime().substr(0,16) ];
+    db.query(sql, sqlParams, err => { if (err) console.log(err); });
+}
+
+//校团委初审结束、专家审核开始
+module.exports.auditEnd = function(db) {
+    sql = 'UPDATE Application SET state = "refused" WHERE state = "auditing" AND matchId IN (SELECT `Match`.id FROM `Match` WHERE LEFT(auditTime, 16) = ?)'
+    sqlParams = [ util.getTime().substr(0,16) ];
+    db.query(sql, sqlParams, err => { if (err) console.log(err); });
+}
+
+//专家审核结束
+module.exports.scoreEnd = function(db) {
+
+    //专家自动拒绝评审
+    sql = 'UPDATE Assessment SET state = "refused" WHERE state = "auditing" AND applicationId IN (SELECT Application.id FROM Application WHERE matchId IN (SELECT `Match`.id FROM `Match` WHERE LEFT(auditTime, 16) = ?))'
+    sqlParams = [ util.getTime().substr(0,16) ];
+    db.query(sql, sqlParams, err => { if (err) console.log(err); });
+
+    //申请评审完成
+    sql = 'UPDATE Application SET state = "scored" WHERE state = "scoring" AND matchId IN (SELECT `Match`.id FROM `Match` WHERE LEFT(auditTime, 16) = ?)'
+    sqlParams = [ util.getTime().substr(0,16) ];
+    db.query(sql, sqlParams, err => { if (err) console.log(err); });
+}
+
 //邀请专家参与评审
-module.exports.inviteExpert = function(db, info, res) {
+module.exports.inviteExpert = function(db, info, num) {
     console.log('System - Invite expert\n' + util.getTime());
 
     //搜索申请
@@ -17,6 +50,7 @@ module.exports.inviteExpert = function(db, info, res) {
         } else {
             var matchId = data[0].matchId;
             var category = data[0].category;
+            var applicationId = data[0].applicationId;
 
             //搜索比赛
             var sql = 'SELECT * FROM `Match` WHERE id = ?';
@@ -27,14 +61,14 @@ module.exports.inviteExpert = function(db, info, res) {
                 } else {
                     var name = data[0].name;
 
-                    //搜索专家
+                    //搜索专家（随机顺序）
                     var sql = 'SELECT * FROM Expert WHERE category = ? ORDER BY RAND()';
                     var sqlParams = [ category ];
                     db.query(sql, sqlParams, (err, data) => {
                         if (err) {
                             console.log(err);
                         } else {
-                            var msg = '北航校团委邀请您参与比赛《' + name + '》的评审工作！';
+                            //SMTP客户端对象
                             var send = nodemailer.createTransport(smtpTransport({
                                 service: '163',
                                 auth: {
@@ -42,25 +76,35 @@ module.exports.inviteExpert = function(db, info, res) {
                                     pass: 'whitegive123'
                                 }
                             }));
-                            for (var i = 0; i < 3 && i < data.length; i++) {
+                            for (var i = 0; i < num && i < data.length; i++) {
                                 var email = data[i].email;
                                 var expertId = data[i].id;
 
                                 //插入评审
                                 var sql = 'INSERT INTO Assessment ' + util.values(5);
-                                var sqlParams = [ 0, expertId, info.applicationId, "auditing", 0 ];
-                                db.query(sql, sqlParams, (err, data) => {
+                                var sqlParams = [ 0, expertId, info.applicationId, "accepted", 0 ];
+                                db.query(sql, sqlParams, err => {
                                     if (err) {
                                         console.log(err);
                                     } else {
-
-                                        //发送邮件
-                                        send.sendMail({
+                                        var acceptUrl = 'http://58.87.72.138:30000/expertAcceptAssessment?info={"expertId":"' + expertId + '","applicationId":"' + applicationId + '","accept":"' + true + '"}';
+                                        var refuseUrl = 'http://58.87.72.138:30000/expertAcceptAssessment?info={"expertId":"' + expertId + '","applicationId":"' + applicationId + '","accept":"' + false + '"}';
+                                        
+                                        //邮件对象
+                                        var mail = {
                                             from: 'goodapple8946@163.com',
                                             to: email,
                                             subject: '比赛评审工作邀请',
-                                            html: msg
-                                        }, (err, res) => {
+                                            html:
+                                            '<p>北航校团委邀请您参与评审工作！</p>' +
+                                            '<p>接受：</p>' + 
+                                            '<p>' + acceptUrl + '</p>' +
+                                            '<p>拒绝：</p>' + 
+                                            '<p>' + refuseUrl + '</p>'
+                                        };
+
+                                        //发送邮件
+                                        send.sendMail(mail, err => {
                                             if (err) {
                                                 console.log(err);
                                             } else {
@@ -82,24 +126,51 @@ module.exports.inviteExpert = function(db, info, res) {
 module.exports.upload = function(files, res) {
     console.log('System - Upload\n' + util.getTime());
 
-    //移动并重命名文件
-    var ret = { err: null, msg: null };
-    var oldPath = files.fileUpload.path;
-    var newPath = oldPath.replace('/temp/', '/work/');
+    var ret = { err: null, msg: null, documentUrl: [], pictureUrl: [], videoUrl: [] };
 
-    fs.rename(oldPath, newPath, err => {
-        if (err) {
-            console.log(err);
-            ret.err = true;
-            ret.msg = 'Upload failed.';
-            res.send(JSON.stringify(ret));
-        } else {
-            ret.err = false;
-            ret.msg = 'Upload Successfully.';
-            ret.url = newPath;
-            res.send(JSON.stringify(ret));
+    //移动并重命名文件
+    for (var i in files) {
+        console.log(files[i]);
+
+        if (files[i].path) {
+            var file = files[i];
+            var oldPath = file.path;
+            var newPath = file.path.replace('temp', 'work');
+            fs.rename(oldPath, newPath, err => { if (err) console.log(err); });
+            if (file.fieldName == 'document' && file.originalFilename != '')
+                ret.documentUrl.push(newPath);
+            else if (file.fieldName == 'image' && file.originalFilename != '')
+                ret.pictureUrl.push(newPath);
+            else if (file.fieldName == 'video' && file.originalFilename != '')
+                ret.videoUrl.push(newPath);
         }
+        else
+            for (var j in files[i]) {
+                var file = files[i][j];
+                var oldPath = file.path;
+                var newPath = file.path.replace('temp', 'work');
+                fs.rename(oldPath, newPath, err => { if (err) console.log(err); });
+                ret.pictureUrl.push(newPath);
+            }
+    }
+    ret.err = false;
+    ret.msg = 'File upload accomplished.';
+    res.send(JSON.stringify(ret));
+}
+
+//下载文件
+module.exports.download = function(info, res) {
+    console.log('System - Download\n' + util.getTime());
+
+    //添加到压缩文件
+    var zip = new JSZip();
+    zip.file(info.url, 'white-give');
+    var data = zip.generate({
+        type: 'nodebuffer',
+        compression:'DEFLATE',
+        streamFiles: true
     });
+    res.send(data);
 }
 
 //根据URL删除文件
@@ -117,6 +188,95 @@ module.exports.deleteByUrl = function(info, res) {
             ret.err = false;
             ret.msg = 'Upload Successfully.';
             res.send(JSON.stringify(ret));
+        }
+    });
+}
+
+//生成PDF
+module.exports.generatePdf = function (db, info, res) {
+    console.log('System - Generate PDF\n' + util.getTime());
+    
+    var content = fs.readFileSync(path.join(__dirname, '../data/template/doc.docx'), 'binary');
+    var zip = new JSZip(content);
+    var doc = new Docxtemplater();
+    
+    //搜索申请
+    var ret = { err: null, msg: null };
+    var sql = 'SELECT * FROM Application WHERE id = ?';
+    var sqlParams = [ info.appId ];
+    db.query(sql, sqlParams, (err, data) => {
+        if (err) {
+            console.log(err);
+            ret.err = true;
+            ret.msg = 'Database error(SELECT).';
+            res.send(JSON.stringify(ret));
+        } else {
+            var application = data[0];
+            doc.loadZip(zip);
+            doc.setData({
+                "id": application.id,
+                "department": application.department,
+                "appCategory": application.appCategory,
+                "name": application.name,
+                "studentNumber": application.studentNumber,
+                "birthday": application.birthday,
+                "eduBackground": application.eduBackground,
+                "major": application.major,
+                "enrollmentYear": application.enrollmentYear,
+                "workName": application.workName,
+                "address": application.address,
+                "phone": application.phone,
+                "email": application.email,
+                "c1Name": application.c1Name,
+                "c1StudentNumber": application.c1StudentNumber,
+                "c1EduBackground": application.c1EduBackground,
+                "c1Email": application.c1Email,
+                "c1Phone": application.c1Phone,
+                "c2Name": application.c2Name,
+                "c2StudentNumber": application.c2StudentNumber,
+                "c2EduBackground": application.c2EduBackground,
+                "c2Email": application.c2Email,
+                "c2Phone": application.c2Phone,
+                "c3Name": application.c3Name,
+                "c3StudentNumber": application.c3StudentNumber,
+                "c3EduBackground": application.c3EduBackground,
+                "c3Email": application.c3Email,
+                "c3Phone": application.c3Phone,
+                "c4Name": application.c4Name,
+                "c4StudentNumber": application.c4StudentNumber,
+                "c4EduBackground": application.c4EduBackground,
+                "c4Email": application.c4Email,
+                "c4Phone": application.c4Phone,
+                "category": application.category,
+                "introduction": application.introduction,
+                "innovation": application.innovation,
+                "keyword": application.keyword
+            });
+            try {
+                doc.render();
+            } catch (ex) {
+                console.log(ex);
+                ret.err = true;
+                ret.msg = 'Generate PDF Failed.';
+                res.send(JSON.stringify(ret));
+            }
+            var buf = doc.getZip().generate({ type: 'nodebuffer' });
+            var url = '/var/ftp/pub/data/application/' + application.studentNumber + '_' + application.name + '_' + application.id + '.pdf';
+            toPdf(buf).then(pdfBuffer => {
+                    fs.writeFileSync(url, pdfBuffer)
+                }, err => {
+                    if (err) {
+                        console.log(err);
+                        ret.err = true;
+                        ret.msg = 'Generate PDF Failed.';
+                        res.send(JSON.stringify(ret));
+                    } else {
+                        ret.err = false;
+                        ret.msg = 'Generate PDF Successfully.';
+                        ret.url = url;
+                        res.send(JSON.stringify(ret));
+                    }
+            });
         }
     });
 }

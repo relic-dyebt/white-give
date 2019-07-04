@@ -1,0 +1,558 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<!-- import CSS -->
+	<link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
+	<link href="../css/apply.css" rel="stylesheet" media="screen">
+	<!-- import Vue before Element -->
+	<script src="https://unpkg.com/vue/dist/vue.js"></script>
+	<!-- import JavaScript -->
+	<script src="https://unpkg.com/element-ui/lib/index.js"></script>
+	<!-- import JQuery -->
+	<script src="https://cdn.staticfile.org/jquery/3.1.1/jquery.min.js"></script>
+</head>
+
+
+<style>
+
+</style>
+
+
+<body>
+  <div id="app">
+      <el-row :gutter="20">
+          <el-col :span="12" :offset="6">
+              <el-card>
+                  <el-steps :active="current" finish-status="success" >
+                    <el-step title="参报概要"></el-step>
+                    <el-step title="个人信息"></el-step>
+                    <el-step title="合作者信息"></el-step>
+                    <el-step title="作品信息"></el-step>
+                    <el-step title="作品上传"></el-step>
+                  </el-steps>
+
+                  <h4>当前正在进行第 {{ current + 1 }} 步</h4>
+                  
+                  <el-form ref="formApplication" :model="formApplication" :rules="ruleApplication" label-position="right" label-width="80px">
+                      <div v-if="current==0">
+                          <el-form-item label="作品名称" prop="workName">
+                              <el-input v-model="formApplication.workName" placeholder="请输入您的作品名称"></el-input>
+                          </el-form-item>
+                          <el-form-item label="院系" prop="department">
+                              <el-input v-model="formApplication.department" placeholder="请输入您的院系名称"></el-input>
+                          </el-form-item>
+                          <el-form-item label="论文类别" prop="appCategory">
+                              <el-radio-group v-model="formApplication.appCategory">
+                                  <el-radio label="A">科技发明制作</el-radio>
+                                  <el-radio label="B">调查报告和学术论文</el-radio> 
+                              </el-radio-group>
+                          </el-form-item>
+                          <Center>
+                              <el-button type="dashed" disabled style="margin-right:70px"><i class="el-icon-arrow-left"></i>上一步</el-button>
+                              <el-button type="primary" @click="next">下一步<i class="el-icon-arrow-right"></i></el-button>
+                          </Center>
+                      </div>
+      
+                      <div v-if="current==1">
+                          <el-form-item label="姓名" prop="name">
+                              <el-input v-model="formApplication.name" placeholder="请输入您的姓名"></el-input>
+                          </el-form-item>
+                          <el-form-item label="学号" prop="studentNumber">
+                              <el-input v-model="formApplication.studentNumber" placeholder="请输入您的学号"></el-input>
+                          </el-form-item>
+                          <el-form-item label="出生年月" prop="birthday">
+                              <el-date-picker type="date" placeholder="请选择您的出生年月" v-model="formApplication.birthday" style="width:215px"></el-date-picker>
+                          </el-form-item>
+                          <el-form-item label="学历" prop="eduBackground">
+                              <el-radio-group v-model="formApplication.eduBackground">
+                                  <el-radio label="A">大专</el-radio>
+                                  <el-radio label="B">大学本科</el-radio>
+                                  <el-radio label="C">硕士研究生</el-radio>
+                                  <el-radio label="D">博士研究生</el-radio>
+                              </el-radio-group>
+                          </el-form-item>
+                          <el-form-item label="专业" prop="major">
+                              <el-input v-model="formApplication.major" placeholder="请输入您的专业"></el-input>
+                          </el-form-item>
+                          
+                          <el-form-item label="入学年份" prop="enrollmentYear">
+                              <el-date-picker type='year' v-model="formApplication.enrollmentYear" placeholder="请选择入学年份"></el-date-picker>
+                          </el-form-item>
+                          <el-form-item label="通讯地址" prop="address">
+                              <el-input v-model="formApplication.address" placeholder="请输入您的通讯地址"></el-input>
+                          </el-form-item>
+                          <el-form-item label="联系电话" prop="phone">
+                              <el-input v-model="formApplication.phone" placeholder="请输入您的联系电话"></el-input>
+                          </el-form-item>
+                          <el-form-item label="邮箱" prop="email">
+                              <el-input v-model="formApplication.email" placeholder="请输入您的邮箱"></el-input>
+                          </el-form-item>
+                          <Center>
+                              <el-button type="primary" @click="prev" style="margin-right:70px"><i class="el-icon-arrow-left"></i>上一步</el-button>
+                              <el-button type="primary" @click="next">下一步<i class="el-icon-arrow-right"></i></el-button>
+                          </Center>
+                      </div>
+                      
+                      <div v-if="current==2">
+                          <div v-if="count>=1">
+                              <el-card>
+                                  <div slot="header" class="clearfix">
+                                      <span>合作者1</span>
+                                      <el-button size="medium" type="danger" @click="handleRemove" shape="circle" style="float: right; padding: 3px 0" icon="el-icon-delete-solid">移除</el-button>
+                                  </div>
+                                  <div>
+                                    <el-row>
+                                        <el-col :span="12">
+                                            <el-form-item label="姓名" prop="c1Name"
+                                            :rules="{required: true, message: '姓名不能为空！', trigger: 'blur'}">
+                                                <el-input v-model="formApplication.c1Name"></el-input>
+                                            </el-form-item>
+                                            <el-form-item label="联系电话" prop="c1Phone"
+                                            :rules="{required: true, message: '联系电话不能为空！', trigger: 'blur'}">
+                                                <el-input v-model="formApplication.c1Phone"></el-input>
+                                            </el-form-item>
+                                            </el-col>
+                                        <el-col :span="12">
+                                            <el-form-item label="学历" prop="c1eduBackground"
+                                            :rules="{required: true, message: '学历不能为空！', trigger: 'blur'}">
+                                                <el-input v-model="formApplication.c1eduBackground"></el-input>
+                                            </el-form-item>
+                                            <el-form-item label="邮箱" prop="c1Email">
+                                                <el-input v-model="formApplication.c1Email"></el-input>
+                                            </el-form-item>
+                                        </el-col>
+                                    </el-row>
+                                  </div>
+                                </el-card>
+                          </div>
+                          <div v-if="count>=2">
+                              <el-card>
+                                <div slot="header" class="clearfix">
+                                    <span>合作者2</span>
+                                    <el-button size="medium" type="danger" @click="handleRemove" shape="circle" style="float: right; padding: 3px 0" icon="el-icon-delete-solid">移除</el-button>
+                                </div>
+                                <div>
+                                    <el-row>
+                                        <el-col :span="12">
+                                            <el-form-item label="姓名" prop="c2Name"
+                                            :rules="{required: true, message: '姓名不能为空！', trigger: 'blur'}">
+                                                <el-input v-model="formApplication.c2Name"></el-input>
+                                            </el-form-item>
+                                            <el-form-item label="联系电话" prop="c2Phone"
+                                            :rules="{required: true, message: '联系电话不能为空！', trigger: 'blur'}">
+                                                <el-input v-model="formApplication.c2Phone"></el-input>
+                                            </el-form-item>
+                                        </el-col>
+                                        <el-col :span="12">
+                                            <el-form-item label="学历" prop="c2eduBackground"
+                                            :rules="{required: true, message: '学历不能为空！', trigger: 'blur'}">
+                                                <el-input v-model="formApplication.c2eduBackground"></el-input>
+                                            </el-form-item>
+                                            <el-form-item label="邮箱" prop="c2Email">
+                                                <el-input v-model="formApplication.c2Email"></el-input>
+                                            </el-form-item>
+                                            </el-col>
+                                    </el-row>
+                                </div>
+                              </el-card>
+                          </div>
+                        <div v-if="count>=3">
+                            <el-card>
+                                <div slot="header" class="clearfix">
+                                    <span>合作者3</span>
+                                    <el-button size="medium" type="danger" @click="handleRemove" shape="circle" style="float: right; padding: 3px 0" icon="el-icon-delete-solid">移除</el-button>
+                                </div>
+                                <div>
+                                    <el-row>
+                                        <el-col :span="12">
+                                            <el-form-item label="姓名" prop="c3Name"
+                                            :rules="{required: true, message: '姓名不能为空！', trigger: 'blur'}">
+                                                <el-input v-model="formApplication.c3Name"></el-input>
+                                            </el-form-item>
+                                            <el-form-item label="联系电话" prop="c3Phone"
+                                            :rules="{required: true, message: '联系电话不能为空！', trigger: 'blur'}">
+                                                <el-input v-model="formApplication.c3Phone"></el-input>
+                                            </el-form-item>
+                                        </el-col>
+                                        <el-col :span="12">
+                                            <el-form-item label="学历" prop="c3eduBackground"
+                                            :rules="{required: true, message: '学历不能为空！', trigger: 'blur'}">
+                                                <el-input v-model="formApplication.c3eduBackground"></el-input>
+                                            </el-form-item>
+                                            <el-form-item label="邮箱" prop="c3Email">
+                                                <el-input v-model="formApplication.c3Email"></el-input>
+                                            </el-form-item>
+                                        </el-col>
+                                    </el-row>
+                                </div>
+                            </el-card>
+                        </div>
+                          <div v-if="count>=4">
+                              <el-card>
+                                    <div slot="header" class="clearfix">
+                                        <span>合作者4</span>
+                                        <el-button size="medium" type="danger" @click="handleRemove" shape="circle" style="float: right; padding: 3px 0" icon="el-icon-delete-solid">移除</el-button>
+                                    </div>
+                                  <div>
+                                    <el-row>
+                                        <el-col :span="12">
+                                            <el-form-item label="姓名" prop="c4Name"
+                                            :rules="{required: true, message: '姓名不能为空！', trigger: 'blur'}">
+                                                <el-input v-model="formApplication.c4Name"></el-input>
+                                            </el-form-item>
+                                            <el-form-item label="联系电话" prop="c4Phone"
+                                            :rules="{required: true, message: '联系电话不能为空！', trigger: 'blur'}">
+                                                <el-input v-model="formApplication.c4Phone"></el-input>
+                                            </el-form-item>
+                                        </el-col>
+                                        <el-col :span="12">
+                                            <el-form-item label="学历" prop="c4eduBackground"
+                                            :rules="{required: true, message: '学历不能为空！', trigger: 'blur'}">
+                                                <el-input v-model="formApplication.c4eduBackground"></el-input>
+                                            </el-form-item>
+                                            <el-form-item label="邮箱" prop="c4Email">
+                                                <el-input v-model="formApplication.c4Email"></el-input>
+                                            </el-form-item>
+                                        </el-col>
+                                    </el-row>
+                                  </div>
+                                </el-card>
+                          </div>
+                          <br>
+                          <el-form-item>
+                            <el-row>
+                                  <el-col :span="8" :offset="8">
+                                      <el-button type="dashed" @click="handleAdd" icon="el-icon-plus">添加合作者</el-button>
+                                  </el-col>
+                            </el-row>
+                          </el-form-item>
+                          <Center>
+                              <el-button type="primary" @click="prev" style="margin-right:70px"><i class="el-icon-arrow-left"></i>上一步</el-button>
+                              <el-button type="primary" @click="next">下一步<i class="el-icon-arrow-right"></i></el-button>
+                          </Center>
+                      </div>
+                      
+                      <div v-if="current==3">
+                          <el-form-item label="作品类别" prop="category">
+                              <el-select v-model="formApplication.category" placeholder="请选择您的作品类别">
+                                <el-option value="A" label="A.机械与控制（包括机械、仪器仪表、自动化控制、工程、交通、建筑等）"></el-option>
+                                <el-option value="B" label="B.信息技术（包括计算机、电信、通讯、电子等）"></el-option>
+                                <el-option value="C" label="C.数理（包括数学、物理、地球与空间科学等）"></el-option>
+                                <el-option value="D" label="D.生命科学(包括生物､农学､药学､医学､健康､卫生､食品等)"></el-option>
+                                <el-option value="E" label="E.能源化工（包括能源、材料、石油、化学、化工、生态、环保等）"></el-option>
+                                <el-option value="F" label="F.哲学社会科学（包括哲学、经济、社会、法律、教育、管理）"></el-option>
+                              </el-select>
+                          </el-form-item>
+                          <el-form-item label="作品简介" prop="introduction">
+                              <el-input v-model="formApplication.introduction" type="textarea" :autosize="{minRows: 5,maxRows: 10}" placeholder="请在此填写您的作品总体情况说明，不超过800字"></el-input>
+                          </el-form-item>
+                          <el-form-item label="创新点" prop="innovation">
+                              <el-input v-model="formApplication.innovation" type="textarea" :autosize="{minRows: 3,maxRows: 5}" placeholder="请在此填写1-5条体现作品主要创意的创新点"></el-input>
+                          </el-form-item>
+                          <el-form-item label="关键词" prop="keyword">
+                              <el-input v-model="formApplication.keyword" type="textarea" :autosize="{minRows: 3,maxRows: 5}" placeholder="请在此填写4-7个体现作品核心技术和问题的关键词"></el-input>
+                          </el-form-item>
+                          <Center>
+                              <el-button type="primary" @click="prev" style="margin-right:70px"><i class="el-icon-arrow-left"></i>上一步</el-button>
+                              <el-button type="primary" @click="next">下一步<i class="el-icon-arrow-right"></i></el-button>     
+                          </Center>
+                      </div>
+      
+                      <div v-if="current==4">
+                          <el-form-item>
+                            <el-row>
+                                <el-col :span="12" :offset="4">
+                                    <form id= "uploadForm" >
+										<div class="uploader blue">
+										<input type="text" class="filename" readonly/>
+										<input type="button" class="button" value="Browse..."/>
+										<input type="file" size="30" name="document"/>
+										</div>
+										<br/>
+										<div class="uploader blue">
+											<input type="text" class="filename"  readonly/>
+											<input type="button" class="button" value="Browse..."/>
+											<input type="file" size="30" name="image" multiple/>
+										</div>
+										<br/>
+										<div class="uploader blue">
+											<input type="text" class="filename"  readonly/>
+											<input type="button" class="button" value="Browse..."/>
+											<input type="file" size="30" name="video"/>
+										</div>
+									</form>
+									
+									
+                                </el-col>
+                            </el-row>
+                          </el-form-item>
+                          <Center>
+                              <el-button type="primary" @click="prev" style="margin-right:70px"><i class="el-icon-arrow-left"></i>上一步</el-button>
+                              <el-button type="success" @click="handleSubmit('formApplication')">提交<i class="el-icon-upload"></i></el-button>
+                          </Center>
+                      </div>
+              </el-card>
+          </el-col>
+      </el-row>
+	 
+	 
+  </div>
+</body>
+
+</html>
+
+
+<script>
+  new Vue({
+    el: '#app',
+    data: function() {
+		return { 
+            current: 0,
+            count: 0,
+            visible: false, 
+            formApplication: {
+                    workName:'秀的一麻批',//作品名称
+                    department:'计算机学院',//院系
+                    appCategory:'A',//论文申请类别
+
+                    name:'李华',//学生姓名
+                    studentNumber:'16211000',//学号
+                    birthday:'1998-04-20',//出生年月
+                    eduBackground:'A',//学历
+                    major:'软件工程',//专业
+                    enrollmentYear:'2016',//入学年份
+                    address:'紫禁城',//通讯地址
+                    phone:'13012345678',//手机号
+                    email:'lihua@163.com',//邮箱
+
+                    c1Name:'李华',
+					c1StudentNumber:'16211000',
+                    c1eduBackground:'本科',
+                    c1Phone:'13012345678',
+                    c1Email:'lihua@163.com',
+
+                    c2Name:'',
+					c2StudentNumber:'',
+                    c2eduBackground:'',
+                    c2Phone:'',
+                    c2Email:'',
+
+                    c3Name:'',
+					c3StudentNumber:'',
+                    c3eduBackground:'',
+                    c3Phone:'',
+                    c3Email:'',
+
+                    c4Name:'',
+					c4StudentNumber:'',
+                    c4eduBackground:'',
+                    c4Phone:'',
+                    c4Email:'',
+
+                    category:'A', //作品类别
+                    introduction:'你说啥就是啥', //作品简介
+                    innovation:'写不完了', //创新点
+                    keyword:'没有keyword', //关键词
+					documentUrl: '',
+					imageUrl: '',
+					videoUrl: '',
+					
+                },
+            ruleApplication: {
+                    workName:[
+                        {required: true, message: '作品名称不能为空！', trigger: 'blur'}
+                    ],
+                    department:[
+                        {required: true, message: '院系名称不能为空！', trigger: 'blur'}
+                    ],
+                    appCategor:[
+                        {required: true, message: '请选择论文类别！', trigger: 'change'}
+                    ],
+
+                    name:[
+                        {required: true, message: '姓名不能为空！', trigger: 'blur'}
+                    ],
+                    studentNumber:[
+                        {required: true, message: '学号不能为空！', trigger: 'blur'}
+                    ],
+                    birthday:[
+                        {required: true, type: 'date', message: '请选择出生年月！', trigger: 'change'}
+                    ],
+                    eduBackground:[
+                        {required: true, message: '请选择学历！', trigger: 'change'}
+                    ],
+                    major:[
+                        {required: true, message: '专业不能为空！', trigger: 'blur'}
+                    ],
+                    enrollmentYear:[
+                        {required: true, message: '请选择入学年份！！', trigger: 'change'}
+                    ],
+                    address:[
+                        {required: true, message: '通讯地址不能为空！', trigger: 'blur'}
+                    ],
+                    phone:[
+                        {required: true, message: '联系电话不能为空！', trigger: 'blur'}
+                    ],
+                    email:[
+                        {required: true, message: '邮箱不能为空！', trigger: 'blur'},
+                        { type: 'email', message: '邮箱格式不正确！', trigger: 'blur' }
+                    ],
+                    c1Email:[
+                        {required: true, message: '邮箱不能为空！', trigger: 'blur'},
+                        { type: 'email', message: '邮箱格式不正确！', trigger: 'blur' }
+                    ],
+                    c2Email:[
+                        {required: true, message: '邮箱不能为空！', trigger: 'blur'},
+                        { type: 'email', message: '邮箱格式不正确！', trigger: 'blur' }
+                    ],
+                    c3Email:[
+                        {required: true, message: '邮箱不能为空！', trigger: 'blur'},
+                        { type: 'email', message: '邮箱格式不正确！', trigger: 'blur' }
+                    ],
+                    c4Email:[
+                        {required: true, message: '邮箱不能为空！', trigger: 'blur'},
+                        { type: 'email', message: '邮箱格式不正确！', trigger: 'blur' }
+                    ],
+
+                    category:[
+                        {required: true, message: '请选择作品类别！', trigger: 'change'}
+                    ], 
+                    introduction:[
+                        {required: true, message: '作品简介不能为空！', trigger: 'blur'}
+                    ], 
+                    innovation:[
+                        {required: true, message: '创新点不能为空！', trigger: 'blur'}
+                    ],
+                    keyword:[
+                        {required: true, message: '关键词不能为空！', trigger: 'blur'}
+                    ]
+            },
+                }
+        },
+
+    methods:{
+      next () {
+        if (this.current == 4) {
+			this.current = 0;
+		  } else {
+			this.current += 1;
+		  }
+		if(this.current == 4){
+			this.$nextTick(()=>{
+				this.update();
+			})
+		}
+		
+      },
+      prev (){
+          this.current -= 1;
+      },
+      handleAdd () {
+          if(this.count<=4){
+              this.count++;
+              if(this.count==5){
+                  alert("您最多只能添加四位合作者！");
+                  this.count--;
+              }
+          }
+      },
+      handleRemove () {
+          if(this.count>=1){
+              this.count--;
+          }
+      },
+      handleSubmit (name) {
+          this.$refs[name].validate((valid) => {
+              if (valid) {
+                  this.upload();
+					this.submit();
+              } else {
+                  _self.$message({
+					message: '提交失败，请检查信息填写是否正确',
+					type: 'error',
+					center: true
+				});
+              }
+          });
+		  
+      },
+	  submit(){
+			var _self=this;
+			console.log(_self.formApplication.name);
+					
+			$.ajax({
+				url: "http://58.87.72.138:30000/submitApplication",
+				type: "get",
+				dataType: 'json',
+				contentType:"application/json",
+				data: {
+					info: JSON.stringify(_self.formApplication),
+				},
+				success: function(res){
+					console.log(res);
+					
+				
+				},
+				error: function(err){
+					console.log(err);
+				}
+				
+			})
+		},
+		upload: function(){
+			
+			var _self = this;
+			var formData = new FormData($( "#uploadForm" )[0]);  
+			$.ajax({  
+				url: 'http://58.87.72.138:30000/upload' ,  
+				type: 'POST',  
+				data: formData,  
+				async: false,  
+				cache: false,  
+				contentType: false,  
+				processData: false,  
+				success: function (res) {
+					var data = JSON.parse(res);
+					console.log(data);
+					_self.formApplication.documentUrl = data.documentUrl[0];
+					_self.formApplication.videoUrl = data.videoUrl[0];
+					for(item in data.pictureUrl){
+						_self.formApplication.imageUrl += (data.pictureUrl[item] + ';');
+					}
+					
+					
+					if(data.err == false){
+						_self.$message({
+							message: '申请提交成功',
+							type: 'success',
+							center: true
+						});
+						
+						setTimeout(() => {
+							window.location.href="main.html";
+						}, 1000);
+					}
+					else{
+						_self.$message({
+							message: '申请失败',
+							type: 'error',
+							center: true
+						});
+					}
+					
+				},  
+				error: function (err) {  
+					console.log(err);  
+				}  
+		   });
+			
+		},
+		update: function(){
+			$("input[type=file]").change(function(){$(this).parents(".uploader").find(".filename").val($(this).val());});
+			$("input[type=file]").each(function(){if($(this).val()==""){$(this).parents(".uploader").find(".filename").val("No file selected...");}});
+		},
+    }
+  })
+</script>
+
