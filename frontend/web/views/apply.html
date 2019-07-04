@@ -312,6 +312,7 @@
             count: 0,
             visible: false, 
             formApplication: {
+                    matchId:1,
                     workName:'秀的一麻批',//作品名称
                     department:'计算机学院',//院系
                     appCategory:'A',//论文申请类别
@@ -480,6 +481,7 @@
 	  submit(){
 			var _self=this;
 			console.log(_self.formApplication.name);
+			_self.formApplication.matchId=localStorage.getItem("selMatch");
 					
 			$.ajax({
 				url: "http://58.87.72.138:30000/submitApplication",

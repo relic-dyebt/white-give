@@ -315,18 +315,37 @@
             return this.info;
         },
         methods: {
-            joinMatch: function(url){
-                window.open(url);
+            joinMatch(id){
+                localStorage.setItem("selMatch",id);
+                window.open("apply.html");
+
             }
         },
-        template: '<el-row :gutter="12"><el-col :offset="8" :span="8"><el-card class="box-card" shadow="hover"><div slot="header" class="clearfix"><span class="matchName">{{ info.name }}</span><el-button icon="el-icon-position" style="float: right; padding: 3px 0" type="text" @click="joinMatch(info.joinUrl)">参加比赛</el-button></div><div class="text item">{{ "开始时间： "+ info.joinTime }}</div><div class="text item">{{ "结束时间： "+ info.endTime }}</div><div class="text item">{{ "简介： "+ info.introduction}}</div></el-card></el-col></el-row>',
+        template: '<el-row :gutter="12">\n' +
+            '            <el-col :offset="6" :span="12">\n' +
+            '                <el-card class="box-card" shadow="hover">\n' +
+            '                    <div slot="header" class="clearfix">\n' +
+            '                        <span class="matchName">{{ info.name }}</span>\n' +
+            '                        <el-button \n' +
+            '                        icon="el-icon-position" \n' +
+            '                        style="float: right; padding: 3px 0" \n' +
+            '                        type="text" @click="joinMatch()">参加比赛</el-button>\n' +
+            '                    </div>\n' +
+            '                    <div class="text item">{{ "比赛简介： "+ info.introduction }}</div>\n' +
+            '                    <div class="text item">{{ "开始时间： "+ info.joinTime }}</div>\n' +
+            '                    <div class="text item">{{ "报名截止时间： "+ info.auditTime }}</div>\n' +
+            '                    <div class="text item">{{ "团委初审结束时间： "+ info.scoreTime }}</div>\n' +
+            '                    <div class="text item">{{ "专家评审结束时间： "+ info.endTime }}</div>\n' +
+            '                </el-card>\n' +
+            '            </el-col>\n' +
+            '        </el-row>',
     });
 
     new Vue({
         el: '#main',
         data: function() {
             return {
-                sidebarIndex : 2,
+                sidebarIndex : 1,
                 matchData: [],
                 userInfo: null,
                 role: null
@@ -337,6 +356,7 @@
           this.getUserInfo();
         },
         methods: {
+
             getMatchData(){
                 var _self=this;
                 $.ajax({
