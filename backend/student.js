@@ -232,6 +232,29 @@ module.exports.submitApplication = function(db, info, res) {
     });
 }
 
+//学生获取申请
+module.exports.studentGetApplication = function(db, info, res) {
+    console.log('Student - Get application\n' + util.getTime());
+
+    //搜索申请
+    var ret = { err: null, msg: null };
+    var sql = 'SELECT * FROM Application WHERE studentNumber = ?';
+    var sqlParams = [ info.studentNumber ];
+    db.query(sql, sqlParams, (err, data) => {
+        if (err) {
+            console.log(err);
+            ret.err = true;
+            ret.msg = 'Database error(SELECT).';
+            res.send(JSON.stringify(ret));
+        } else {
+            ret.err = false;
+            ret.msg = 'Application found successfully.';
+            ret.data = data;
+            res.send(JSON.stringify(ret));
+        }
+    });
+}
+
 //学生根据比赛获取申请
 module.exports.studentGetApplicationByMatch = function(db, info, res) {
     console.log('Student - Get application by match\n' + util.getTime());

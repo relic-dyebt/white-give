@@ -94,6 +94,11 @@ app.get('/submitApplication', (req, res) => {
     student.submitApplication(db, info, res);
 });
 
+app.get('/studentGetApplication', (req, res) => {
+    var info = JSON.parse(url.parse(req.url, true).query.info);
+    student.studentGetApplication(db, info, res);
+});
+
 app.get('/studentGetApplicationByMatch', (req, res) => {
     var info = JSON.parse(url.parse(req.url, true).query.info);
     student.studentGetApplicationByMatch(db, info, res);
