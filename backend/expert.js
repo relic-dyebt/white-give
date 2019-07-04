@@ -105,6 +105,36 @@ module.exports.logout = function(db, info, res) {
     });
 }
 
+//专家修改个人信息
+module.exports.modifyInfo = function(db, info, res) {
+    console.log('Expert - Modify Information\n' + util.getTime());
+
+    //更新专家
+    var ret = { err: null, msg: null };
+    var sql = 'UPDATE Expert SET username = ?, name = ?, introduction = ?, profileUrl = ?, phone = ?, category = ? WHERE email = ?';
+    var sqlParams = [
+        info.username,
+        info.name,
+        info.introduction,
+        info.profileUrl,
+        info.phone,
+        info.category,
+        info.email
+    ];
+    db.query(sql, sqlParams, err => {
+        if (err) {
+            console.log(err);
+            ret.err = true;
+            ret.msg = 'Database error(UPDATE).';
+            res.send(JSON.stringify(ret));
+        } else {
+            ret.err = false;
+            ret.msg = 'Modify Information successfully.';
+            res.send(JSON.stringify(ret));
+        }
+    });
+}
+
 //专家修改密码
 module.exports.expertSetPassword = function(db, info, res) {
     console.log('Expert - Set password\n' + util.getTime());
@@ -113,7 +143,7 @@ module.exports.expertSetPassword = function(db, info, res) {
     var ret = { err: null, msg: null };
     var sql = 'UPDATE Expert SET `password` = ? WHERE email = ?';
     var sqlParams = [ info.password, info.email ];
-    db.query(sql, sqlParams, (err, data) => {
+    db.query(sql, sqlParams, err => {
         if (err) {
             console.log(err);
             ret.err = true;

@@ -44,9 +44,9 @@ app.use(mutipart({
 }));
 
 //通用
-app.get('/getMatchByDate', (req, res) => {
+app.get('/getMatch', (req, res) => {
     var info = JSON.parse(url.parse(req.url, true).query.info);
-    common.getMatchByDate(db, info, res);
+    common.getMatch(db, info, res);
 });
 
 app.get('/getWorkById', (req, res) => {
@@ -78,6 +78,11 @@ app.get('/studentLogin', (req, res) => {
 app.get('/studentLogout', (req, res) => {
     var info = JSON.parse(url.parse(req.url, true).query.info);
     student.logout(db, info, res);
+});
+
+app.get('/studentModifyInfo', (req, res) => {
+    var info = JSON.parse(url.parse(req.url, true).query.info);
+    student.modifyInfo(db, info, res);
 });
 
 app.get('/studentSetPassword', (req, res) => {
@@ -178,8 +183,10 @@ app.get('/generatePdf', (req, res) => {
     genpdf.generatePdf(db, info, res);
 });
 
-//定时检测比赛开始
-new CronJob('59 59 23 */1 * *', system.matchStart(db));
+//定时检测
+new CronJob('0 */1 * * * *', system.joinEnd(db), null, false);
+new CronJob('0 */1 * * * *', system.auditEnd(db), null, false);
+new CronJob('0 */1 * * * *', system.scoreEnd(db), null, false);
 
 //测试
 //test.test();

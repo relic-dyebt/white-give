@@ -9,17 +9,32 @@ var crypto = require('crypto');
 
 var util = require('./util');
 
-//比赛开始
-module.exports.matchStart = function(db) {
-    sql = 'UPDATE Application SET state = "auditing" WHERE state = "submitted" AND matchId IN (SELECT `Match`.id FROM `Match` WHERE endDate = ?)';
-    sqlParams = [ util.getTime() ];
-    db.query(sql, sqlParams, err => {
-        if (err) {
-            console.log(err);
-        } else {
-            console.log('Match start, application state update.');
-        }
-    });
+//学生报名结束、校团委初审开始
+module.exports.joinEnd = function(db) {
+    sql = 'UPDATE Application SET state = "auditing" WHERE state = "submitted" AND matchId IN (SELECT `Match`.id FROM `Match` WHERE LEFT(auditTime, 16) = ?)';
+    sqlParams = [ util.getTime().substr(0,16) ];
+    db.query(sql, sqlParams, err => { if (err) console.log(err); });
+}
+
+//校团委初审结束、专家审核开始
+module.exports.auditEnd = function(db) {
+    sql = 'UPDATE Application SET state = "refused" WHERE state = "auditing" AND matchId IN (SELECT `Match`.id FROM `Match` WHERE LEFT(auditTime, 16) = ?)'
+    sqlParams = [ util.getTime().substr(0,16) ];
+    db.query(sql, sqlParams, err => { if (err) console.log(err); });
+}
+
+//专家审核结束
+module.exports.scoreEnd = function(db) {
+
+    //专家自动拒绝评审
+    sql = 'UPDATE Assessment SET state = "refused" WHERE state = "auditing" AND applicationId IN (SELECT Application.id FROM Application WHERE matchId IN (SELECT `Match`.id FROM `Match` WHERE LEFT(auditTime, 16) = ?))'
+    sqlParams = [ util.getTime().substr(0,16) ];
+    db.query(sql, sqlParams, err => { if (err) console.log(err); });
+
+    //申请评审完成
+    sql = 'UPDATE Application SET state = "scored" WHERE state = "scoring" AND matchId IN (SELECT `Match`.id FROM `Match` WHERE LEFT(auditTime, 16) = ?)'
+    sqlParams = [ util.getTime().substr(0,16) ];
+    db.query(sql, sqlParams, err => { if (err) console.log(err); });
 }
 
 //邀请专家参与评审
@@ -149,25 +164,13 @@ module.exports.download = function(info, res) {
 
     //添加到压缩文件
     var zip = new JSZip();
-    for (var i in info.url) {
-        zip.file(info.url[i]);
-    }
-    zip.generateAsync({
-        // 压缩类型选择nodebuffer，在回调函数中会返回zip压缩包的Buffer的值，再利用fs保存至本地
-        type: "nodebuffer",
-        compression: "DEFLATE",
-        compressionOptions: { level: 9 }
-    }).then(content => {
-        let zip = crypto.createHash('SHA256').update(util.getTime()).digest('hex') + '.zip';
-        // 写入磁盘
-        fs.writeFile(getFullFileName(zip), content, err => {
-            if (err) {
-                console.log(err);
-            } else {
-                res.send(content);
-            }
-        });
+    zip.file(info.url, 'white-give');
+    var data = zip.generate({
+        type: 'nodebuffer',
+        compression:'DEFLATE',
+        streamFiles: true
     });
+    res.send(data);
 }
 
 //根据URL删除文件

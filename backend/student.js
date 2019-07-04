@@ -23,9 +23,7 @@ module.exports.register = function(db, info, res) {
             res.send(JSON.stringify(ret));
         } else {
             //插入学生
-            var sql = 
-                'INSERT INTO Student ' +
-                util.values(11);
+            var sql = 'INSERT INTO Student ' + util.values(11);
             var sqlParams = [
                 info.studentNumber,
                 info.username,
@@ -109,6 +107,61 @@ module.exports.logout = function(db, info, res) {
     });
 }
 
+//学生修改个人信息
+module.exports.modifyInfo = function(db, info, res) {
+    console.log('Student - Modify Information\n' + util.getTime());
+
+    //更新学生
+    var ret = { err: null, msg: null };
+    var sql = 'UPDATE Student SET username = ?, name = ?, introduction = ?, profileUrl = ?, phone = ?, email = ?, department = ?, major =?, enrollmentYear = ? WHERE studentNumber = ?';
+    var sqlParams = [
+        info.username,
+        info.name,
+        info.introduction,
+        info.profileUrl,
+        info.phone,
+        info.email,
+        info.department,
+        info.major,
+        info.enrollmentYear,
+        info.studentNumber
+    ];
+    db.query(sql, sqlParams, err => {
+        if (err) {
+            console.log(err);
+            ret.err = true;
+            ret.msg = 'Database error(UPDATE).';
+            res.send(JSON.stringify(ret));
+        } else {
+            ret.err = false;
+            ret.msg = 'Modify Information successfully.';
+            res.send(JSON.stringify(ret));
+        }
+    });
+}
+
+//学生修改密码
+module.exports.studentSetPassword = function(db, info, res) {
+    console.log('Student - Set password\n' + util.getTime());
+
+    //更新密码
+    var ret = { err: null, msg: null };
+    var sql = 'UPDATE Student SET `password` = ? WHERE studentNumber = ?';
+    var sqlParams = [ info.password, info.studentNumber ];
+    db.query(sql, sqlParams, err => {
+        if (err) {
+            console.log(err);
+            ret.err = true;
+            ret.msg = 'Database error(UPDATE).';
+            res.send(JSON.stringify(ret));
+        } else {
+            ret.err = false;
+            ret.msg = 'Set password successfully.';
+            res.send(JSON.stringify(ret));
+        }
+    });
+}
+
 //学生提交申请
 module.exports.submitApplication = function(db, info, res) {
     console.log('Student - Submit application\n' + util.getTime());
@@ -131,7 +184,7 @@ module.exports.submitApplication = function(db, info, res) {
         } else {
             
             //插入申请
-            var sql = 'INSERT INTO Application ' + util.values(40);
+            var sql = 'INSERT INTO Application ' + util.values(42);
             var sqlParams = [
                 0,
                 info.department,
@@ -200,28 +253,6 @@ module.exports.studentGetApplicationByMatch = function(db, info, res) {
             ret.err = false;
             ret.msg = 'Application found successfully.';
             ret.data = data[0];
-            res.send(JSON.stringify(ret));
-        }
-    });
-}
-
-//学生修改密码
-module.exports.studentSetPassword = function(db, info, res) {
-    console.log('Student - Set password\n' + util.getTime());
-
-    //更新密码
-    var ret = { err: null, msg: null };
-    var sql = 'UPDATE Student SET `password` = ? WHERE studentNumber = ?';
-    var sqlParams = [ info.password, info.studentNumber ];
-    db.query(sql, sqlParams, err => {
-        if (err) {
-            console.log(err);
-            ret.err = true;
-            ret.msg = 'Database error(UPDATE).';
-            res.send(JSON.stringify(ret));
-        } else {
-            ret.err = false;
-            ret.msg = 'Set password successfully.';
             res.send(JSON.stringify(ret));
         }
     });

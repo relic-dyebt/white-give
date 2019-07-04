@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <!-- import CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
+
+    <!-- import Vue before Element -->
+    <script src="https://unpkg.com/vue/dist/vue.js"></script>
+    <!-- import JavaScript -->
+    <script src="https://unpkg.com/element-ui/lib/index.js"></script>
+    <!-- import JQuery -->
+    <script src="https://cdn.staticfile.org/jquery/3.1.1/jquery.min.js"></script>
+
+</head>
+<style>
+    .el-header, .el-footer {
+        background-color: #FFFFFF;
+        color: #333;
+        text-align: center;
+        line-height: 60px;
+    }
+    .el-aside {
+        background-color: #D3DCE6;
+        color: #333;
+        text-align: center;
+        line-height: 200px;
+    }
+    .el-container.el-main {
+        background-color: #E9EEF3;
+        color: #333;
+        text-align: center;
+        line-height: 160px;
+    }
+    body > .el-container {
+        margin-bottom: 40px;
+    }
+    .el-container:nth-child(5) .el-aside,
+    .el-container:nth-child(6) .el-aside {
+        line-height: 260px;
+    }
+    .el-container:nth-child(7) .el-aside {
+        line-height: 320px;
+    }
+    .text {
+        font-size: 18px;
+    }
+    .item {
+        margin-bottom: 18px;
+    }
+    .clearfix:before,
+    .clearfix:after {
+        display: table;
+        content: "";
+    }
+    .clearfix:after {
+        clear: both
+    }
+    .matchName {
+        font-size: 20px;
+        line-height: 1.5;
+        font-family:"微软雅黑";
+        font-weight: 700;
+    }
+    .el-button {
+        font-size: 20px;
+    }
+    .el-row {
+        margin-top: 40px;
+    }
+</style>
+
+<body>
+<div id="main">
+    <el-container style="height: 100%; border: 1px solid #eee">
+        <el-aside width="200px" style="background-color: rgb(238, 241, 246)" v-if="role=='学生'">
+            <el-menu >
+                <el-menu
+                        default-active="1"
+                        class="el-menu-vertical-demo"
+                        @open="handleOpen"
+                        @close="handleClose">
+
+                    <el-menu-item index="1">
+                        <i class="el-icon-menu"></i>
+                        <span slot="title">查看比赛</span>
+                    </el-menu-item>
+                    <el-menu-item index="2">
+                        <i class="el-icon-document"></i>
+                        <span slot="title">查看已提交申请</span>
+                    </el-menu-item>
+                    <el-menu-item index="3">
+                        <i class="el-icon-setting"></i>
+                        <span slot="title">修改个人信息</span>
+                    </el-menu-item>
+                </el-menu>
+        </el-aside>
+        <el-aside width="200px" style="background-color: rgb(238, 241, 246)" v-else-if="role=='团委'">
+            <el-menu >
+                <el-menu
+                        default-active="1"
+                        class="el-menu-vertical-demo"
+                        @open="handleOpen"
+                        @close="handleClose">
+
+                    <el-menu-item index="1">
+                        <i class="el-icon-menu"></i>
+                        <span slot="title">比赛管理</span>
+                    </el-menu-item>
+                    <el-menu-item index="2">
+                        <i class="el-icon-document"></i>
+                        <span slot="title">新增比赛</span>
+                    </el-menu-item>
+                    <el-menu-item index="3">
+                        <i class="el-icon-setting"></i>
+                        <span slot="title">申请管理</span>
+                    </el-menu-item>
+                    <el-menu-item index="4">
+                        <i class="el-icon-setting"></i>
+                        <span slot="title">专家管理</span>
+                    </el-menu-item>
+                </el-menu>
+        </el-aside>
+        <el-aside width="200px" style="background-color: rgb(238, 241, 246)" v-else >
+            <el-menu >
+                <el-menu
+                        default-active="1"
+                        class="el-menu-vertical-demo"
+                        @open="handleOpen"
+                        @close="handleClose">
+
+                    <el-menu-item index="1">
+                        <i class="el-icon-menu"></i>
+                        <span slot="title">查看比赛</span>
+                    </el-menu-item>
+                    <el-menu-item index="2">
+                        <i class="el-icon-document"></i>
+                        <span slot="title">评审作品</span>
+                    </el-menu-item>
+                    <el-menu-item index="3">
+                        <i class="el-icon-setting"></i>
+                        <span slot="title">修改个人信息</span>
+                    </el-menu-item>
+                </el-menu>
+        </el-aside>
+
+        <el-container>
+            <el-header style="text-align: right; font-size: 10%;padding-top: 10px" >
+                <el-avatar size="large"> {{info.username}} </el-avatar>
+            </el-header>
+
+            <!-- 学生查看比赛 -->
+            <el-main v-if="false">
+
+                <match-card v-bind:info="testData"></match-card>
+
+                <match-card v-bind:info="testData"></match-card>
+
+                <match-card v-bind:info="testData"></match-card>
+
+                <match-card v-bind:info="testData"></match-card>
+
+            </el-main>
+
+            <!-- 团委申请管理 -->
+            <el-main v-else-if="true">
+                <application-table v-bind:data="applicationTableData"></application-table>
+            </el-main>
+        </el-container>
+    </el-container>
+
+</div>
+
+
+</body>
+<script type="text/javascript">
+    Vue.component('match-card', {
+        props: {
+            info:Object
+        },
+        data: function(){
+            console.log(this.info);
+            return this.info;
+        },
+        methods: {
+            joinMatch: function(url){
+                window.open(url);
+            }
+        },
+        template: '<el-row :gutter="12"><el-col :offset="8" :span="8"><el-card class="box-card" shadow="hover"><div slot="header" class="clearfix"><span class="matchName">{{ info.matchName }}</span><el-button icon="el-icon-position" style="float: right; padding: 3px 0" type="text" @click="joinMatch(info.joinUrl)">参加比赛</el-button></div><div class="text item">{{ "开始时间： "+ info.startTime }}</div><div class="text item">{{ "结束时间： "+ info.endTime }}</div><div class="text item">{{ "主办单位： "+ info.organizer }}</div></el-card></el-col></el-row>',
+    });
+
+    Vue.component('application-table', {
+        props: {
+            data:Array
+        },
+        methods: {
+            resetDateFilter() {
+                this.$refs.filterTable.clearFilter('date');
+            },
+            clearFilter() {
+                this.$refs.filterTable.clearFilter();
+            },
+            formatter(row, column) {
+                return row.address;
+            },
+            filterTag(value, row) {
+                return row.matchId === value;
+            },
+            filterHandler(value, row, column) {
+                const property = column['property'];
+                return row[property] === value;
+            }
+        },
+        template: '<div><el-button @click="resetDateFilter">清除日期过滤器</el-button>\
+        <el-button @click="clearFilter">清除所有过滤器</el-button>\
+        <el-table\
+        ref="filterTable"\
+        :data="data"\
+        style="width: 100%">\
+        <el-table-column\
+        prop="date"\
+        label="日期"\
+        sortable\
+        width="180"\
+        column-key="date"\
+        :filters="[{text: "2016-05-01", value: "2016-05-01}, {text: "2016-05-02", value: "2016-05-02"}, {text: "2016-05-03", value: "2016-05-03"}, {text: "2016-05-04", value: "2016-05-04"}]"\
+        :filter-method="filterHandler"\
+        >\
+        </el-table-column>\
+        <el-table-column\
+        prop="name"\
+        label="姓名"\
+        width="100">\
+        </el-table-column>\
+        <el-table-column\
+        prop="workName"\
+        label="作品名称"\
+        width="100">\
+        </el-table-column>\
+        <el-table-column\
+        prop="department"\
+        label="学院"\
+        width="100">\
+        </el-table-column>\
+        <el-table-column\
+        prop="phone"\
+        label="联系电话"\
+        width="100">\
+        </el-table-column>\
+        <el-table-column\
+        prop="state"\
+        label="状态"\
+        width="100">\
+        </el-table-column>\
+        <el-table-column\
+        prop="matchId"\
+        label="比赛ID"\
+        width="100">\
+        </el-table-column>\
+        <el-table-column\
+        fixed="right"\
+        label="操作"\
+        width="180">\
+        <template slot-scope="scope">\
+            <el-button type="text" size="small">下载申请</el-button>\
+            <el-button type="text" size="small">通过初审</el-button>\
+            <el-button type="text" size="small">拒绝初审</el-button>\
+        </template>\
+        </el-table-column>\
+    </el-table></div>'
+    });
+
+    new Vue({
+        el: '#main',
+        data: function() {
+            return {
+                testData: { matchName:"北京航空航天大学第28届冯如杯",startTime:" 2019-07-03 12:00",endTime:" 2019-08-03 12:00",organizer:" 北京航空航天大学冯如杯组委会",joinUrl:"index.html"},
+                info: {
+                    "password":"root1234",
+                    "studentNumber":"16211000",
+                    "username": 'default'
+                },
+                role:'学生',
+                activeIndex: '1',
+                applicationTableData: [{
+                date: '2016-05-02',
+                name: '王小虎',
+                workName: '基于北航软件学院的网页开发高等教育',
+                department:"软件学院",
+                phone:"131213121",
+                state:"passed",
+                matchId:"1"
+                },{
+                date: '2016-05-02',
+                name: '王小虎',
+                workName: '基于北航软件学院的网页开发高等教育',
+                department:"软件学院",
+                phone:"131213121",
+                state:"passed",
+                matchId:"2"
+                }]
+            }
+        },
+        created(){
+          this.setUser();
+        },
+        methods: {
+            setUser (){
+                this.info.username=sessionStorage.getItem("username");
+                console.log(this.info.username);
+                this.role=sessionStorage.getItem("role");
+            },
+            handleSelect(key, keyPath) {
+                console.log(key, keyPath);
+            }
+        }
+    })
+</script>
+</html>
