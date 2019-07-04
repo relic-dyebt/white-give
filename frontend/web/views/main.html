@@ -97,7 +97,7 @@
                 </el-menu>
         </el-aside>
         <el-aside width="200px" style="background-color: rgb(238, 241, 246)" v-else-if="role=='团委'">
-            <el-menu >
+
                 <el-menu
                         default-active="1"
                         class="el-menu-vertical-demo"
@@ -124,7 +124,6 @@
                 </el-menu>
         </el-aside>
         <el-aside width="200px" style="background-color: rgb(238, 241, 246)" v-else >
-            <el-menu >
                 <el-menu
                         default-active="1"
                         class="el-menu-vertical-demo"
@@ -147,10 +146,16 @@
                 </el-menu>
         </el-aside>
 
+        <!-- header -->
         <el-container>
             <el-header style="text-align: right; font-size: 10%;padding-top: 10px" >
                 <el-avatar size="large"> {{userInfo.username}} </el-avatar>
             </el-header>
+            <el-main v-if="sidebarIndex==1 &&role=='学生'" >
+                <div v-for ="item in matchData">
+                    <match-card v-bind:info="item"></match-card>
+                </div>
+            </el-main>
 
             <!-- 专家修改个人信息 -->
             <el-main v-if="sidebarIndex==3 && role=='专家'">
@@ -303,36 +308,77 @@
 <script type="text/javascript">
     Vue.component('match-card', {
         props: {
-            userInfo:Object
+            info:Object
         },
         data: function(){
-            console.log(this.userInfo);
-            return this.userInfo;
+            console.log(this.info);
+            return this.info;
         },
         methods: {
             joinMatch: function(url){
                 window.open(url);
             }
         },
-        template: '<el-row :gutter="12"><el-col :offset="8" :span="8"><el-card class="box-card" shadow="hover"><div slot="header" class="clearfix"><span class="matchName">{{ userInfo.matchName }}</span><el-button icon="el-icon-position" style="float: right; padding: 3px 0" type="text" @click="joinMatch(userInfo.joinUrl)">参加比赛</el-button></div><div class="text item">{{ "开始时间： "+ userInfo.startTime }}</div><div class="text item">{{ "结束时间： "+ userInfo.endTime }}</div><div class="text item">{{ "主办单位： "+ userInfo.organizer }}</div></el-card></el-col></el-row>',
+        template: '<el-row :gutter="12"><el-col :offset="8" :span="8"><el-card class="box-card" shadow="hover"><div slot="header" class="clearfix"><span class="matchName">{{ info.name }}</span><el-button icon="el-icon-position" style="float: right; padding: 3px 0" type="text" @click="joinMatch(info.joinUrl)">参加比赛</el-button></div><div class="text item">{{ "开始时间： "+ info.joinTime }}</div><div class="text item">{{ "结束时间： "+ info.endTime }}</div><div class="text item">{{ "简介： "+ info.introduction}}</div></el-card></el-col></el-row>',
     });
 
     new Vue({
         el: '#main',
         data: function() {
             return {
-                sidebarIndex : 1,
-                testData: { matchName:"北京航空航天大学第28届冯如杯",startTime:" 2019-07-03 12:00",endTime:" 2019-08-03 12:00",organizer:" 北京航空航天大学冯如杯组委会",joinUrl:"index.html"},
+                sidebarIndex : 2,
+                matchData: [],
                 userInfo: null,
                 role: null
             }
         },
         created(){
+            this.getMatchData();
           this.getUserInfo();
         },
         methods: {
+            getMatchData(){
+                var _self=this;
+                $.ajax({
+                    url: "http://58.87.72.138:30000/getMatch",
+                    type: "get",
+                    dataType: 'json',
+                    contentType:"application/json",
+                    data: {
+
+                    },
+                    success: function(res){
+                        console.log(res);
+                        if(res.err == false){
+                            _self.matchData=res.data;
+                            console.log(res.data);
+                            console.log(_self.matchData);
+
+                            _self.$message({
+                                message: '获取比赛成功',
+                                type: 'success',
+                                center: true
+                            });
+                        }
+                        else{
+                            _self.$message({
+                                message: '获取比赛失败',
+                                type: 'error',
+                                center: true
+                            });
+                        }
+
+                    },
+                    error: function(err){
+                        console.log(err);
+                    }
+
+                })
+
+            },
             setSidebarIndex(index) {
                 this.sidebarIndex = index;
+
             },
             getUserInfo() {
                 this.role = sessionStorage.getItem("role");
