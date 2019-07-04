@@ -152,7 +152,36 @@
                 <el-avatar size="large"> {{userInfo.username}} </el-avatar>
             </el-header>
 
-            <!-- 学生查看比赛 -->
+            <!-- 专家修改个人信息 -->
+            <el-main v-if="sidebarIndex==3 && role=='专家'">
+                    <el-form label-width="100px" >
+                        <el-form-item label="用户名">
+                            <el-input v-model="userInfo.username"></el-input>
+                        </el-form-item>
+                        <el-form-item label="真实姓名">
+                            <el-input v-model="userInfo.name"></el-input>
+                        </el-form-item>
+                        <el-form-item label="个人信息">
+                            <el-input type="textarea" v-model="userInfo.introduction"></el-input>
+                        </el-form-item>
+                        <el-form-item label="电话">
+                            <el-input type="number" v-model="userInfo.phone"></el-input>
+                        </el-form-item>
+                        <el-form-item label="关注作品类别">
+                            <el-select v-model="userInfo.category">
+                                <el-option value="A" label="A.机械与控制（包括机械、仪器仪表、自动化控制、工程、交通、建筑等）"></el-option>
+                                <el-option value="B" label="B.信息技术（包括计算机、电信、通讯、电子等）"></el-option>
+                                <el-option value="C" label="C.数理（包括数学、物理、地球与空间科学等）"></el-option>
+                                <el-option value="D" label="D.生命科学(包括生物､农学､药学､医学､健康､卫生､食品等)"></el-option>
+                                <el-option value="E" label="E.能源化工（包括能源、材料、石油、化学、化工、生态、环保等）"></el-option>
+                                <el-option value="F" label="F.哲学社会科学（包括哲学、经济、社会、法律、教育、管理）"></el-option>
+                            </el-select>
+                        </el-form-item>
+                        <el-button type="primary" @click="modifyInfo">确认修改</el-button>
+                    </el-form>
+                </el-main>
+
+            <!-- 学生修改个人信息 -->
             <el-main v-if="sidebarIndex==3 && role=='学生'">
                 <el-form label-width="100px" >
                     <el-form-item label="用户名">
@@ -344,14 +373,10 @@
                             type: "get",
                             dataType: 'json',
                             contentType:"application/json",
-                            data: {
-                                info: JSON.stringify(this.userInfo),
-                            },
+                            data: { info: JSON.stringify(this.userInfo), },
                             success: function(res){
                                 console.log(res);
                                 if(res.err == false){
-                                    sessionStorage.setItem('username',_self.userInfo.username);
-                                    sessionStorage.setItem('stdudentNumber',_self.userInfo.studentNumber);
                                     sessionStorage.setItem('username',_self.userInfo.username);
                                     sessionStorage.setItem('name',_self.userInfo.name);
                                     sessionStorage.setItem('introduction',_self.userInfo.introduction);
@@ -367,10 +392,7 @@
                                         type: 'success',
                                         center: true
                                     });
-
-                                    setTimeout(() => {
-                                        window.location.href="main.html";
-                                    }, 1000);
+                                    setTimeout(() => { window.location.href="main.html"; }, 1000);
                                 }
                                 else{
                                     _self.$message({
@@ -379,12 +401,44 @@
                                         center: true
                                     });
                                 }
-
                             },
-                            error: function(err){
-                                console.log(err);
-                            }
+                            error: err => { console.log(err); }
+                        })
+                    break;
+                    case "专家":
+                        $.ajax({
+                            url: "http://58.87.72.138:30000/expertModifyInfo",
+                            type: "get",
+                            dataType: 'json',
+                            contentType:"application/json",
+                            data: { info: JSON.stringify(this.userInfo), },
+                            success: function(res){
+                                console.log(res);
+                                if(res.err == false){
+                                    sessionStorage.setItem('username',_self.userInfo.username);
+                                    sessionStorage.setItem('name',_self.userInfo.name);
+                                    sessionStorage.setItem('introduction',_self.userInfo.introduction);
+                                    sessionStorage.setItem('profileUrl',_self.userInfo.profileUrl);
+                                    sessionStorage.setItem('phone',_self.userInfo.phone);
+                                    sessionStorage.setItem('email',_self.userInfo.email);
+                                    sessionStorage.setItem('category',_self.userInfo.category);
 
+                                    _self.$message({
+                                        message: '修改成功',
+                                        type: 'success',
+                                        center: true
+                                    });
+                                    setTimeout(() => { window.location.href="main.html"; }, 1000);
+                                }
+                                else{
+                                    _self.$message({
+                                        message: '修改失败',
+                                        type: 'error',
+                                        center: true
+                                    });
+                                }
+                            },
+                            error: err => { console.log(err); }
                         })
                     break;
                 }

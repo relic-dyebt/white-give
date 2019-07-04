@@ -163,8 +163,11 @@ module.exports.download = function(info, res) {
     console.log('System - Download\n' + util.getTime());
 
     //添加到压缩文件
+    var urls = info.url.split(';');
     var zip = new JSZip();
-    zip.file(info.url, 'white-give');
+    for (var i in urls) {
+        zip.file(urls[i].replace('/var/ftp/pub/data/work',''), fs.readFileSync(urls[i]));
+    }
     var data = zip.generate({
         type: 'nodebuffer',
         compression:'DEFLATE',
