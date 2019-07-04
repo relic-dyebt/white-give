@@ -137,15 +137,15 @@
                         @open="handleOpen"
                         @close="handleClose">
 
-                    <el-menu-item index="1">
+                    <el-menu-item index="1" @click="{{sidebarIndex=1}}">
                         <i class="el-icon-menu"></i>
                         <span slot="title">查看比赛</span>
                     </el-menu-item>
-                    <el-menu-item index="2">
+                    <el-menu-item index="2" @click="{{sidebarIndex=2}}">
                         <i class="el-icon-document"></i>
                         <span slot="title">评审作品</span>
                     </el-menu-item>
-                    <el-menu-item index="3">
+                    <el-menu-item index="3" @click="{{sidebarIndex=3}}">
                         <i class="el-icon-setting"></i>
                         <span slot="title">修改个人信息</span>
                     </el-menu-item>
@@ -154,19 +154,46 @@
 
         <el-container style="">
             <el-header style="text-align: right; font-size: 10%;padding-top: 10px" >
-                <el-avatar size="large"> {{info.username}} </el-avatar>
+                <el-avatar size="large"> {{userInfo.username}} </el-avatar>
             </el-header>
 
             <el-main >
 
-                <match-card v-bind:info="testData"></match-card>
+                <!-- <match-card v-bind:userInfo="testData"></match-card>
 
-                <match-card v-bind:info="testData"></match-card>
+                <match-card v-bind:userInfo="testData"></match-card>
 
-                <match-card v-bind:info="testData"></match-card>
+                <match-card v-bind:userInfo="testData"></match-card>
 
-                <match-card v-bind:info="testData"></match-card>
+                <match-card v-bind:userInfo="testData"></match-card> -->
 
+                <el-form label-width="100px" v-if="sidebarIndex==3 && role==学生">
+                    <el-form-item label="用户名">
+                        <el-input v-model="userInfo.username"></el-input>
+                    </el-form-item>
+                    <el-form-item label="真实姓名">
+                        <el-input v-model="userInfo.name"></el-input>
+                    </el-form-item>
+                    <el-form-item label="个人信息">
+                        <el-input type="textarea" v-model="userInfo.introduction"></el-input>
+                    </el-form-item>
+                    <el-form-item label="电话">
+                        <el-input type="number" v-model="userInfo.phone"></el-input>
+                    </el-form-item>
+                    <el-form-item label="邮箱">
+                        <el-input v-model="userInfo.email"></el-input>
+                    </el-form-item>
+                    <el-form-item label="院系">
+                        <el-input v-model="userInfo.department"></el-input>
+                    </el-form-item>
+                    <el-form-item label="专业">
+                        <el-input v-model="userInfo.major"></el-input>
+                    </el-form-item>
+                    <el-form-item label="入学年份">
+                        <el-input type="number" v-model="userInfo.enrollmentYear"></el-input>
+                    </el-form-item>
+                    <el-button type="primary" @click="modifyInfo">确认修改</el-button>
+                </el-form>
             </el-main>
         </el-container>
     </el-container>
@@ -178,48 +205,116 @@
 <script type="text/javascript">
     Vue.component('match-card', {
         props: {
-            info:Object
+            userInfo:Object
         },
         data: function(){
-            console.log(this.info);
-            return this.info;
+            console.log(this.userInfo);
+            return this.userInfo;
         },
         methods: {
             joinMatch: function(url){
                 window.open(url);
             }
         },
-        template: '<el-row :gutter="12"><el-col :offset="8" :span="8"><el-card class="box-card" shadow="hover"><div slot="header" class="clearfix"><span class="matchName">{{ info.matchName }}</span><el-button icon="el-icon-position" style="float: right; padding: 3px 0" type="text" @click="joinMatch(info.joinUrl)">参加比赛</el-button></div><div class="text item">{{ "开始时间： "+ info.startTime }}</div><div class="text item">{{ "结束时间： "+ info.endTime }}</div><div class="text item">{{ "主办单位： "+ info.organizer }}</div></el-card></el-col></el-row>',
+        template: '<el-row :gutter="12"><el-col :offset="8" :span="8"><el-card class="box-card" shadow="hover"><div slot="header" class="clearfix"><span class="matchName">{{ userInfo.matchName }}</span><el-button icon="el-icon-position" style="float: right; padding: 3px 0" type="text" @click="joinMatch(userInfo.joinUrl)">参加比赛</el-button></div><div class="text item">{{ "开始时间： "+ userInfo.startTime }}</div><div class="text item">{{ "结束时间： "+ userInfo.endTime }}</div><div class="text item">{{ "主办单位： "+ userInfo.organizer }}</div></el-card></el-col></el-row>',
     });
     new Vue({
         el: '#main',
         data: function() {
             return {
+                sidebarIndex : 1,
                 testData: { matchName:"北京航空航天大学第28届冯如杯",startTime:" 2019-07-03 12:00",endTime:" 2019-08-03 12:00",organizer:" 北京航空航天大学冯如杯组委会",joinUrl:"index.html"},
-                info: {
-                    "password":"root1234",
-                    "studentNumber":"16211000",
-                    "username": 'default'
-                },
-                role:'学生',
-                activeIndex: '1'
+                userInfo: null
             }
         },
         created(){
-          this.setUser();
-
+          this.getUserInfo();
         },
 
         methods: {
-            setUser (){
-                this.info.username=sessionStorage.getItem("username");
-                console.log(this.info.username);
-                this.role=sessionStorage.getItem("role");
+            getUserInfo() {
+                this.userInfo.role = sessionStorage.getItem("role");
+                switch (this.userInfo.role) {
+                    case "学生":
+                        this.userInfo = {
+                            studentNumber: sessionStorage.getItem('stdudentNumber'),
+                            username: sessionStorage.getItem("username"),
+                            name: sessionStorage.getItem('name'),
+                            introduction: sessionStorage.getItem('introduction'),
+                            profileUrl: sessionStorage.getItem('profileUrl'),
+                            phone: sessionStorage.getItem('phone'),
+                            email: sessionStorage.getItem('email'),
+                            department: sessionStorage.getItem('department'),
+                            major: sessionStorage.getItem('major'),
+                            enrollmentYear: sessionStorage.getItem('enrollmentYear')
+                        };
+                    break;
+                    case "专家":
+                        this.userInfo = {
+                            username: sessionStorage.getItem("username"),
+                            name: sessionStorage.getItem('name'),
+                            introduction: sessionStorage.getItem('introduction'),
+                            profileUrl: sessionStorage.getItem('profileUrl'),
+                            phone: sessionStorage.getItem('phone'),
+                            email: sessionStorage.getItem('email'),
+                            category: sessionStorage.getItem('category')
+                        };
+                    break;
+                }
             },
-            handleSelect(key, keyPath) {
-                console.log(key, keyPath);
-            }
+            modifyInfo() {
+                switch (this.userInfo.role) {
+                    case "学生":
+                        $.ajax({
+                            url: "http://58.87.72.138:30000/studentModifyInfo",
+                            type: "get",
+                            dataType: 'json',
+                            contentType:"application/json",
+                            data: {
+                                info: JSON.stringify(this.userInfo),
+                            },
+                            success: function(res){
+                                console.log(res);
+                                if(res.err == false){
+                                    sessionStorage.setItem('username',this.userInfo.username);
+                                    sessionStorage.setItem('stdudentNumber',this.userInfo.studentNumber);
+                                    sessionStorage.setItem('username',this.userInfo.username);
+                                    sessionStorage.setItem('name',this.userInfo.name);
+                                    sessionStorage.setItem('introduction',this.userInfo.introduction);
+                                    sessionStorage.setItem('profileUrl',this.userInfo.profileUrl);
+                                    sessionStorage.setItem('phone',this.userInfo.phone);
+                                    sessionStorage.setItem('email',this.userInfo.email);
+                                    sessionStorage.setItem('department',this.userInfo.department);
+                                    sessionStorage.setItem('major',this.userInfo.major);
+                                    sessionStorage.setItem('enrollmentYear',this.userInfo.enrollmentYear);
 
+                                    _self.$message({
+                                        message: '修改成功',
+                                        type: 'success',
+                                        center: true
+                                    });
+
+                                    setTimeout(() => {
+                                        window.location.href="main.html";
+                                    }, 1000);
+                                }
+                                else{
+                                    _self.$message({
+                                        message: '修改失败',
+                                        type: 'error',
+                                        center: true
+                                    });
+                                }
+
+                            },
+                            error: function(err){
+                                console.log(err);
+                            }
+
+                        })
+                    break;
+                }
+            }
         }
     })
 

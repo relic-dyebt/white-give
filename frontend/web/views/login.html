@@ -142,9 +142,17 @@
 					console.log(res);
 
 					if(res.err == false){
-						sessionStorage.setItem('stuId',res.data.studentNumber);
-						sessionStorage.setItem('username',res.data.username);
 						sessionStorage.setItem('role', _self.role);
+						sessionStorage.setItem('stdudentNumber',res.data.studentNumber);
+						sessionStorage.setItem('username',res.data.username);
+						sessionStorage.setItem('name',res.data.name);
+						sessionStorage.setItem('introduction',res.data.introduction);
+						sessionStorage.setItem('profileUrl',res.data.profileUrl);
+						sessionStorage.setItem('phone',res.data.phone);
+						sessionStorage.setItem('email',res.data.email);
+						sessionStorage.setItem('department',res.data.department);
+						sessionStorage.setItem('major',res.data.major);
+						sessionStorage.setItem('enrollmentYear',res.data.enrollmentYear);
 						_self.$message({
 							message: 'Hi	' + res.data.username,
 							type: 'success',
@@ -187,10 +195,14 @@
 				success: function(res){
 					console.log(res);
 					if(res.err == false){
-
-						sessionStorage.setItem('expertId',res.data.id);
-						sessionStorage.setItem('username',res.data.username);
 						sessionStorage.setItem('role', _self.role);
+						sessionStorage.setItem('username',res.data.username);
+						sessionStorage.setItem('name',res.data.name);
+						sessionStorage.setItem('introduction',res.data.introduction);
+						sessionStorage.setItem('profileUrl',res.data.profileUrl);
+						sessionStorage.setItem('phone',res.data.phone);
+						sessionStorage.setItem('email',res.data.email);
+						sessionStorage.setItem('category',res.data.category);
 						_self.$message({
 							message: 'Hi	' + res.data.username,
 							type: 'success',
@@ -233,7 +245,6 @@
 				success: function(res){
 					console.log(res);
 					if(res.err == false){
-						sessionStorage.setItem('twId',res.data.id);
 						sessionStorage.setItem('username',res.data.username);
 						sessionStorage.setItem('role', _self.role);
 						_self.$message({
