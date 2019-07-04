@@ -81,7 +81,7 @@
 <body>
 <div id="main">
     <el-container style="height: 100%; border: 1px solid #eee">
-        <el-aside width="200px" style="background-color: rgb(238, 241, 246)">
+        <el-aside width="200px" style="background-color: rgb(238, 241, 246)" v-if="role=='学生'">
             <el-menu >
                 <el-menu
                         default-active="1"
@@ -96,6 +96,54 @@
                     <el-menu-item index="2">
                         <i class="el-icon-document"></i>
                         <span slot="title">查看已提交申请</span>
+                    </el-menu-item>
+                    <el-menu-item index="3">
+                        <i class="el-icon-setting"></i>
+                        <span slot="title">修改个人信息</span>
+                    </el-menu-item>
+                </el-menu>
+        </el-aside>
+        <el-aside width="200px" style="background-color: rgb(238, 241, 246)" v-else-if="role=='团委'">
+            <el-menu >
+                <el-menu
+                        default-active="1"
+                        class="el-menu-vertical-demo"
+                        @open="handleOpen"
+                        @close="handleClose">
+
+                    <el-menu-item index="1">
+                        <i class="el-icon-menu"></i>
+                        <span slot="title">比赛管理</span>
+                    </el-menu-item>
+                    <el-menu-item index="2">
+                        <i class="el-icon-document"></i>
+                        <span slot="title">新增比赛</span>
+                    </el-menu-item>
+                    <el-menu-item index="3">
+                        <i class="el-icon-setting"></i>
+                        <span slot="title">申请管理</span>
+                    </el-menu-item>
+                    <el-menu-item index="4">
+                        <i class="el-icon-setting"></i>
+                        <span slot="title">专家管理</span>
+                    </el-menu-item>
+                </el-menu>
+        </el-aside>
+        <el-aside width="200px" style="background-color: rgb(238, 241, 246)" v-else >
+            <el-menu >
+                <el-menu
+                        default-active="1"
+                        class="el-menu-vertical-demo"
+                        @open="handleOpen"
+                        @close="handleClose">
+
+                    <el-menu-item index="1">
+                        <i class="el-icon-menu"></i>
+                        <span slot="title">查看比赛</span>
+                    </el-menu-item>
+                    <el-menu-item index="2">
+                        <i class="el-icon-document"></i>
+                        <span slot="title">评审作品</span>
                     </el-menu-item>
                     <el-menu-item index="3">
                         <i class="el-icon-setting"></i>
