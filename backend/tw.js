@@ -60,16 +60,16 @@ module.exports.createMatch = function(db, info, res) {
 
     //插入比赛
     var ret = { err: null, msg: null };
-    var sql = 
-        'INSERT INTO `Match` ' +
-        util.values(5);
+    var sql = 'INSERT INTO `Match` ' + util.values(8);
     var sqlParams = [
         0,
         info.name,
-        info.startDate,
-        info.endDate,
         info.introduction,
-        info.coverUrl
+        info.coverUrl,
+        info.joinTime,
+        info.auditTime,
+        info.scoreTime,
+        info.endTime
     ];
     db.query(sql, sqlParams, (err, data) => {
         if (err) {

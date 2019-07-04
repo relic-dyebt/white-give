@@ -1,13 +1,13 @@
 var util = require('./util');
 
 //根据时间获取比赛
-module.exports.getMatchByDate = function(db, info, res) {
-    console.log('Common - Get match by date.\n' + util.getTime());
+module.exports.getMatch = function(db, info, res) {
+    console.log('Common - Get match.\n' + util.getTime());
 
     //搜索比赛
     var ret = { err: null, msg: null };
-    var sql = 'SELECT * FROM Match WHERE startDate > ? AND endDate < ?';
-    var sqlParams = [ info.earliestDate, info.latestDate ];
+    var sql = 'SELECT * FROM Match';
+    var sqlParams = [];
     db.query(sql, sqlParams, (err, data) => {
         if (err) {
             console.log(err);
