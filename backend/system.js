@@ -67,19 +67,21 @@ module.exports.scoreEnd = function(db) {
 }
 
 //邀请专家参与评审
-module.exports.inviteExpert = function(db, info, num) {
+module.exports.inviteExpert = function(db, info, res) {
     console.log('System - Invite expert\n' + util.getTime());
 
     //搜索申请
+    var ret = { err: null, msg: null };
     var sql = 'SELECT * FROM Application WHERE id = ?';
     var sqlParams = [ info.applicationId ];
     db.query(sql, sqlParams, (err, data) => {
         if (err) {
             console.log(err);
+            ret.err = true;
+            ret.msg = 'Database error(SELECT)';
+            res.send(JSON.stringify(ret));
         } else {
             var matchId = data[0].matchId;
-            var category = data[0].category;
-            var applicationId = data[0].applicationId;
 
             //搜索比赛
             var sql = 'SELECT * FROM `Match` WHERE id = ?';
@@ -87,62 +89,61 @@ module.exports.inviteExpert = function(db, info, num) {
             db.query(sql, sqlParams, (err, data) => {
                 if (err) {
                     console.log(err);
+                    ret.err = true;
+                    ret.msg = 'Database error(SELECT)';
+                    res.send(JSON.stringify(ret));
                 } else {
                     var name = data[0].name;
 
-                    //搜索专家（随机顺序）
-                    var sql = 'SELECT * FROM Expert WHERE category = ? ORDER BY RAND()';
-                    var sqlParams = [ category ];
-                    db.query(sql, sqlParams, (err, data) => {
+                    //SMTP客户端对象
+                    var send = nodemailer.createTransport(smtpTransport({
+                        service: '163',
+                        auth: {
+                            user: 'goodapple8946@163.com',
+                            pass: 'whitegive123'
+                        }
+                    }));
+
+                    //插入评审
+                    var sql = 'INSERT INTO Assessment ' + util.values(6);
+                    var sqlParams = [ 0, info.expertId, info.applicationId, 'auditing', 0, '' ];
+                    db.query(sql, sqlParams, err => {
                         if (err) {
                             console.log(err);
+                            ret.err = true;
+                            ret.msg = 'Database error(INSERT)';
+                            res.send(JSON.stringify(ret));
                         } else {
-                            //SMTP客户端对象
-                            var send = nodemailer.createTransport(smtpTransport({
-                                service: '163',
-                                auth: {
-                                    user: 'goodapple8946@163.com',
-                                    pass: 'whitegive123'
+                            var acceptUrl = 'http://58.87.72.138:30000/expertAcceptAssessment?info={"expertId":"' + info.expertId + '","applicationId":"' + info.applicationId + '","accept":"' + true + '"}';
+                            var refuseUrl = 'http://58.87.72.138:30000/expertAcceptAssessment?info={"expertId":"' + info.expertId + '","applicationId":"' + info.applicationId + '","accept":"' + false + '"}';
+                            
+                            //邮件对象
+                            var mail = {
+                                from: 'goodapple8946@163.com',
+                                to: info.email,
+                                subject: '比赛《' + name + '》评审工作邀请',
+                                html:
+                                '<p>北航校团委邀请您参与评审工作！</p>' +
+                                '<p>接受：</p>' + 
+                                '<p>' + acceptUrl + '</p>' +
+                                '<p>拒绝：</p>' + 
+                                '<p>' + refuseUrl + '</p>'
+                            };
+
+                            //发送邮件
+                            send.sendMail(mail, err => {
+                                if (err) {
+                                    console.log(err);
+                                    ret.err = true;
+                                    ret.msg = 'Send email failed.';
+                                    res.send(JSON.stringify(ret));
+                                } else {
+                                    console.log('Invite expert successfully.')
+                                    ret.err = false;
+                                    ret.msg = 'Send email successfully.';
+                                    res.send(JSON.stringify(ret));
                                 }
-                            }));
-                            for (var i = 0; i < num && i < data.length; i++) {
-                                var email = data[i].email;
-                                var expertId = data[i].id;
-
-                                //插入评审
-                                var sql = 'INSERT INTO Assessment ' + util.values(6);
-                                var sqlParams = [ 0, expertId, info.applicationId, 'accepted', 0, '' ];
-                                db.query(sql, sqlParams, err => {
-                                    if (err) {
-                                        console.log(err);
-                                    } else {
-                                        var acceptUrl = 'http://58.87.72.138:30000/expertAcceptAssessment?info={"expertId":"' + expertId + '","applicationId":"' + applicationId + '","accept":"' + true + '"}';
-                                        var refuseUrl = 'http://58.87.72.138:30000/expertAcceptAssessment?info={"expertId":"' + expertId + '","applicationId":"' + applicationId + '","accept":"' + false + '"}';
-                                        
-                                        //邮件对象
-                                        var mail = {
-                                            from: 'goodapple8946@163.com',
-                                            to: email,
-                                            subject: '比赛评审工作邀请',
-                                            html:
-                                            '<p>北航校团委邀请您参与评审工作！</p>' +
-                                            '<p>接受：</p>' + 
-                                            '<p>' + acceptUrl + '</p>' +
-                                            '<p>拒绝：</p>' + 
-                                            '<p>' + refuseUrl + '</p>'
-                                        };
-
-                                        //发送邮件
-                                        send.sendMail(mail, err => {
-                                            if (err) {
-                                                console.log(err);
-                                            } else {
-                                                console.log('Invite expert successfully.')
-                                            }
-                                        });
-                                    }
-                                });
-                            }
+                            });
                         }
                     });
                 }

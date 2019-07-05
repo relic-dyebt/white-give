@@ -59,11 +59,6 @@ app.get('/getApplicationById', (req, res) => {
     common.getApplicationById(db, info, res);
 });
 
-app.get('/getExpertByCategory', (req, res) => {
-    var info = JSON.parse(url.parse(req.url, true).query.info);
-    common.getExpertByCategory(db, info, res);
-});
-
 //学生
 app.get('/studentRegister', (req, res) => {
     var info = JSON.parse(url.parse(req.url, true).query.info);
@@ -182,6 +177,11 @@ app.get('/getExpertByApplication', (req, res) => {
     tw.getExpertByApplication(db, info, res);
 });
 
+app.get('/getExpertByCategory', (req, res) => {
+    var info = JSON.parse(url.parse(req.url, true).query.info);
+    tw.getExpertByCategory(db, info, res);
+});
+
 app.get('/getExpert', (req, res) => {
     tw.getExpert(db, res);
 });
@@ -199,6 +199,11 @@ app.get('/download', (req, res) => {
 app.get('/delete', mutipartMiddeware, (req, res) => {
     var info = JSON.parse(url.parse(req.url, true).query.info);
     system.delete(info, res);
+});
+
+app.get('/inviteExpert', mutipartMiddeware, (req, res) => {
+    var info = JSON.parse(url.parse(req.url, true).query.info);
+    system.inviteExpert(db, info, res);
 });
 
 app.get('/getFile', (req, res) => {

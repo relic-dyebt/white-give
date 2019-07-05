@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<!-- import CSS -->
+	<link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
+	<!-- import Vue before Element -->
+	<script src="https://unpkg.com/vue/dist/vue.js"></script>
+	<!-- import JavaScript -->
+	<script src="https://unpkg.com/element-ui/lib/index.js"></script>
+	<!-- import JQuery -->
+	<script src="https://cdn.staticfile.org/jquery/3.1.1/jquery.min.js"></script>
+
+</head>
+
+
+<body>
+<div id="app">
+      <el-table :data="auditData" border empty-text="您没有待评审作品">
+        <el-table-column width="45" type="selection" align="center"></el-table-column>
+        <el-table-column label="序号" width="90"  align="center" prop="id"></el-table-column>
+        <el-table-column label="作品名称" width="400" prop="workName" align="center"></el-table-column>
+        <el-table-column label="第一作者" width="180" prop="name" align="center"></el-table-column>
+
+        <el-table-column label="预览操作" align="center" width="240" >
+          <template slot-scope="scope">
+            <el-button type="primary" size="mini">图片</el-button>
+            <el-button type="primary" size="mini">文件</el-button>
+            <el-button type="primary" size="mini">视频</el-button>
+          </template>
+        </el-table-column>
+        <el-table-column label="下载" align="center" width="108">
+            <template slot-scope="scope">
+              <el-button type="primary" size="mini">下载<i class="el-icon-download"></i></el-button>
+            </template>
+          </el-table-column>
+        <el-table-column label="得分" width="150" prop="score" align="center">
+          <template slot-scope="scope">
+            <el-input placeholder="请在此处评分"  v-model.number="scope.row.score" suffix-icon="el-icon-edit"  ></el-input>
+          </template>
+        </el-table-column>
+        <el-table-column label="评语" width="210" prop="comment" align="center">
+            <template slot-scope="scope">
+              <el-button type="primary" size="mini" icon="el-icon-edit" @click="editComment=true" >编辑评语</el-button>
+              <el-button type="text" size="mini" icon="el-icon-search">查看评语</el-button>
+            </template>
+        </el-table-column>
+      </el-table>
+	  
+	  
+      <el-dialog title="评语填写" :visible.sync="editComment" :close-on-click-modal="false">
+        <el-form :model="editForm" label-position="top" label-width="80px" ref="editForm">
+          <el-form-item label="填写评论" prop="comment">
+            <el-input type="textarea" v-model="editForm.comment"></el-input>
+          </el-form-item>
+          <el-button type="primary">提交</el-button>
+        </el-form>
+      </el-dialog>
+
+      <el-dialog title="评语查看" :visible.sync="viewComment" :close-on-click-modal="false">
+        
+      </el-dialog>
+  </div>
+</body>
+
+
+
+<script>
+new Vue({
+    el: '#app',
+    data: function() {
+    return { 
+        id: 0,
+        visible: false,
+        editComment:false,
+        viewComment:false,
+        auditData:[
+        ],
+        editForm: {
+          comment: '',
+        },
+		info:{"expertId":"2","state":null},
+    }
+    },
+	mounted: function(){
+		this.get();
+	}, 
+    methods:{
+		handleEdit(index, row){
+			this.editComment=true;
+			this.editForm = Object.assign({},row.comment);
+		},
+		get(){
+			var _self = this;
+			$.ajax({
+				url: "http://58.87.72.138:30000/expertGetApplicationByAssessmentState",
+				type: "get",
+				dataType: 'json',
+				contentType:"application/json",
+				data:{
+					info: JSON.stringify(_self.info),
+				},
+				success: function(res){
+					console.log(res);
+					data = res.data;
+					var count = 1;
+					for(item in data){
+						var ap = {
+							id: count,
+							workName: data[item].workName,
+							name: data[item].name,
+						}
+						console.log(ap);
+						_self.auditData.push(ap);
+						count += 1;
+					}
+					console.log(_self.data);
+				},
+				error: function(err){
+					console.log(err);
+				}
+			})
+		},
+	
+    }
+})
+</script>
+</html>
