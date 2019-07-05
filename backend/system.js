@@ -35,12 +35,12 @@ module.exports.joinEnd = function(db) {
 module.exports.auditEnd = function(db) {
     
     //修改比赛
-    sql = 'UPDATE `Match` SET state = "scoring" WHERE state = "auditing" AND auditTime < ?';
+    sql = 'UPDATE `Match` SET state = "scoring" WHERE state = "auditing" AND scoreTime < ?';
     sqlParams = [ util.getTime() ];
     db.query(sql, sqlParams, err => { if (err) console.log(err); });
 
     //修改申请
-    sql = 'UPDATE Application SET state = "refused" WHERE state = "auditing" AND matchId IN (SELECT `Match`.id FROM `Match` WHERE auditTime < ?)'
+    sql = 'UPDATE Application SET state = "refused" WHERE state = "auditing" AND matchId IN (SELECT `Match`.id FROM `Match` WHERE scoreTime < ?)'
     sqlParams = [ util.getTime() ];
     db.query(sql, sqlParams, err => { if (err) console.log(err); });
 }
@@ -49,19 +49,19 @@ module.exports.auditEnd = function(db) {
 module.exports.scoreEnd = function(db) {
 
     //修改比赛
-    sql = 'UPDATE `Match` SET state = "scored" WHERE state = "scoring" AND auditTime < ?';
+    sql = 'UPDATE `Match` SET state = "scored" WHERE state = "scoring" AND endTime < ?';
     sqlParams = [ util.getTime() ];
-    db.query(sql, sqlParams, err => { if (err) console.log(err); });
+    db.query(sql, sqlParams, err => err && console.log(err));
 
     //专家自动拒绝评审
-    sql = 'UPDATE Assessment SET state = "refused" WHERE state = "auditing" AND applicationId IN (SELECT Application.id FROM Application WHERE matchId IN (SELECT `Match`.id FROM `Match` WHERE auditTime < ?))'
+    sql = 'UPDATE Assessment SET state = "refused" WHERE state = "auditing" AND applicationId IN (SELECT Application.id FROM Application WHERE matchId IN (SELECT `Match`.id FROM `Match` WHERE endTime < ?))'
     sqlParams = [ util.getTime() ];
-    db.query(sql, sqlParams, err => { if (err) console.log(err); });
+    db.query(sql, sqlParams, err => err && console.log(err));
 
     //申请评审完成
-    sql = 'UPDATE Application SET state = "scored" WHERE state = "scoring" AND matchId IN (SELECT `Match`.id FROM `Match` WHERE auditTime < ?)'
+    sql = 'UPDATE Application SET state = "scored" WHERE state = "scoring" AND matchId IN (SELECT `Match`.id FROM `Match` WHERE endTime < ?)'
     sqlParams = [ util.getTime() ];
-    db.query(sql, sqlParams, err => { if (err) console.log(err); });
+    db.query(sql, sqlParams, err => err && console.log(err));
 }
 
 //邀请专家参与评审
