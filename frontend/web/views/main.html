@@ -351,7 +351,7 @@
                             width="300"
                             >
                             <template slot-scope="scope">
-                                <el-button style="font-size: 12px" type="primary" size="mini" @click="twDownloadApply(scope.$index)">下载申请</el-button>
+                                <el-button style="font-size: 12px" type="primary" size="mini" @click="twPreviewApply(scope.$index)">预览申请</el-button>
                                 <el-button style="font-size: 12px" type="success" size="mini" @click="twPassApply(scope.$index)">通过初审</el-button>
                                 <el-button style="font-size: 12px" type="danger" size="mini" @click="twRefuseApply(scope.$index)">拒绝初审</el-button>
                             </el-table-column>
@@ -382,6 +382,7 @@
                 window.open("apply.html");
             },
             downloadMatchDoc(url){
+
                 const xhr = new XMLHttpRequest();
                 xhr.responseType = "arraybuffer";
                 xhr.open("GET", "http://58.87.72.138:30000/download?info=" + JSON.stringify({url:url}),true);
@@ -428,7 +429,8 @@
                 userInfo: null,
                 role: null,
                 stuApplyData:null,
-                twApplyData:null
+                twApplyData:null,
+                previewUrl:null
             }
         },
         created(){
@@ -551,21 +553,9 @@
                     });
                 }
             },
-            twDownloadApply(index){
-                var url=this.twApplyData[index].pdfUrl;
-                const xhr = new XMLHttpRequest();
-                xhr.responseType = "arraybuffer";
-                xhr.open("GET", "http://58.87.72.138:30000/download?info=" + JSON.stringify({url:url}),true);
-                xhr.onload = function(oEvent){
-                    console.log("Blobing");
-                    let res = xhr.response;
-                    console.log(res);
-                    var blob = new Blob([res],{type:"application/x-gzip"});
-                    console.log(blob);
-                    var str = URL.createObjectURL(blob);
-                    window.open(str);
-                };
-                xhr.send();
+            twPreviewApply(index){
+                this.previewUrl = this.twApplyData[index].pdfUrl;
+                window.open('http://ow365.cn/?i=19000&furl=http://58.87.72.138:30000/getFile?info={"url":"'+this.previewUrl+'"}');
             },
             getTwApply(){
                 var _self=this;
