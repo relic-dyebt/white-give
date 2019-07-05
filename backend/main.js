@@ -59,11 +59,6 @@ app.get('/getApplicationById', (req, res) => {
     common.getApplicationById(db, info, res);
 });
 
-app.get('/getExpertByCategory', (req, res) => {
-    var info = JSON.parse(url.parse(req.url, true).query.info);
-    common.getExpertByCategory(db, info, res);
-});
-
 //学生
 app.get('/studentRegister', (req, res) => {
     var info = JSON.parse(url.parse(req.url, true).query.info);
@@ -180,6 +175,11 @@ app.get('/setApplicationScore', (req, res) => {
 app.get('/getExpertByApplication', (req, res) => {
     var info = JSON.parse(url.parse(req.url, true).query.info);
     tw.getExpertByApplication(db, info, res);
+});
+
+app.get('/getExpertByCategory', (req, res) => {
+    var info = JSON.parse(url.parse(req.url, true).query.info);
+    tw.getExpertByCategory(db, info, res);
 });
 
 app.get('/getExpert', (req, res) => {
