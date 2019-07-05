@@ -318,7 +318,21 @@
             joinMatch(id){
                 localStorage.setItem("selMatch",id);
                 window.open("apply.html");
-
+            },
+            downloadMatchDoc(url){
+                const xhr = new XMLHttpRequest();
+                xhr.responseType = "arraybuffer";
+                xhr.open("GET", "http://58.87.72.138:30000/download?info=" + JSON.stringify({url:url}),true);
+                xhr.onload = function(oEvent){
+                    console.log("Blobing");
+                    let res = xhr.response;
+                    console.log(res);
+                    var blob = new Blob([res],{type:"application/x-gzip"});
+                    console.log(blob);
+                    var str = URL.createObjectURL(blob);
+                    window.open(str);
+                };
+                xhr.send();
             }
         },
         template: '<el-row :gutter="12">\n' +
@@ -329,13 +343,15 @@
             '                        <el-button \n' +
             '                        icon="el-icon-position" \n' +
             '                        style="float: right; padding: 3px 0" \n' +
-            '                        type="text" @click="joinMatch()">参加比赛</el-button>\n' +
+            '                        type="text" @click="joinMatch(info.id)">参加比赛</el-button>\n' +
             '                    </div>\n' +
             '                    <div class="text item">{{ "比赛简介： "+ info.introduction }}</div>\n' +
             '                    <div class="text item">{{ "开始时间： "+ info.joinTime }}</div>\n' +
             '                    <div class="text item">{{ "报名截止时间： "+ info.auditTime }}</div>\n' +
             '                    <div class="text item">{{ "团委初审结束时间： "+ info.scoreTime }}</div>\n' +
             '                    <div class="text item">{{ "专家评审结束时间： "+ info.endTime }}</div>\n' +
+            '                    <el-button type="primary" plain @click="downloadMatchDoc(info.coverUrl)">下载附件</el-button>\n'+
+            '                    <el-button type="primary" plain>查看结果</el-button>\n'+
             '                </el-card>\n' +
             '            </el-col>\n' +
             '        </el-row>',
@@ -364,9 +380,6 @@
                     type: "get",
                     dataType: 'json',
                     contentType:"application/json",
-                    data: {
-
-                    },
                     success: function(res){
                         console.log(res);
                         if(res.err == false){
