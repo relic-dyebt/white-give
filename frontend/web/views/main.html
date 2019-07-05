@@ -270,6 +270,19 @@
                 </el-row>
             </el-main>
 
+            <!-- 团委比赛管理 -->
+            <el-main v-else-if="sidebarIndex==1 && role=='团委'">
+                <el-row :gutter="12" style="margin-top: 10px">
+                    <el-col :span="24">
+                        <el-table :data="matchData" style="width: 100%">
+                            <el-table-column fixed width="200" prop="name" label="名称"></el-table-column>
+                            <el-table-column width="300" prop="introduction" label="简介"></el-table-column>
+                            <el-table-column width="100" prop="state" label="状态"></el-table-column>
+                        </el-table>
+                    </el-col>
+                </el-row>
+            </el-main>
+
             <!-- 团委专家管理 -->
             <el-main v-else-if="sidebarIndex==4 && role=='团委'">
                 <el-row :gutter="12" style="margin-top: 10px">
