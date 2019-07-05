@@ -222,6 +222,16 @@
                                 label="作品状态"
                                 wideth="180">
                         </el-table-column>
+                        <el-table-column
+                            label="操作"
+                            wideth="180">
+                            <template slot-scope="scope">
+                                <el-button type="text" size="mini" @click="downloadPdf(scope.$index)">下载pdf</el-button>
+                                <el-button type="text" size="mini">补充提交</el-button>
+                            </template>
+                    </el-table-column>
+
+
                     </el-table>
                 </template>
 
@@ -449,6 +459,25 @@
 
         },
         methods: {
+            downloadData(url){
+                const xhr = new XMLHttpRequest();
+                xhr.responseType = "arraybuffer";
+                xhr.open("GET", "http://58.87.72.138:30000/download?info=" + JSON.stringify({url:url}),true);
+                xhr.onload = function(oEvent){
+                    console.log("Blobing");
+                    let res = xhr.response;
+                    console.log(res);
+                    var blob = new Blob([res],{type:"application/x-gzip"});
+                    console.log(blob);
+                    var str = URL.createObjectURL(blob);
+                    window.location.href=str;
+                };
+                xhr.send();
+            },
+            downloadPdf(index){
+                var url = this.stuApplyData[index].pdfUrl;
+                this.downloadData(url);
+            },
             twSetSidebarIndex(index) {
                 this.sidebarIndex = index;
                 if(index == 3){
@@ -563,7 +592,7 @@
                     var blob = new Blob([res],{type:"application/x-gzip"});
                     console.log(blob);
                     var str = URL.createObjectURL(blob);
-                    window.open(str);
+                    window.location.href=str;
                 };
                 xhr.send();
             },
