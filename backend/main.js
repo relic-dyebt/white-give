@@ -2,7 +2,8 @@ var express = require('express');
 var http = require('http');
 var url = require('url');
 var mysql = require('mysql');
-var mutipart= require('connect-multiparty');
+var mutipart = require('connect-multiparty');
+var fs = require('fs');
 
 var CronJob = require('cron').CronJob;
 
@@ -171,6 +172,11 @@ app.get('/setApplicationState', (req, res) => {
     tw.setApplicationState(db, info, res);
 });
 
+app.get('/setApplicationScore', (req, res) => {
+    var info = JSON.parse(url.parse(req.url, true).query.info);
+    tw.setApplicationScore(db, info, res);
+});
+
 //系统
 app.post('/upload', mutipartMiddeware, (req, res) => {
     system.upload(req.files, res);
@@ -184,6 +190,23 @@ app.get('/download', (req, res) => {
 app.get('/delete', mutipartMiddeware, (req, res) => {
     var info = JSON.parse(url.parse(req.url, true).query.info);
     system.delete(info, res);
+});
+
+app.get('/getFile', (req, res) => {
+    var info = JSON.parse(url.parse(req.url, true).query.info);
+    var stats = fs.statSync(info.url);
+    var block = info.url.split('/');
+    var suffix = block[block.length - 1];
+    if(stats.isFile()){
+        res.set({
+            'Content-Type': 'application/octet-stream',
+            'Content-Disposition': 'attachment; filename=download.' + suffix,
+            'Content-Length': stats.size
+        });
+        fs.createReadStream(info.url).pipe(res);
+    } else {
+        res.end(404);
+    }
 });
 
 //定时检测
