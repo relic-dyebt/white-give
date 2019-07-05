@@ -391,19 +391,19 @@
                                     placement="left"
                                     trigger="click">
                                     <el-transfer
-                                    style="text-align: left; display: inline-block"
-                                    :titles="['专家列表', '已选专家']"
+                                    style="text-align: left; display: block"
+                                    :titles="['可选专家', '已选专家']"
                                     filterable
                                     :filter-method="filterMethod"
-                                    filter-placeholder="请输入专家姓名"
-                                    v-model="value"
+                                    filter-placeholder="请输入专家姓名....."
+                                    v-model="addedExpertIndex"
                                     :data="twAddExpertForApply">
-                                    <el-button class="transfer-footer" slot="left-footer" size="mini" @click=change()>操作</el-button>
+                                    <el-button type="primary" size="mini" class="transfer-footer" slot="right-footer" size="mini" @click=sendInvite(scope.$index)>发送邮件邀请</el-button>
                                     </el-transfer>
-                                    <el-button style="font-size: 12px;margin-left: 10px;" type="info" size="mini" slot="reference">分配专家</el-button>
+                                    <el-button style="font-size: 12px;margin-left: 10px;" type="info" size="mini" slot="reference" @click="twAddExpert(scope.$index)">分配专家</el-button>
                                 </el-popover>
-                            </el-table-column>
                             </template>
+                        </el-table-column>
                         </el-table>
                     </el-col>
                     </el-row>
@@ -482,6 +482,17 @@
     new Vue({
         el: '#main',
         data: function() {  
+            const generateData = _ => {
+              const data = [];
+              const experts = ['王教授', '北教授'];
+              experts.forEach((expert, index) => {
+                data.push({
+                  label: expert,
+                  key: index,
+                });
+              });
+              return data;
+            };
             return {
                 sidebarIndex : 1,
                 matchData: null,
@@ -490,9 +501,13 @@
                 stuApplyData:null,
                 twApplyData:null,
                 previewUrl:null,
-                twAddExpertForApply:null,
-                twExpertData: null
-
+                twAddExpertForApply:generateData(),
+                addedExpertIndex:[],
+                expertTemp:[],
+                twExpertData: null,
+                filterMethod(query, item) {
+                    return item.label == query || query == '';
+                },
             }
         },
         created(){
@@ -515,6 +530,89 @@
 
         },
         methods: {
+            //团委给被选中的专家发送邀请
+            sendInvite(index) {
+                var _self = this;
+                var applicationId = this.twApplyData[index].id;
+                for(var i in this.addedExpertIndex){
+                    var expertId = this.expertTemp[this.addedExpertIndex[i]].id;
+                    var email = this.expertTemp[this.addedExpertIndex[i]].email;
+                    console.log("expert email: " + email);
+                    $.ajax({
+                        url: "http://58.87.72.138:30000/inviteExpert",
+                        type: "get",
+                        dataType: 'json',
+                        contentType:"application/json",
+                        data: {
+                            info: JSON.stringify({ applicationId: applicationId,expertId:expertId,email:email }),
+                        },
+                        success: function(res){
+                            console.log(res);
+                            if(res.err == false){
+                                _self.$notify({
+                                    message: '邀请成功',
+                                    type: 'success',
+                                    title:'成功'
+                                });
+                            }
+                            else{
+                                _self.$notify({
+                                    message: '邮件发送失败',
+                                    type: 'error',
+                                    title:'失败'
+                                });
+                            }
+
+                        },
+                        error: function(err){
+                            console.log(err);
+                        }
+                    });
+                }       
+            },            
+            //团委查找专家信息，以分配专家
+            twAddExpert(index) {
+                var _self=this;
+                _self.twAddExpertForApply = [];
+                _self.addedExpertIndex = [];
+                var applicationId = this.twApplyData[index].id;
+                $.ajax({
+                    url: "http://58.87.72.138:30000/getExpertByApplication",
+                    type: "get",
+                    dataType: 'json',
+                    contentType:"application/json",
+                    data: {
+                        info: JSON.stringify({ applicationId: applicationId,invited:"false" }),
+                    },
+                    success: function(res){
+                        console.log(res);
+                        if(res.err == false){
+                            var expertNames = [];
+                            _self.expertTemp = res.data;
+                            for(var i in res.data){
+                                expertNames.push(res.data[i].name);
+                            }
+                            expertNames.forEach((expert, index) => {
+                                _self.twAddExpertForApply.push({
+                                    label: expert,
+                                    key: index,
+                                });
+                            });
+                        }
+                        else{
+                            _self.$notify({
+                                message: '获取专家失败',
+                                type: 'error',
+                                title:'失败'
+                            });
+                        }
+
+                    },
+                    error: function(err){
+                        console.log(err);
+                    }
+                });
+            },
             //创建比赛
             deleteRow(index, rows) {
                 rows.splice(index, 1);
