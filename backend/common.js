@@ -1,6 +1,6 @@
 var util = require('./util');
 
-//根据时间获取比赛
+//获取比赛
 module.exports.getMatch = function(db, res) {
     console.log('Common - Get match\n' + util.getTime());
 

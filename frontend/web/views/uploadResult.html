@@ -1,0 +1,172 @@
+﻿<html>
+<head>
+    <title></title>
+    <link rel="stylesheet" type="text/css" href="http://unpkg.com/iview/dist/styles/iview.css">
+    <script type="text/javascript" src="http://vuejs.org/js/vue.min.js"></script>
+    <script type="text/javascript" src="http://unpkg.com/iview/dist/iview.min.js"></script>
+    <meta charset="UTF-8">
+    <!-- import CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
+    <!-- import Vue before Element
+    <script src="https://unpkg.com/vue/dist/vue.js"></script>
+     -->
+    <!-- import JavaScript -->
+    <script src="https://unpkg.com/element-ui/lib/index.js"></script>
+    <!-- import JQuery -->
+    <script src="https://cdn.staticfile.org/jquery/3.1.1/jquery.min.js"></script>
+
+</head>
+
+<body>
+<center>
+    <div id="app">
+        <i-table border :columns="columns2" :data="data3" style="width:850px"></i-table>
+    </div>
+</center>
+</body>
+
+<script>
+    var app = new Vue({
+        el: '#app',
+        $isEdit: false,
+        data () {
+            return {
+                id: 0,
+                //测试成绩
+                   info:{"state":"scoring"},
+
+                columns2: [
+                    {
+                        title: '序号',
+                        key: 'id'
+                    },
+                    {
+                        title: '作品',
+                        key: 'workName'
+                    },
+                    {
+                        title: '作者',
+                        key: 'name',
+                    },
+                    {
+                        title: '手机',
+                        key: 'phone',
+                    },
+                    {
+                        title: '最终得分',
+                        key: 'score',
+                        render: (h, params) => {
+                            if (params.row.$isEdit) {
+                                return h('input', {
+                                    domProps: {
+                                        value: params.row.score
+                                    },
+                                    on: {
+                                        input: function (event) {
+                                            params.row.score = event.target.value
+                                        }
+                                    }
+                                });
+                            } else  {
+                                return h('div', params.row.score);
+                            }
+                        }
+                    },
+                    {
+                        title: 'Action',
+                        key: 'action',
+                        render: (h, params) => {
+                            return h('Button', {
+                                props: {
+                                    type: 'info',
+                                    size: 'small'
+                                },
+                                on: {
+                                    click: () => {
+                                        if (params.row.$isEdit) {
+                                            this.handleSave(params.row)
+                                        } else {
+                                            this.handleEdit(params.row)
+                                        }
+                                    }
+                                }
+                            }, params.row.$isEdit ? '保存' : '编辑')
+                        }
+                    }
+                ],
+                data3: []
+            }
+        },
+        mounted:function(){
+            this.get();
+        },
+        methods: {
+            handleEdit (row) {
+                this.$set(row, '$isEdit', true)
+
+            },
+            handleSave (row) {
+                console.log(row);
+                var setinfo =JSON.stringify({
+                    "applicationId": row.applicationId.toString(),
+                    "score": row.score,
+                });
+                console.log(setinfo);
+                $.ajax({
+                    url: "http://58.87.72.138:30000/setApplicationScore",
+                    type: "get",
+                    dataType: 'json',
+                    contentType:"application/json",
+                    data:{
+                        info: setinfo,
+                    },
+                    success: function(res){
+                        console.log(res);
+
+                    },
+                    error: function(err){
+                        console.log(err);
+                    }
+                });
+                this.$set(row, '$isEdit', false)
+            },
+            get (){
+                var _self = this;
+                $.ajax({
+                    url: "http://58.87.72.138:30000/GetApplicationByState",
+                    type: "get",
+                    dataType: 'json',
+                    contentType:"application/json",
+                    data:{
+                        info: JSON.stringify(_self.info),
+                    },
+                    success: function(res){
+                        console.log(res);
+                        data = res.data;
+                        var count = 1;
+                        for(item in data){
+                            var ap = {
+                                id: count,
+                                workName: data[item].workName,
+                                name: data[item].name,
+                                phone: data[item].phone,
+                                applicationId: data[item].id,
+                                score: data[item].score,
+                            };
+                            console.log(ap);
+                            _self.data3.push(ap);
+                            count += 1;
+                        }
+                        console.log(_self.data);
+                    },
+                    error: function(err){
+                        console.log(err);
+                    }
+                })
+            },
+
+        }
+    })
+</script>
+
+</html>

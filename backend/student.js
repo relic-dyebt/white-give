@@ -182,7 +182,7 @@ module.exports.submitApplication = function(db, info, res) {
         } else {
             
             //插入申请
-            var sql = 'INSERT INTO Application ' + util.values(46);
+            var sql = 'INSERT INTO Application ' + util.values(47);
             var sqlParams = [
                 0,
                 info.department,
@@ -213,7 +213,8 @@ module.exports.submitApplication = function(db, info, res) {
                 info.videoUrl, 
                 '',
                 'submitted',
-                0.0
+                0.0,
+                util.getDate()
             ];
             db.query(sql, sqlParams, (err, data) => {
                 if (err) {
