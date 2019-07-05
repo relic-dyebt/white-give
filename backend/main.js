@@ -177,6 +177,15 @@ app.get('/setApplicationScore', (req, res) => {
     tw.setApplicationScore(db, info, res);
 });
 
+app.get('/getExpertByApplication', (req, res) => {
+    var info = JSON.parse(url.parse(req.url, true).query.info);
+    tw.getExpertByApplication(db, info, res);
+});
+
+app.get('/getExpert', (req, res) => {
+    tw.getExpert(db, res);
+});
+
 //系统
 app.post('/upload', mutipartMiddeware, (req, res) => {
     system.upload(req.files, res);

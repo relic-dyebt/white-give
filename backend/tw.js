@@ -216,11 +216,35 @@ module.exports.getExpertByApplication = function(db, info, res) {
         if (err) {
             console.log(err);
             ret.err = true;
-            ret.msg = 'Database error(UPDATE).';
+            ret.msg = 'Database error(SELECT).';
             res.send(JSON.stringify(ret));
         } else {
             ret.err = false;
-            ret.msg = 'Set application state successfully.';
+            ret.msg = 'Get expert successfully.';
+            ret.data = data;
+            res.send(JSON.stringify(ret));
+        }
+    });
+}
+
+//获取专家
+module.exports.getExpert = function(db, res) {
+    console.log('Tw - Get expert\n' + util.getTime());
+
+    //搜索专家
+    var ret = { err: null, msg: null };
+    var sql = 'SELECT * FROM Expert';
+    var sqlParams = [];
+    db.query(sql, sqlParams, (err, data) => {
+        if (err) {
+            console.log(err);
+            ret.err = true;
+            ret.msg = 'Database error(SELECT).';
+            res.send(JSON.stringify(ret));
+        } else {
+            ret.err = false;
+            ret.msg = 'Get expert successfully.';
+            ret.data = data;
             res.send(JSON.stringify(ret));
         }
     });

@@ -269,9 +269,19 @@
                     </el-col>
                 </el-row>
             </el-main>
-                <!--团委管理比赛-->
-            <el-main v-else-if="sidebarIndex==1 && role=='团委'">
 
+            <!-- 团委专家管理 -->
+            <el-main v-else-if="sidebarIndex==4 && role=='团委'">
+                <el-row :gutter="12" style="margin-top: 10px">
+                    <el-col :span="24">
+                        <el-table :data="twExpertData" style="width: 100%">
+                            <el-table-column fixed width="240" prop="email" label="邮箱"></el-table-column>
+                            <el-table-column width="80" prop="name" label="姓名" ></el-table-column>
+                            <el-table-column width="300" prop="introduction" label="简介"></el-table-column>
+                            <el-table-column width="100" prop="phone" label="电话"></el-table-column>
+                        </el-table>
+                    </el-col>
+                </el-row>
             </el-main>
 
             <!-- 团委申请管理 -->
@@ -448,9 +458,9 @@
                 matchData: null,
                 userInfo: null,
                 role: null,
-                stuApplyData:null,
-                twApplyData:null,
-
+                stuApplyData: null,
+                twApplyData: null,
+                twExpertData: null
 
             }
         },
@@ -465,6 +475,7 @@
                 case '团委':
                     this.getTwApply();
                     this.getMatchData();
+                    this.getTwExpert();
                     break;
                 case '专家':
                     this.getMatchData();
@@ -554,8 +565,13 @@
             },
             twSetSidebarIndex(index) {
                 this.sidebarIndex = index;
-                if(index == 3){
-                    this.getTwApply();
+                switch (index) {
+                    case 3:
+                        this.getTwApply();
+                        break;
+                    case 4:
+                        this.getTwExpert();
+                        break;
                 }
             },
             expertSetSidebarIndex(index) {
@@ -657,6 +673,35 @@
             twDownloadApply(index){
                 var url=this.twApplyData[index].pdfUrl;
                 this.downloadData(url);
+            },
+            getTwExpert(){
+                var _self = this;
+                $.ajax({
+                    url: "http://58.87.72.138:30000/getExpert",
+                    type: "get",
+                    dataType: 'json',
+                    contentType:"application/json",
+                    data: {},
+                    success: res => {
+                        console.log(res);
+                        if(res.err == false) {
+                            _self.twExpertData = res.data;
+                            _self.$message({
+                                message: '获取专家成功',
+                                type: 'success',
+                                center: true
+                            });
+                        }
+                        else{
+                            _self.$message({
+                                message: '获取专家失败',
+                                type: 'error',
+                                center: true
+                            });
+                        }
+                    },
+                    error: err => console.log(err)
+                })
             },
             getTwApply(){
                 var _self=this;
@@ -783,7 +828,6 @@
 
                 })
             },
-
             getMatchData(){
                 var _self=this;
                 $.ajax({
