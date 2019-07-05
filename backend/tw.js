@@ -118,7 +118,7 @@ module.exports.setApplicationState = function(db, info, res) {
     var ret = { err: null, msg: null };
     var sql = 'UPDATE Application SET state = ? WHERE id = ?';
     var sqlParams = [ info.state, info.applicationId ];
-    db.query(sql, sqlParams, (err, data) => {
+    db.query(sql, sqlParams, err => {
         if (err) {
             console.log(err);
             ret.err = true;
@@ -127,6 +127,28 @@ module.exports.setApplicationState = function(db, info, res) {
         } else {
             ret.err = false;
             ret.msg = 'Set application state successfully.';
+            res.send(JSON.stringify(ret));
+        }
+    });
+}
+
+//设置申请分数
+module.exports.setApplicationScore = function(db, info, res) {
+    console.log('Tw - Set application score\n' + util.getTime());
+
+    //更新申请
+    var ret = { err: null, msg: null };
+    var sql = 'UPDATE Application SET score = ? WHERE id = ?';
+    var sqlParams = [ info.score, info.applicationId ];
+    db.query(sql, sqlParams, err => {
+        if (err) {
+            console.log(err);
+            ret.err = true;
+            ret.msg = 'Database error(UPDATE).';
+            res.send(JSON.stringify(ret));
+        } else {
+            ret.err = false;
+            ret.msg = 'Set application score successfully.';
             res.send(JSON.stringify(ret));
         }
     });

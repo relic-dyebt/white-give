@@ -7,43 +7,40 @@
 <!-- import JQuery -->
 <script src="https://cdn.staticfile.org/jquery/3.1.1/jquery.min.js"></script>
 
-<div id="upload">
+<div id="download">
 <button @click="download">
 下载
 </button>
+
+<img id="img" />
 </div>
 
 <script>
 	new Vue({
-    el: '#upload',
+    el: '#download',
     data: function(){
 		return { 
-			url: '',
+			info: {"url":"/var/ftp/pub/data/work/g2n--G2DLTAuaYDxxvVOcprH.jpg;/var/ftp/pub/data/work/l-Le82ZggCPLPIxJDpsVjm8f.jpeg;/var/ftp/pub/data/work/WiXaufnf6Ek1PE0fwHaNkkZB.docx;/var/ftp/pub/data/work/2IjkwJi5-7sJeKZ-Z55BFaEh.docx",},
 		}
     },
 	methods: {
 		download: function(){
-			var _self = this;
-			$.ajax({  
-				url: 'http://58.87.72.138:30000/download' ,  
-				type: 'POST',  
-				data: formData,  
-				async: false,  
-				cache: false,  
-				contentType: false,  
-				processData: false,  
-				success: function (res) {
-					console.log(res);
-					var data = JSON.parse(res);
-					console.log(data);
-					_self.url = data.url;
-					console.log(_self.url);
-					
-				},  
-				error: function (err) {  
-					console.log(err);  
-				}  
-		   });  
+			const xhr = new XMLHttpRequest();
+			xhr.responseType = "arraybuffer";
+			var data = JSON.stringify(this.info);
+			console.log(data);
+			xhr.open("GET", "http://58.87.72.138:30000/download?info=" + JSON.stringify(this.info),true);
+			
+			xhr.onload = function(oEvent){
+				console.log("Blobing");
+				let res = xhr.response;
+				console.log(res);
+				var blob = new Blob([res],{type:"application/x-gzip"});
+  				console.log(blob);
+  				var str = URL.createObjectURL(blob);
+				window.open(str);
+			};
+			xhr.send();
 		}
 	}
   })

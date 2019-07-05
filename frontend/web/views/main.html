@@ -63,7 +63,7 @@
         font-weight: 700;
     }
     .el-button {
-        font-size: 20px;
+        font-size: 15px;
     }
     .el-row {
         margin-top: 40px;
@@ -104,10 +104,6 @@
                     <el-menu-item index="1">
                         <i class="el-icon-menu"></i>
                         <span slot="title">比赛管理</span>
-                    </el-menu-item>
-                    <el-menu-item index="2">
-                        <i class="el-icon-document"></i>
-                        <span slot="title">新增比赛</span>
                     </el-menu-item>
                     <el-menu-item index="3">
                         <i class="el-icon-setting"></i>
@@ -222,6 +218,16 @@
                                 label="作品状态"
                                 wideth="180">
                         </el-table-column>
+                        <el-table-column
+                            label="操作"
+                            wideth="180">
+                            <template slot-scope="scope">
+                                <el-button type="text" size="mini" @click="downloadPdf(scope.$index)">下载pdf</el-button>
+                                <el-button type="text" size="mini">补充提交</el-button>
+                            </template>
+                    </el-table-column>
+
+
                     </el-table>
                 </template>
 
@@ -262,6 +268,10 @@
                         </el-form>
                     </el-col>
                 </el-row>
+            </el-main>
+                <!--团委管理比赛-->
+            <el-main v-else-if="sidebarIndex==1 && role=='团委'">
+
             </el-main>
 
             <!-- 团委申请管理 -->
@@ -368,6 +378,17 @@
 
 </body>
 <script type="text/javascript">
+    new Vue({
+        el: '#app',
+        data: function() {
+            return {
+
+            };
+        },
+        methods:{
+
+        },
+    });
     Vue.component('match-card', {
         props: {
             info:Object
@@ -443,6 +464,7 @@
                     break;
                 case '团委':
                     this.getTwApply();
+                    this.getMatchData();
                     break;
                 case '专家':
                     this.getMatchData();
@@ -451,6 +473,85 @@
 
         },
         methods: {
+            //创建比赛
+            deleteRow(index, rows) {
+                rows.splice(index, 1);
+            },
+            /*edit(index,row){
+              this.createCompetition=true;
+              alert(row[index].endDate);
+            },*/
+            submitForm(formName) {
+                let self=this;
+                this.$refs[formName].validate((valid) => {
+                    if (valid) {
+                        var a={nameM:self.createCompetitionForm.name, matchTypeM:self.createCompetitionForm.matchType, startDateM:self.createCompetitionForm.startDate, endDateM:self.createCompetitionForm.endDate, introductionM:self.createRules.introduction, remove: false};
+                        self.createData.push(a);
+                        this.createCompetition=false;
+                        this.$refs[formName].resetFields();
+                        self.$message({
+                            message:'比赛创建成功！',
+                            type:'success'
+                        });
+                    } else {
+                        alert('创建失败，请检查是否有漏填信息！');
+                        console.log('error submit!!');
+                        return false;
+                    }
+                });
+            },
+            resetForm(formName) {
+                this.$refs[formName].resetFields();
+            },
+            handleRemove(file, fileList) {
+                console.log(file, fileList);
+            },
+            handlePreview(file) {
+                console.log(file);
+            },
+            submitUpload() {
+                this.$refs.upload.submit();
+            },
+            beforeUpload(file) {
+                var testmsg=file.name.substring(file.name.lastIndexOf('.')+1)
+                const extension = testmsg === 'xls'
+                const extension2 = testmsg === 'xlsx'
+                const extension3 = testmsg === 'pdf'
+                const isLt2M = file.size / 1024 / 1024 < 10     //这里做文件大小限制
+                if(!extension && !extension2 && !extension3) {
+                    this.$message({
+                        message: '上传文件只能是 xls、xlsx、pdf格式!',
+                        type: 'warning'
+                    });
+                }
+                if(!isLt2M) {
+                    this.$message({
+                        message: '上传文件大小不能超过 10MB!',
+                        type: 'warning'
+                    });
+                }
+                return extension || extension2 && isLt2M
+            },
+            //其他方法
+            downloadData(url){
+                const xhr = new XMLHttpRequest();
+                xhr.responseType = "arraybuffer";
+                xhr.open("GET", "http://58.87.72.138:30000/download?info=" + JSON.stringify({url:url}),true);
+                xhr.onload = function(oEvent){
+                    console.log("Blobing");
+                    let res = xhr.response;
+                    console.log(res);
+                    var blob = new Blob([res],{type:"application/x-gzip"});
+                    console.log(blob);
+                    var str = URL.createObjectURL(blob);
+                    window.location.href=str;
+                };
+                xhr.send();
+            },
+            downloadPdf(index){
+                var url = this.stuApplyData[index].pdfUrl;
+                this.downloadData(url);
+            },
             twSetSidebarIndex(index) {
                 this.sidebarIndex = index;
                 if(index == 3){
