@@ -267,11 +267,6 @@ module.exports.expertAcceptAssessment = function(db, info, res) {
                             res.send(JSON.stringify(ret));
                         }
                     });
-
-                    //邀请专家，并创建评审表
-                    if (info.accept == 'false') {
-                        system.inviteExpert(db, info, 1);
-                    }
                 }
             });
         }
