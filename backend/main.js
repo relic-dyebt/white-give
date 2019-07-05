@@ -187,9 +187,9 @@ app.get('/delete', mutipartMiddeware, (req, res) => {
 });
 
 //定时检测
-new CronJob('0 */5 * * * *', system.joinEnd(db));
-new CronJob('0 */5 * * * *', system.auditEnd(db));
-new CronJob('0 */5 * * * *', system.scoreEnd(db));
+new CronJob('* * * * * *', system.joinEnd(db), null, true);
+new CronJob('* * * * * *', system.auditEnd(db), null, true);
+new CronJob('* * * * * *', system.scoreEnd(db), null, true);
 
 //测试
 //test.test();

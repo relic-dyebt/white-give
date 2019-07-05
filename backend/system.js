@@ -11,6 +11,8 @@ var util = require('./util');
 //学生报名开始
 module.exports.joinStart = function(db) {
 
+    console.log(util.getTime());
+
     //修改比赛
     sql = 'UPDATE `Match` SET state = "joining" WHERE state = "created" AND joinTime < ?';
     sqlParams = [ util.getTime() ];
@@ -275,7 +277,9 @@ module.exports.generatePdf = function (db, applicationId) {
                 "category": application.category,
                 "introduction": application.introduction,
                 "innovation": application.innovation,
-                "keyword": application.keyword
+                "keyword": application.keyword,
+                "displayForm": application.displayForm,
+                "surveyMethod": application.surveyMethod
             });
             doc.render();
             var buf = doc.getZip().generate({ type: 'nodebuffer' });
