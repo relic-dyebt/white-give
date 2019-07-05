@@ -1,7 +1,5 @@
-var formidable = require('formidable');
-
-var util = require('./util');
 var system = require('./system');
+var util = require('./util');
 
 //学生注册
 module.exports.register = function(db, info, res) {
@@ -210,8 +208,8 @@ module.exports.submitApplication = function(db, info, res) {
                 info.matchId,
                 info.documentUrl,
                 info.imageUrl,
-                info.videoUrl,
-                info.pdfUrl,
+                info.videoUrl, 
+                '',
                 'submitted',
                 0.0
             ];
@@ -226,6 +224,9 @@ module.exports.submitApplication = function(db, info, res) {
                     ret.msg = 'Submit application successfully.';
                     ret.applicationId = data.insertId;
                     res.send(JSON.stringify(ret));
+
+                    //生成PDF
+                    system.generatePdf(db, data.insertId);
                 }
             });
         }

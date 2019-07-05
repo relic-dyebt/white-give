@@ -186,12 +186,6 @@ app.get('/delete', mutipartMiddeware, (req, res) => {
     system.delete(info, res);
 });
 
-//生成PDF
-app.get('/generatePdf', (req, res) => {
-    var info = JSON.parse(url.parse(req.url, true).query.info);
-    genpdf.generatePdf(db, info, res);
-});
-
 //定时检测
 new CronJob('0 */5 * * * *', system.joinEnd(db));
 new CronJob('0 */5 * * * *', system.auditEnd(db));

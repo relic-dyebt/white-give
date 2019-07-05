@@ -123,6 +123,7 @@
                     </el-menu-item>
                 </el-menu>
         </el-aside>
+        <--! 专家的侧边栏-->
         <el-aside width="200px" style="background-color: rgb(238, 241, 246)" v-else >
                 <el-menu
                         default-active="1"
@@ -151,11 +152,7 @@
             <el-header style="text-align: right; font-size: 10%;padding-top: 10px" >
                 <el-avatar size="large"> {{userInfo.username}} </el-avatar>
             </el-header>
-            <el-main v-if="sidebarIndex==1 &&role=='学生'" >
-                <div v-for ="item in matchData">
-                    <match-card v-bind:info="item"></match-card>
-                </div>
-            </el-main>
+
 
             <!-- 专家修改个人信息 -->
             <el-main v-if="sidebarIndex==3 && role=='专家'">
@@ -185,7 +182,43 @@
                         <el-button type="primary" @click="modifyInfo">确认修改</el-button>
                     </el-form>
                 </el-main>
+            <!--            ! 学生查看比赛（并参赛）-->
+            <el-main v-if="sidebarIndex==1 &&role=='学生'" >
+                <div v-for ="item in matchData">
+                    <match-card v-bind:info="item"></match-card>
+                </div>
+            </el-main>
 
+            <!-- 学生查看已提交申请-->
+            <el-main v-if="sidebarIndex==2 && role=='学生'">
+                <template>
+                    <el-table
+                            :data="stuApplyData"
+                            style="width: 100%">
+                        <el-table-column
+                                prop="workName"
+                                label="作品名称"
+                                width="180">
+                        </el-table-column>
+                        <el-table-column
+                                prop="category"
+                                label="分类"
+                                width="180">
+                        </el-table-column>
+                        <el-table-column
+                                prop="appCategory"
+                                label="申请类型"
+                                width="180">
+                        </el-table-column>
+                        <el-table-column
+                                prop="state"
+                                label="作品状态"
+                                wideth="180">
+                        </el-table-column>
+                    </el-table>
+                </template>
+
+            </el-main>
             <!-- 学生修改个人信息 -->
             <el-main v-if="sidebarIndex==3 && role=='学生'">
                 <el-form label-width="100px" >
@@ -229,7 +262,7 @@
                         <el-col  :span="24">
                         <el-table
                             ref="filterTable"
-                            :data="applicationTableData"
+                            :data="twApplyData"
                             style="width: 100%">
                             <el-table-column
                             prop="date"
@@ -364,14 +397,87 @@
                 sidebarIndex : 1,
                 matchData: [],
                 userInfo: null,
-                role: null
+                role: null,
+                stuApplyData:[],
             }
         },
         created(){
-            this.getMatchData();
-          this.getUserInfo();
+            var _self=this;
+            this.getUserInfo();
+            switch(sessionStorage.getItem("role")){
+                case '学生':
+                    this.getStuApply();
+                    this.getMatchData();
+                    break;
+            }
+
         },
         methods: {
+            getStuApply(){
+                var _self=this;
+                var info = {
+                    studentNumber: sessionStorage.getItem("studentNumber"),
+                };
+                console.log(sessionStorage.getItem("studentNumber"));
+                $.ajax({
+                    url: "http://58.87.72.138:30000/studentGetApplication",
+                    type: "get",
+                    dataType: 'json',
+                    contentType:"application/json",
+                    data: {
+                        info: JSON.stringify(info),
+                    },
+                    success: function(res){
+                        console.log(res);
+                        if(res.err == false){
+                            _self.stuApplyData=res.data;
+                            for(var i in _self.stuApplyData){
+                                switch (_self.stuApplyData[i].state) {
+                                    case 'submitted':
+                                        _self.stuApplyData[i].state='已提交';
+                                        break;
+                                    case 'auditing':
+                                        _self.stuApplyData[i].state='正在初审';
+                                        break;
+                                    case 'accepted':
+                                        _self.stuApplyData[i].state='初审通过';
+                                        break;
+                                    case 'refused':
+                                        _self.stuApplyData[i].state='初审未通过';
+                                        break;
+                                    case 'assigned':
+                                        _self.stuApplyData[i].state='已分配专家';
+                                        break;
+                                    case 'scoring':
+                                        _self.stuApplyData[i].state='专家评审中';
+                                        break;
+                                    case 'scored':
+                                        _self.stuApplyData[i].state='专家已评审';
+                                        break;
+                                }
+                            }
+
+                            _self.$message({
+                                message: '获取申请成功',
+                                type: 'success',
+                                center: true
+                            });
+                        }
+                        else{
+                            _self.$message({
+                                message: '获取申请失败',
+                                type: 'error',
+                                center: true
+                            });
+                        }
+
+                    },
+                    error: function(err){
+                        console.log(err);
+                    }
+
+                })
+            },
 
             getMatchData(){
                 var _self=this;
@@ -418,7 +524,7 @@
                 switch (this.role) {
                     case "学生":
                         this.userInfo = {
-                            studentNumber: sessionStorage.getItem('stdudentNumber'),
+                            studentNumber: sessionStorage.getItem('studentNumber'),
                             username: sessionStorage.getItem("username"),
                             name: sessionStorage.getItem('name'),
                             introduction: sessionStorage.getItem('introduction'),
