@@ -101,9 +101,7 @@
                 <el-menu
                         default-active="1"
                         class="el-menu-vertical-demo"
-                        @open="handleOpen"
-                        @close="handleClose"
-                        @select="setSidebarIndex">
+                        @select="twSetSidebarIndex">
 
                     <el-menu-item index="1">
                         <i class="el-icon-menu"></i>
@@ -123,14 +121,12 @@
                     </el-menu-item>
                 </el-menu>
         </el-aside>
-        <--! 专家的侧边栏-->
+        <!-- 用户侧边栏 -->
         <el-aside width="200px" style="background-color: rgb(238, 241, 246)" v-else >
                 <el-menu
                         default-active="1"
                         class="el-menu-vertical-demo"
-                        @open="handleOpen"
-                        @close="handleClose"
-                        @select="setSidebarIndex">
+                        @select="stuSetSidebarIndex">
 
                     <el-menu-item index="1" >
                         <i class="el-icon-menu"></i>
@@ -254,8 +250,10 @@
             <el-main v-else-if="sidebarIndex==3 && role=='团委'">
                 <el-row :gutter="12" style="margin-top: 0px">
                         <el-col >
-                            <el-button style="font-size: 14px" type="info" plain @click="resetDateFilter">清除日期过滤器</el-button>
-                            <el-button style="font-size: 14px" type="info" plain @click="clearFilter">清除所有过滤器</el-button>
+                            <el-button style="font-size: 14px" type="primary" plain @click="resetDateFilter">清除日期过滤器</el-button>
+                            <el-button style="font-size: 14px" type="success" plain @click="resetStateFilter">清除状态过滤器</el-button>
+                            <el-button style="font-size: 14px" type="warning" plain @click="resetMatchIdFilter">清除比赛ID过滤器</el-button>
+                            <el-button style="font-size: 14px" type="danger" plain @click="clearFilter">清除所有过滤器</el-button>
                         </el-col>
                 </el-row>
                     <el-row :gutter="12" style="margin-top: 10px">
@@ -325,9 +323,7 @@
                             :filter-method="filterTag"
                             filter-placement="bottom-end">
                             <template slot-scope="scope">
-                                <el-tag
-                                :type="scope.row.matchId === '冯如杯' ? 'primary' : 'success'"
-                                disable-transitions>{{scope.row.matchId}}</el-tag>
+                                {{scope.row.matchId}}
                             </template>
                             </el-table-column>
                 
@@ -432,10 +428,16 @@
 
         },
         methods: {
+            twSetSidebarIndex(index) {
+                this.sidebarIndex = index;
+                if(index == 3){
+                    this.getTwApply();
+                }
+            },
             twPassApply(index){
                 var state = this.twApplyData[index].state;
                 var _self=this;
-                if(state == "正在初审"){
+                if(state == "正在初审" || state == "初审通过" || state == "初审未通过"){
                     $.ajax({
                     url: "http://58.87.72.138:30000/setApplicationState",
                     type: "get",
@@ -447,6 +449,7 @@
                     success: function(res){
                         console.log(res);
                         if(res.err == false){
+                            _self.twApplyData[index].state = "初审通过";
                             _self.$message({
                                 message: '修改申请状态成功',
                                 type: 'success',
@@ -479,7 +482,7 @@
             twRefuseApply(index){
                 var state = this.twApplyData[index].state;
                 var _self=this;
-                if(state == "正在初审"){
+                if(state == "正在初审" || state == "初审通过" || state == "初审未通过"){
                     $.ajax({
                     url: "http://58.87.72.138:30000/setApplicationState",
                     type: "get",
@@ -491,6 +494,7 @@
                     success: function(res){
                         console.log(res);
                         if(res.err == false){
+                            _self.twApplyData[index].state = "初审未通过";
                             _self.$message({
                                 message: '修改申请状态成功',
                                 type: 'success',
@@ -819,6 +823,12 @@
             resetDateFilter() {
                 this.$refs.filterTable.clearFilter('date');
             },
+            resetStateFilter() {
+                this.$refs.filterTable.clearFilter('state');
+            },
+            resetMatchIdFilter() {
+                this.$refs.filterTable.clearFilter('matchId');
+            }, 
             clearFilter() {
                 this.$refs.filterTable.clearFilter();
             },
