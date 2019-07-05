@@ -221,7 +221,7 @@ module.exports.deleteByUrl = function(info, res) {
 }
 
 //生成PDF
-module.exports.generatePdf = function (db, info, res) {
+module.exports.generatePdf = function (db, applicationId) {
     console.log('System - Generate PDF\n' + util.getTime());
     
     var content = fs.readFileSync(path.join(__dirname, '../data/template/doc.docx'), 'binary');
@@ -231,13 +231,10 @@ module.exports.generatePdf = function (db, info, res) {
     //搜索申请
     var ret = { err: null, msg: null };
     var sql = 'SELECT * FROM Application WHERE id = ?';
-    var sqlParams = [ info.appId ];
+    var sqlParams = [ applicationId ];
     db.query(sql, sqlParams, (err, data) => {
         if (err) {
             console.log(err);
-            ret.err = true;
-            ret.msg = 'Database error(SELECT).';
-            res.send(JSON.stringify(ret));
         } else {
             var application = data[0];
             doc.loadZip(zip);
@@ -280,14 +277,7 @@ module.exports.generatePdf = function (db, info, res) {
                 "innovation": application.innovation,
                 "keyword": application.keyword
             });
-            try {
-                doc.render();
-            } catch (ex) {
-                console.log(ex);
-                ret.err = true;
-                ret.msg = 'Generate PDF Failed.';
-                res.send(JSON.stringify(ret));
-            }
+            doc.render();
             var buf = doc.getZip().generate({ type: 'nodebuffer' });
             var url = '/var/ftp/pub/data/application/' + application.studentNumber + '_' + application.name + '_' + application.id + '.pdf';
             toPdf(buf).then(pdfBuffer => {
@@ -295,14 +285,18 @@ module.exports.generatePdf = function (db, info, res) {
                 }, err => {
                     if (err) {
                         console.log(err);
-                        ret.err = true;
-                        ret.msg = 'Generate PDF Failed.';
-                        res.send(JSON.stringify(ret));
                     } else {
-                        ret.err = false;
-                        ret.msg = 'Generate PDF Successfully.';
-                        ret.url = url;
-                        res.send(JSON.stringify(ret));
+                        
+                        //更新申请
+                        var sql = 'UPDATE Application SET pdfUrl = ? WHERE id = ?';
+                        var sqlParams = [ url, applicationId ];
+                        db.query(sql, sqlParams, err => {
+                            if (err) {
+                                console.log(err);
+                            } else {
+                                console.log('PDF generated.')
+                            }
+                        });
                     }
             });
         }
