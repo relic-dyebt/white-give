@@ -251,60 +251,73 @@
             </el-main>
 
             <!-- 团委申请管理 -->
-            <el-main v-else-if="sidebarIndex==2 && role=='团委'">
-                <el-row :gutter="12">
+            <el-main v-else-if="sidebarIndex==3 && role=='团委'">
+                <el-row :gutter="12" style="margin-top: 0px">
                         <el-col >
-                            <el-button @click="resetDateFilter">清除日期过滤器</el-button>
-                            <el-button @click="clearFilter">清除所有过滤器</el-button>
+                            <el-button style="font-size: 14px" type="info" plain @click="resetDateFilter">清除日期过滤器</el-button>
+                            <el-button style="font-size: 14px" type="info" plain @click="clearFilter">清除所有过滤器</el-button>
                         </el-col>
                 </el-row>
-                    <el-row :gutter="12">
+                    <el-row :gutter="12" style="margin-top: 10px">
                         <el-col  :span="24">
                         <el-table
                             ref="filterTable"
                             :data="twApplyData"
                             style="width: 100%">
                             <el-table-column
+                            fixed
+                            width="150"
                             prop="date"
                             label="日期"
                             sortable
-                            
                             column-key="date"
                             :filters="[{text: '2016-05-01', value: '2016-05-01'}, {text: '2016-05-02', value: '2016-05-02'}, {text: '2016-05-03', value: '2016-05-03'}, {text: '2016-05-04', value: '2016-05-04'}]"
                             :filter-method="filterHandler">
                             </el-table-column>
                             <el-table-column
+                            width="100"
                             prop="name"
                             label="姓名"
                             >
                             </el-table-column>
                 
                             <el-table-column
+                            width="300"
                             prop="workName"
                             label="作品名称"
                             >
                             </el-table-column>
                 
                             <el-table-column
+                            width="150"
                             prop="department"
                             label="学院"
                             >
                             </el-table-column>
                 
                             <el-table-column
+                            width="150"
                             prop="phone"
                             label="联系电话"
                             >
                             </el-table-column>
                 
                             <el-table-column
+                            width="100"
                             prop="state"
                             label="状态"
-                            >
+                            
+                            :filters="[{ text: '已提交', value: '已提交' }, { text: '正在初审', value: '正在初审' },{ text: '初审通过', value: '初审通过' },{ text: '初审未通过', value: '初审未通过' },{ text: '已分配专家', value: '已分配专家' },{ text: '专家评审中', value: '专家评审中' },{ text: '专家已评审', value: '专家已评审' }]"
+                            :filter-method="filterState"
+                            filter-placement="bottom-end">
+                            <template slot-scope="scope">
+                                {{scope.row.state}}
+                            </template>
                             </el-table-column>
                 
                 
                             <el-table-column
+                            width="100"
                             prop="matchId"
                             label="比赛ID"
                             
@@ -320,13 +333,15 @@
                 
                             <el-table-column
                             label="操作"
+                            fixed="right"
+                            width="300"
                             >
                             <template slot-scope="scope">
-                                <el-button type="text" size="small">下载申请</el-button>
-                                <el-button type="text" size="small">通过初审</el-button>
-                                <el-button type="text" size="small">拒绝初审</el-button>
-                            </template>
+                                <el-button style="font-size: 12px" type="primary" size="mini" @click="twDownloadApply(scope.$index)">下载申请</el-button>
+                                <el-button style="font-size: 12px" type="success" size="mini" @click="twPassApply(scope.$index)">通过初审</el-button>
+                                <el-button style="font-size: 12px" type="danger" size="mini" @click="twRefuseApply(scope.$index)">拒绝初审</el-button>
                             </el-table-column>
+                            </template>
                         </el-table>
                     </el-col>
                     </el-row>
@@ -384,7 +399,7 @@
             '                    <div class="text item">{{ "团委初审结束时间： "+ info.scoreTime }}</div>\n' +
             '                    <div class="text item">{{ "专家评审结束时间： "+ info.endTime }}</div>\n' +
             '                    <el-button type="primary" plain @click="downloadMatchDoc(info.coverUrl)">下载附件</el-button>\n'+
-            '                    <el-button type="primary" plain>查看结果</el-button>\n'+
+            '                    <el-button type="success" plain>查看结果</el-button>\n'+
             '                </el-card>\n' +
             '            </el-col>\n' +
             '        </el-row>',
@@ -395,10 +410,11 @@
         data: function() {
             return {
                 sidebarIndex : 1,
-                matchData: [],
+                matchData: null,
                 userInfo: null,
                 role: null,
-                stuApplyData:[],
+                stuApplyData:null,
+                twApplyData:null
             }
         },
         created(){
@@ -409,10 +425,177 @@
                     this.getStuApply();
                     this.getMatchData();
                     break;
+                case '团委':
+                    this.getTwApply();
+                    break;
             }
 
         },
         methods: {
+            twPassApply(index){
+                var state = this.twApplyData[index].state;
+                var _self=this;
+                if(state == "正在初审"){
+                    $.ajax({
+                    url: "http://58.87.72.138:30000/setApplicationState",
+                    type: "get",
+                    dataType: 'json',
+                    contentType:"application/json",
+                    data: {
+                        info: JSON.stringify({ state: "accepted", applicationId: this.twApplyData[index].id }),
+                    },
+                    success: function(res){
+                        console.log(res);
+                        if(res.err == false){
+                            _self.$message({
+                                message: '修改申请状态成功',
+                                type: 'success',
+                                center: true
+                            });
+                        }
+                        else{
+                            _self.$message({
+                                message: '修改申请状态失败',
+                                type: 'error',
+                                center: true
+                            });
+                        }
+
+                    },
+                    error: function(err){
+                        console.log(err);
+                    }
+
+                })
+                }
+                else {
+                    _self.$message({
+                        message: '申请状态异常，无法进行通过初审操作',
+                        type: 'error',
+                        center: true
+                    });
+                }
+            },
+            twRefuseApply(index){
+                var state = this.twApplyData[index].state;
+                var _self=this;
+                if(state == "正在初审"){
+                    $.ajax({
+                    url: "http://58.87.72.138:30000/setApplicationState",
+                    type: "get",
+                    dataType: 'json',
+                    contentType:"application/json",
+                    data: {
+                        info: JSON.stringify({ state: "refused", applicationId: this.twApplyData[index].id }),
+                    },
+                    success: function(res){
+                        console.log(res);
+                        if(res.err == false){
+                            _self.$message({
+                                message: '修改申请状态成功',
+                                type: 'success',
+                                center: true
+                            });
+                        }
+                        else{
+                            _self.$message({
+                                message: '修改申请状态失败',
+                                type: 'error',
+                                center: true
+                            });
+                        }
+
+                    },
+                    error: function(err){
+                        console.log(err);
+                    }
+
+                })
+                }
+                else {
+                    _self.$message({
+                        message: '申请状态异常，无法进行通过初审操作',
+                        type: 'error',
+                        center: true
+                    });
+                }
+            },
+            twDownloadApply(index){
+                var url=this.twApplyData[index].pdfUrl;
+                const xhr = new XMLHttpRequest();
+                xhr.responseType = "arraybuffer";
+                xhr.open("GET", "http://58.87.72.138:30000/download?info=" + JSON.stringify({url:url}),true);
+                xhr.onload = function(oEvent){
+                    console.log("Blobing");
+                    let res = xhr.response;
+                    console.log(res);
+                    var blob = new Blob([res],{type:"application/x-gzip"});
+                    console.log(blob);
+                    var str = URL.createObjectURL(blob);
+                    window.open(str);
+                };
+                xhr.send();
+            },
+            getTwApply(){
+                var _self=this;
+                $.ajax({
+                    url: "http://58.87.72.138:30000/getApplicationByState",
+                    type: "get",
+                    dataType: 'json',
+                    contentType:"application/json",
+                    data: {
+                        info: JSON.stringify({state:null}),
+                    },
+                    success: function(res){
+                        console.log(res);
+                        if(res.err == false){
+                            _self.twApplyData=res.data;
+                            for(var i in _self.twApplyData){
+                                switch (_self.twApplyData[i].state) {
+                                    case 'submitted':
+                                        _self.twApplyData[i].state='已提交';
+                                        break;
+                                    case 'auditing':
+                                        _self.twApplyData[i].state='正在初审';
+                                        break;
+                                    case 'accepted':
+                                        _self.twApplyData[i].state='初审通过';
+                                        break;
+                                    case 'refused':
+                                        _self.twApplyData[i].state='初审未通过';
+                                        break;
+                                    case 'assigned':
+                                        _self.twApplyData[i].state='已分配专家';
+                                        break;
+                                    case 'scoring':
+                                        _self.twApplyData[i].state='专家评审中';
+                                        break;
+                                    case 'scored':
+                                        _self.twApplyData[i].state='专家已评审';
+                                        break;
+                                }
+                            }
+
+                            _self.$message({
+                                message: '获取申请成功',
+                                type: 'success',
+                                center: true
+                            });
+                        }
+                        else{
+                            _self.$message({
+                                message: '获取申请失败',
+                                type: 'error',
+                                center: true
+                            });
+                        }
+                    },
+                    error: function(err){
+                        console.log(err);
+                    }
+
+                })
+            },
             getStuApply(){
                 var _self=this;
                 var info = {
@@ -535,7 +718,7 @@
                             major: sessionStorage.getItem('major'),
                             enrollmentYear: sessionStorage.getItem('enrollmentYear')
                         };
-                    break;
+                        break;
                     case "专家":
                         this.userInfo = {
                             username: sessionStorage.getItem("username"),
@@ -546,7 +729,12 @@
                             email: sessionStorage.getItem('email'),
                             category: sessionStorage.getItem('category')
                         };
-                    break;
+                        break;
+                    case "团委":
+                        this.userInfo = {
+                            username: sessionStorage.getItem("username"),
+                        };
+                        break;
                 }
             },
             modifyInfo() {
@@ -639,6 +827,9 @@
             },
             filterTag(value, row) {
                 return row.tag === value;
+            },
+            filterState(value, row) {
+                return row.state === value;
             },
             filterHandler(value, row, column) {
                 const property = column['property'];
