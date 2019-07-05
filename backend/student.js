@@ -182,7 +182,7 @@ module.exports.submitApplication = function(db, info, res) {
         } else {
             
             //插入申请
-            var sql = 'INSERT INTO Application ' + util.values(44);
+            var sql = 'INSERT INTO Application ' + util.values(46);
             var sqlParams = [
                 0,
                 info.department,
@@ -205,6 +205,8 @@ module.exports.submitApplication = function(db, info, res) {
                 info.introduction,
                 info.innovation,
                 info.keyword,
+                info.displayForm,
+                info.surveyMethod,
                 info.matchId,
                 info.documentUrl,
                 info.imageUrl,
