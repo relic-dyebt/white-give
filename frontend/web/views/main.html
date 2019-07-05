@@ -358,12 +358,27 @@
                             <el-table-column
                             label="操作"
                             fixed="right"
-                            width="300"
+                            width="320"
                             >
                             <template slot-scope="scope">
-                                <el-button style="font-size: 12px" type="primary" size="mini" @click="twPreviewApply(scope.$index)">预览申请</el-button>
-                                <el-button style="font-size: 12px" type="success" size="mini" @click="twPassApply(scope.$index)">通过初审</el-button>
-                                <el-button style="font-size: 12px" type="danger" size="mini" @click="twRefuseApply(scope.$index)">拒绝初审</el-button>
+                                <el-button style="font-size: 12px" type="primary" size="mini" @click="twPreviewApply(scope.$index)">预览</el-button>
+                                <el-button style="font-size: 12px" type="success" size="mini" @click="twPassApply(scope.$index)">通过</el-button>
+                                <el-button style="font-size: 12px" type="danger" size="mini" @click="twRefuseApply(scope.$index)">拒绝</el-button>
+                                <el-popover
+                                    placement="left"
+                                    trigger="click">
+                                    <el-transfer
+                                    style="text-align: left; display: inline-block"
+                                    :titles="['专家列表', '已选专家']"
+                                    filterable
+                                    :filter-method="filterMethod"
+                                    filter-placeholder="请输入专家姓名"
+                                    v-model="value"
+                                    :data="twAddExpertForApply">
+                                    <el-button class="transfer-footer" slot="left-footer" size="mini" @click=change()>操作</el-button>
+                                    </el-transfer>
+                                    <el-button style="font-size: 12px;margin-left: 10px;" type="info" size="mini" slot="reference">分配专家</el-button>
+                                </el-popover>
                             </el-table-column>
                             </template>
                         </el-table>
@@ -443,7 +458,7 @@
 
     new Vue({
         el: '#main',
-        data: function() {
+        data: function() {  
             return {
                 sidebarIndex : 1,
                 matchData: null,
@@ -451,7 +466,8 @@
                 role: null,
                 stuApplyData:null,
                 twApplyData:null,
-                previewUrl:null
+                previewUrl:null,
+                twAddExpertForApply:null
             }
         },
         created(){
@@ -489,9 +505,10 @@
                         self.createData.push(a);
                         this.createCompetition=false;
                         this.$refs[formName].resetFields();
-                        self.$message({
+                        self.$notify({
                             message:'比赛创建成功！',
-                            type:'success'
+                            type:'success',
+                            title:'成功'
                         });
                     } else {
                         alert('创建失败，请检查是否有漏填信息！');
@@ -519,15 +536,17 @@
                 const extension3 = testmsg === 'pdf'
                 const isLt2M = file.size / 1024 / 1024 < 10     //这里做文件大小限制
                 if(!extension && !extension2 && !extension3) {
-                    this.$message({
+                    this.$notify({
                         message: '上传文件只能是 xls、xlsx、pdf格式!',
-                        type: 'warning'
+                        type: 'warning',
+                        title:'警告'
                     });
                 }
                 if(!isLt2M) {
-                    this.$message({
+                    this.$notify({
                         message: '上传文件大小不能超过 10MB!',
-                        type: 'warning'
+                        type: 'warning',
+                        title:'警告'
                     });
                 }
                 return extension || extension2 && isLt2M
@@ -580,17 +599,17 @@
                         console.log(res);
                         if(res.err == false){
                             _self.twApplyData[index].state = "初审通过";
-                            _self.$message({
+                            _self.$notify({
                                 message: '修改申请状态成功',
                                 type: 'success',
-                                center: true
+                                title:'成功'
                             });
                         }
                         else{
-                            _self.$message({
+                            _self.$notify({
                                 message: '修改申请状态失败',
                                 type: 'error',
-                                center: true
+                                title:'失败'
                             });
                         }
 
@@ -602,10 +621,10 @@
                 })
                 }
                 else {
-                    _self.$message({
+                    _self.$notify({
                         message: '申请状态异常，无法进行通过初审操作',
                         type: 'error',
-                        center: true
+                        title:'失败'
                     });
                 }
             },
@@ -625,17 +644,17 @@
                         console.log(res);
                         if(res.err == false){
                             _self.twApplyData[index].state = "初审未通过";
-                            _self.$message({
+                            _self.$notify({
                                 message: '修改申请状态成功',
                                 type: 'success',
-                                center: true
+                                title:'成功'
                             });
                         }
                         else{
-                            _self.$message({
+                            _self.$notify({
                                 message: '修改申请状态失败',
                                 type: 'error',
-                                center: true
+                                title:'失败'
                             });
                         }
 
@@ -647,10 +666,10 @@
                 })
                 }
                 else {
-                    _self.$message({
+                    _self.$notify({
                         message: '申请状态异常，无法进行通过初审操作',
                         type: 'error',
-                        center: true
+                        title:'失败'
                     });
                 }
             },
@@ -698,17 +717,17 @@
                                 }
                             }
 
-                            _self.$message({
+                            _self.$notify({
                                 message: '获取申请成功',
                                 type: 'success',
-                                center: true
+                                title:'成功'
                             });
                         }
                         else{
-                            _self.$message({
+                            _self.$notify({
                                 message: '获取申请失败',
                                 type: 'error',
-                                center: true
+                                title:'失败'
                             });
                         }
                     },
@@ -762,17 +781,17 @@
                                 }
                             }
 
-                            _self.$message({
+                            _self.$notify({
                                 message: '获取申请成功',
                                 type: 'success',
-                                center: true
+                                title:'成功'
                             });
                         }
                         else{
-                            _self.$message({
+                            _self.$notify({
                                 message: '获取申请失败',
                                 type: 'error',
-                                center: true
+                                title:'失败'
                             });
                         }
 
@@ -798,17 +817,17 @@
                             console.log(res.data);
                             console.log(_self.matchData);
 
-                            _self.$message({
+                            _self.$notify({
                                 message: '获取比赛成功',
                                 type: 'success',
-                                center: true
+                                title:'成功'
                             });
                         }
                         else{
-                            _self.$message({
+                            _self.$notify({
                                 message: '获取比赛失败',
                                 type: 'error',
-                                center: true
+                                title:'失败'
                             });
                         }
 
@@ -881,18 +900,18 @@
                                     sessionStorage.setItem('major',_self.userInfo.major);
                                     sessionStorage.setItem('enrollmentYear',_self.userInfo.enrollmentYear);
 
-                                    _self.$message({
+                                    _self.$notify({
                                         message: '修改成功',
                                         type: 'success',
-                                        center: true
+                                        title:'成功'
                                     });
                                     setTimeout(() => { window.location.href="main.html"; }, 1000);
                                 }
                                 else{
-                                    _self.$message({
+                                    _self.$notify({
                                         message: '修改失败',
                                         type: 'error',
-                                        center: true
+                                        title:'失败'
                                     });
                                 }
                             },
@@ -917,18 +936,18 @@
                                     sessionStorage.setItem('email',_self.userInfo.email);
                                     sessionStorage.setItem('category',_self.userInfo.category);
 
-                                    _self.$message({
+                                    _self.$notify({
                                         message: '修改成功',
                                         type: 'success',
-                                        center: true
+                                        title:'成功'
                                     });
                                     setTimeout(() => { window.location.href="main.html"; }, 1000);
                                 }
                                 else{
-                                    _self.$message({
+                                    _self.$notify({
                                         message: '修改失败',
                                         type: 'error',
-                                        center: true
+                                        title:'失败'
                                     });
                                 }
                             },
