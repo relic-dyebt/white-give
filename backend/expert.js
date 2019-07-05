@@ -180,15 +180,15 @@ module.exports.expertGetApplicationByAssessmentState = function(db, info, res) {
     });
 }
 
-//专家设置评审评分
-module.exports.expertSetAssessmentScore = function(db, info, res) {
-    console.log('Expert - Set assessment score\n' + util.getTime());
+//专家设置评审
+module.exports.expertSetAssessment = function(db, info, res) {
+    console.log('Expert - Set assessment\n' + util.getTime());
 
     //更新评审
     var ret = { err: null, msg: null };
-    var sql = 'UPDATE Assessment SET score = ?, state = "scored" WHERE expertId = ? AND applicationId = ?';
-    var sqlParams = [ info.score, info.expertId, info.applicationId ];
-    db.query(sql, sqlParams, (err, data) => {
+    var sql = 'UPDATE Assessment SET score = ?, comment = ?, state = "scored" WHERE expertId = ? AND applicationId = ?';
+    var sqlParams = [ info.score, info.comment, info.expertId, info.applicationId ];
+    db.query(sql, sqlParams, err => {
         if (err) {
             console.log(err);
             ret.err = true;
@@ -196,8 +196,7 @@ module.exports.expertSetAssessmentScore = function(db, info, res) {
             res.send(JSON.stringify(ret));
         } else {
             ret.err = false;
-            ret.msg = 'Set assessment score successfully.';
-            ret.data = data;
+            ret.msg = 'Set assessment successfully.';
             res.send(JSON.stringify(ret));
 
             //搜索评审，检查该申请的评审是否全部完成

@@ -108,8 +108,8 @@ module.exports.inviteExpert = function(db, info, num) {
                                 var expertId = data[i].id;
 
                                 //插入评审
-                                var sql = 'INSERT INTO Assessment ' + util.values(5);
-                                var sqlParams = [ 0, expertId, info.applicationId, "accepted", 0 ];
+                                var sql = 'INSERT INTO Assessment ' + util.values(6);
+                                var sqlParams = [ 0, expertId, info.applicationId, 'accepted', 0, '' ];
                                 db.query(sql, sqlParams, err => {
                                     if (err) {
                                         console.log(err);
@@ -280,24 +280,13 @@ module.exports.generatePdf = function (db, applicationId) {
             doc.render();
             var buf = doc.getZip().generate({ type: 'nodebuffer' });
             var url = '/var/ftp/pub/data/application/' + application.studentNumber + '_' + application.name + '_' + application.id + '.pdf';
+            
             toPdf(buf).then(pdfBuffer => {
-                    fs.writeFileSync(url, pdfBuffer)
-                }, err => {
-                    if (err) {
-                        console.log(err);
-                    } else {
-                        
-                        //更新申请
-                        var sql = 'UPDATE Application SET pdfUrl = ? WHERE id = ?';
-                        var sqlParams = [ url, applicationId ];
-                        db.query(sql, sqlParams, err => {
-                            if (err) {
-                                console.log(err);
-                            } else {
-                                console.log('PDF generated.')
-                            }
-                        });
-                    }
+                fs.writeFileSync(url, pdfBuffer);
+                //更新申请
+                var sql = 'UPDATE Application SET pdfUrl = ? WHERE id = ?';
+                var sqlParams = [ url, applicationId ];
+                db.query(sql, sqlParams, err => console.log(err || 'PDF generated.'));
             });
         }
     });

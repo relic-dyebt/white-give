@@ -135,9 +135,9 @@ app.get('/expertGetApplicationByAssessmentState', (req, res) => {
     expert.expertGetApplicationByAssessmentState(db, info, res);
 });
 
-app.get('/expertSetApplicationScore', (req, res) => {
+app.get('/expertSetAssessment', (req, res) => {
     var info = JSON.parse(url.parse(req.url, true).query.info);
-    expert.expertSetApplicationScore(db, info, res);
+    expert.expertSetAssessment(db, info, res);
 });
 
 app.get('/expertAcceptAssessment', (req, res) => {
