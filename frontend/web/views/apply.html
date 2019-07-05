@@ -24,7 +24,7 @@
       <el-row :gutter="20">
           <el-col :span="12" :offset="6">
               <el-card>
-                  <el-steps :active="current" finish-status="finish" >
+                  <el-steps :active="current" finish-status="success" >
                     <el-step title="参报概要"></el-step>
                     <el-step title="个人信息"></el-step>
                     <el-step title="合作者信息"></el-step>
@@ -312,7 +312,6 @@
             count: 0,
             visible: false, 
             formApplication: {
-                    matchId:1,
                     workName:'秀的一麻批',//作品名称
                     department:'计算机学院',//院系
                     appCategory:'A',//论文申请类别
@@ -481,7 +480,6 @@
 	  submit(){
 			var _self=this;
 			console.log(_self.formApplication.name);
-			_self.formApplication.matchId=localStorage.getItem("selMatch");
 					
 			$.ajax({
 				url: "http://58.87.72.138:30000/submitApplication",
@@ -522,8 +520,8 @@
 					for(item in data.pictureUrl){
 						_self.formApplication.imageUrl += (data.pictureUrl[item] + ';');
 					}
-					
-					
+					_self.formApplication.imageUrl = _self.formApplication.imageUrl.substring(0, _self.formApplication.imageUrl.length - 1);  
+					console.log(_self.formApplication.imageUrl);
 					if(data.err == false){
 						_self.$message({
 							message: '申请提交成功',
@@ -532,7 +530,7 @@
 						});
 						
 						setTimeout(() => {
-							window.location.href="main.html";
+							window.location.href="../index.html";
 						}, 1000);
 					}
 					else{
