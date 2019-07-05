@@ -269,87 +269,9 @@
                     </el-col>
                 </el-row>
             </el-main>
-                <!--团委新增比赛-->
+                <!--团委管理比赛-->
             <el-main v-else-if="sidebarIndex==1 && role=='团委'">
-                <el-button @click="createCompetition=true">创建比赛</el-button>
-                <el-table :data="createData" border style="width: 100%">
-                    <el-table-column label="比赛名称" prop="nameM"></el-table-column>
-                    <el-table-column label="比赛类别" prop="matchTypeM"></el-table-column>
-                    <el-table-column label="报名开始时间" prop="startDateM"></el-table-column>
-                    <el-table-column label="报名结束时间" prop="endDateM"></el-table-column>
-                    <el-table-column label="操作">
-                        <template slot-scope="scope">
-                            <!--<el-button size="mini" @click="edit(scope.$index,createData)" type="primary" icon="el-icon-edit">编辑</el-button>-->
-                            <el-popover placement="top" width="160" v-model="scope.row.remove">
-                                <p>您确定删除已保存的比赛信息吗？</p>
-                                <div style="text-align: right; margin: 0">
-                                    <el-button size="mini" type="text" @click="scope.row.remove=false">取消</el-button>
-                                    <el-button type="primary" size="mini" @click.native.prevent="deleteRow(scope.$index, createData)">确定</el-button>
-                                </div>
-                                <el-button slot="reference" size="mini" type="danger" icon="el-icon-delete">删除</el-button>
-                            </el-popover>
-                            <!--<el-popover placement="top" width="160" v-model="scope.row.remove">
-                                <p>您确定发布该比赛吗？</p>
-                                <div style="text-align: right; margin: 0">
-                                  <el-button size="mini" type="text" @click="scope.row.remove=false">取消</el-button>
-                                  <el-button type="primary" size="mini" @click.native.prevent="deleteRow(scope.$index, createData)">确定</el-button>
-                                </div>
-                                <el-button slot="reference" size="mini" type="success" icon="el-icon-upload2">发布</el-button>
-                              </el-popover>-->
-                        </template>
-                    </el-table-column>
-                </el-table>
 
-                <!--表单-->
-                <el-dialog title="创建比赛" :visible.sync="createCompetition">
-                    <el-form :model="createCompetitionForm" ref="createCompetitionForm" :rules="createRules" label-width="120px">
-                        <el-form-item label="比赛类别" prop="matchType">
-                            <el-radio-group v-model="createCompetitionForm.matchType">
-                                <el-radio label="创意大赛">创意大赛</el-radio>
-                                <el-radio label="创新大赛">创新大赛</el-radio>
-                                <el-radio label="创业大赛">创业大赛</el-radio>
-                            </el-radio-group>
-                        </el-form-item>
-
-                        <el-form-item label="比赛名称" prop="name">
-                            <el-input v-model="createCompetitionForm.name"></el-input>
-                        </el-form-item>
-
-                        <el-form-item label="开始时间" prop="startDate">
-                            <el-date-picker type="datetime" v-model="createCompetitionForm.startDate" placeholder="选择比赛开始时间" value-format="yyyy-MM-dd HH:mm:SS" format="yyyy-MM-dd HH:mm:SS"></el-date-picker>
-                        </el-form-item>
-
-                        <el-form-item label="结束时间" prop="endDate">
-                            <el-date-picker type="datetime" v-model="createCompetitionForm.endDate" placeholder="选择比赛结束时间" value-format="yyyy-MM-dd HH:mm:SS" format="yyyy-MM-dd HH:mm:SS"></el-date-picker>
-                        </el-form-item>
-
-                        <el-form-item label="比赛简介" prop="introduction">
-                            <el-input v-model="createCompetitionForm.introduction" type="textarea" :autosize="{minRows: 5,maxRows: 8}" placeholder="请在此处输入比赛内容简介"></el-input>
-                        </el-form-item>
-
-                        <el-form-item label="文件上传" prop="matchFile">
-                            <el-upload ref="upload" action="https://jsonplaceholder.typicode.com/posts/"
-                                       :on-preview="handlePreview"
-                                       :on-remove="handleRemove"
-                                       :auto-upload="false"
-                                       :show-file-list="true"
-                                       :limit=3
-                                       :file-list="fileList"
-                                       :before-upload="beforeUpload">
-                                <el-button slot="trigger" size="small" type="primary">选取文件</el-button>
-                                <el-button style="margin-left: 10px;" size="small" type="success" @click="submitUpload">上传到服务器</el-button>
-                            </el-upload>
-                        </el-form-item>
-
-                        <center>
-                            <el-form-item>
-                                <el-button type="primary" @click="submitForm('createCompetitionForm')">立即创建</el-button>
-                                <el-button @click="createCompetition = false">取消</el-button>
-                                <el-button @click="resetForm('createCompetitionForm')">重置</el-button>
-                            </el-form-item>
-                        </center>
-                    </el-form>
-                </el-dialog>
             </el-main>
 
             <!-- 团委申请管理 -->
@@ -529,37 +451,7 @@
                 stuApplyData:null,
                 twApplyData:null,
 
-                //创建比赛
-                visible: false,
-                createCompetition: false,
-                createCompetitionForm:{
-                    matchType:'',
-                    name:'',
-                    introduction:'',
-                    startDate:'',
-                    endDate:'',
-                    value:'',
-                },
-                createData:[],
-                fileList:[],
 
-                createRules:{
-                    matchType:[
-                        {required:true, message:'请选择比赛类别',trigger:'change'}
-                    ],
-                    name:[
-                        {required:true, message:'比赛名称不能为空！',trigger:'blur'}
-                    ],
-                    startDate:[
-                        {required:true, type:'string',message:'请选择比赛开始时间！',trigger:'change'}
-                    ],
-                    endDate:[
-                        {required:true, type:'string',message:'请选择比赛结束时间！',trigger:'change'}
-                    ],
-                    introduction:[
-                        {required:true, message:'请填写比赛简介的信息！',trigger:'blur'}
-                    ]
-                }
             }
         },
         created(){
@@ -572,6 +464,7 @@
                     break;
                 case '团委':
                     this.getTwApply();
+                    this.getMatchData();
                     break;
                 case '专家':
                     this.getMatchData();
