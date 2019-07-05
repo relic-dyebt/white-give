@@ -201,6 +201,11 @@ app.get('/delete', mutipartMiddeware, (req, res) => {
     system.delete(info, res);
 });
 
+app.get('/inviteExpert', mutipartMiddeware, (req, res) => {
+    var info = JSON.parse(url.parse(req.url, true).query.info);
+    system.inviteExpert(db, info, res);
+});
+
 app.get('/getFile', (req, res) => {
     var info = JSON.parse(url.parse(req.url, true).query.info);
     var stats = fs.statSync(info.url);

@@ -212,7 +212,7 @@ module.exports.getExpertByApplication = function(db, info, res) {
     var ret = { err: null, msg: null };
     var sql = info.invited == 'true' ?
         'SELECT * FROM Expert WHERE Expert.id IN (SELECT expertId FROM Assessment WHERE applicationId = ?)':
-        'SELECT * FROM Expert WHERE Expert.id NOT IN (SELECT expertId FROM Assessment WHERE applicationId = ?) AND Expert.caetgory IN (SELECT Application.category FROM Application WHERE Application.id = ?)'
+        'SELECT * FROM Expert WHERE Expert.id NOT IN (SELECT expertId FROM Assessment WHERE applicationId = ?) AND Expert.category IN (SELECT Application.category FROM Application WHERE Application.id = ?)'
     var sqlParams = [ info.applicationId, info.applicationId ];
     db.query(sql, sqlParams, (err, data) => {
         if (err) {
