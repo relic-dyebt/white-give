@@ -78,9 +78,7 @@
                 <el-menu
                         default-active="1"
                         class="el-menu-vertical-demo"
-                        @open="handleOpen"
-                        @close="handleClose"
-                        @select="setSidebarIndex">
+                        @select="stuSetSidebarIndex">
 
                     <el-menu-item index="1">
                         <i class="el-icon-menu"></i>
@@ -126,7 +124,7 @@
                 <el-menu
                         default-active="1"
                         class="el-menu-vertical-demo"
-                        @select="stuSetSidebarIndex">
+                        @select="expertSetSidebarIndex">
 
                     <el-menu-item index="1" >
                         <i class="el-icon-menu"></i>
@@ -152,6 +150,8 @@
 
             <!-- 专家修改个人信息 -->
             <el-main v-if="sidebarIndex==3 && role=='专家'">
+                    <el-row :gutter="12" style="margin-top: 10px">
+                        <el-col :offset="6" :span="12">
                     <el-form label-width="100px" >
                         <el-form-item label="用户名">
                             <el-input v-model="userInfo.username"></el-input>
@@ -175,11 +175,22 @@
                                 <el-option value="F" label="F.哲学社会科学（包括哲学、经济、社会、法律、教育、管理）"></el-option>
                             </el-select>
                         </el-form-item>
-                        <el-button type="primary" @click="modifyInfo">确认修改</el-button>
+                        <el-form-item>
+                            <el-button type="primary" @click="modifyInfo">确认修改</el-button>
+                            <el-button @click="resetForm">重置</el-button>
+                        </el-form-item>
                     </el-form>
+                    </el-col>
+                    </el-row>
                 </el-main>
-            <!--            ! 学生查看比赛（并参赛）-->
+            <!--            ! 学生或专家查看比赛（并参赛）-->
             <el-main v-if="sidebarIndex==1 &&role=='学生'" >
+                <div v-for ="item in matchData">
+                    <match-card v-bind:info="item"></match-card>
+                </div>
+            </el-main>
+
+            <el-main v-if="sidebarIndex==1 &&role=='专家'" >
                 <div v-for ="item in matchData">
                     <match-card v-bind:info="item"></match-card>
                 </div>
@@ -217,33 +228,40 @@
             </el-main>
             <!-- 学生修改个人信息 -->
             <el-main v-if="sidebarIndex==3 && role=='学生'">
-                <el-form label-width="100px" >
-                    <el-form-item label="用户名">
-                        <el-input v-model="userInfo.username"></el-input>
-                    </el-form-item>
-                    <el-form-item label="真实姓名">
-                        <el-input v-model="userInfo.name"></el-input>
-                    </el-form-item>
-                    <el-form-item label="个人信息">
-                        <el-input type="textarea" v-model="userInfo.introduction"></el-input>
-                    </el-form-item>
-                    <el-form-item label="电话">
-                        <el-input type="number" v-model="userInfo.phone"></el-input>
-                    </el-form-item>
-                    <el-form-item label="邮箱">
-                        <el-input v-model="userInfo.email"></el-input>
-                    </el-form-item>
-                    <el-form-item label="院系">
-                        <el-input v-model="userInfo.department"></el-input>
-                    </el-form-item>
-                    <el-form-item label="专业">
-                        <el-input v-model="userInfo.major"></el-input>
-                    </el-form-item>
-                    <el-form-item label="入学年份">
-                        <el-input type="number" v-model="userInfo.enrollmentYear"></el-input>
-                    </el-form-item>
-                    <el-button type="primary" @click="modifyInfo">确认修改</el-button>
-                </el-form>
+                <el-row :gutter="12" style="margin-top: 10px">
+                    <el-col :offset="6" :span="12">
+                        <el-form label-width="80px" class="demo-ruleForm">
+                            <el-form-item label="用户名">
+                                <el-input v-model="userInfo.username"></el-input>
+                            </el-form-item>
+                            <el-form-item label="真实姓名">
+                                <el-input v-model="userInfo.name"></el-input>
+                            </el-form-item>
+                            <el-form-item label="个人信息">
+                                <el-input type="textarea" v-model="userInfo.introduction"></el-input>
+                            </el-form-item>
+                            <el-form-item label="电话">
+                                <el-input type="number" v-model="userInfo.phone"></el-input>
+                            </el-form-item>
+                            <el-form-item label="邮箱">
+                                <el-input v-model="userInfo.email"></el-input>
+                            </el-form-item>
+                            <el-form-item label="院系">
+                                <el-input v-model="userInfo.department"></el-input>
+                            </el-form-item>
+                            <el-form-item label="专业">
+                                <el-input v-model="userInfo.major"></el-input>
+                            </el-form-item>
+                            <el-form-item label="入学年份">
+                                <el-input type="number" v-model="userInfo.enrollmentYear"></el-input>
+                            </el-form-item>
+                            <el-form-item>
+                                <el-button type="primary" @click="modifyInfo">确认修改</el-button>
+                                <el-button @click="resetForm">重置</el-button>
+                            </el-form-item>
+                        </el-form>
+                    </el-col>
+                </el-row>
             </el-main>
 
             <!-- 团委申请管理 -->
@@ -424,6 +442,9 @@
                 case '团委':
                     this.getTwApply();
                     break;
+                case '专家':
+                    this.getMatchData();
+                    break;
             }
 
         },
@@ -432,6 +453,12 @@
                 this.sidebarIndex = index;
                 if(index == 3){
                     this.getTwApply();
+                }
+            },
+            expertSetSidebarIndex(index) {
+                this.sidebarIndex = index;
+                if(index == 1){
+                    this.getMatchData();
                 }
             },
             twPassApply(index){
@@ -702,9 +729,8 @@
                 })
 
             },
-            setSidebarIndex(index) {
+            stuSetSidebarIndex(index) {
                 this.sidebarIndex = index;
-
             },
             getUserInfo() {
                 this.role = sessionStorage.getItem("role");
