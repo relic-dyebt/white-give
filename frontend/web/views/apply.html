@@ -15,7 +15,6 @@
 
 
 <style>
-
 </style>
 
 
@@ -24,7 +23,7 @@
       <el-row :gutter="20">
           <el-col :span="12" :offset="6">
               <el-card>
-                  <el-steps :active="current" finish-status="success" >
+                  <el-steps :active="current" finish-status="finish" >
                     <el-step title="参报概要"></el-step>
                     <el-step title="个人信息"></el-step>
                     <el-step title="合作者信息"></el-step>
@@ -35,7 +34,7 @@
                   <h4>当前正在进行第 {{ current + 1 }} 步</h4>
                   
                   <el-form ref="formApplication" :model="formApplication" :rules="ruleApplication" label-position="right" label-width="80px">
-                      <div v-if="current==0">
+                      <div v-show="current==0">
                           <el-form-item label="作品名称" prop="workName">
                               <el-input v-model="formApplication.workName" placeholder="请输入您的作品名称"></el-input>
                           </el-form-item>
@@ -54,7 +53,7 @@
                           </Center>
                       </div>
       
-                      <div v-if="current==1">
+                      <div v-show="current==1">
                           <el-form-item label="姓名" prop="name">
                               <el-input v-model="formApplication.name" placeholder="请输入您的姓名"></el-input>
                           </el-form-item>
@@ -62,7 +61,7 @@
                               <el-input v-model="formApplication.studentNumber" placeholder="请输入您的学号"></el-input>
                           </el-form-item>
                           <el-form-item label="出生年月" prop="birthday">
-                              <el-date-picker type="date" placeholder="请选择您的出生年月" v-model="formApplication.birthday" style="width:215px"></el-date-picker>
+                              <el-date-picker type="date" placeholder="请选择您的出生年月" v-model="formApplication.birthday" style="width:215px" format="yyyy-MM-dd" value-format="yyyy-MM-dd" ></el-date-picker>
                           </el-form-item>
                           <el-form-item label="学历" prop="eduBackground">
                               <el-radio-group v-model="formApplication.eduBackground">
@@ -77,7 +76,7 @@
                           </el-form-item>
                           
                           <el-form-item label="入学年份" prop="enrollmentYear">
-                              <el-date-picker type='year' v-model="formApplication.enrollmentYear" placeholder="请选择入学年份"></el-date-picker>
+                              <el-date-picker type='year' v-model="formApplication.enrollmentYear" placeholder="请选择入学年份" format="yyyy" value-format="yyyy" ></el-date-picker>
                           </el-form-item>
                           <el-form-item label="通讯地址" prop="address">
                               <el-input v-model="formApplication.address" placeholder="请输入您的通讯地址"></el-input>
@@ -94,7 +93,7 @@
                           </Center>
                       </div>
                       
-                      <div v-if="current==2">
+                      <div v-show="current==2">
                           <div v-if="count>=1">
                               <el-card>
                                   <div slot="header" class="clearfix">
@@ -233,9 +232,9 @@
                           </Center>
                       </div>
                       
-                      <div v-if="current==3">
+                      <div v-show="current==3">
                           <el-form-item label="作品类别" prop="category">
-                              <el-select v-model="formApplication.category" placeholder="请选择您的作品类别">
+                              <el-select v-model="formApplication.category" placeholder="请选择您的作品类别" width="400px">
                                 <el-option value="A" label="A.机械与控制（包括机械、仪器仪表、自动化控制、工程、交通、建筑等）"></el-option>
                                 <el-option value="B" label="B.信息技术（包括计算机、电信、通讯、电子等）"></el-option>
                                 <el-option value="C" label="C.数理（包括数学、物理、地球与空间科学等）"></el-option>
@@ -244,6 +243,40 @@
                                 <el-option value="F" label="F.哲学社会科学（包括哲学、经济、社会、法律、教育、管理）"></el-option>
                               </el-select>
                           </el-form-item>
+
+                          <el-form-item label="展示形式" prop="displayFormArray">
+                            <el-checkbox-group v-model="formApplication.displayFormArray">
+                              <el-checkbox label="实物、产品" name="displayFormArray"></el-checkbox>
+                              <el-checkbox label="模型" name="displayFormArray"></el-checkbox>
+                              <el-checkbox label="图纸" name="displayFormArray"></el-checkbox>
+                              <el-checkbox label="磁盘" name="displayFormArray"></el-checkbox>
+                              <el-checkbox label="现场演示" name="displayFormArray"></el-checkbox>
+                              <el-checkbox label="图片" name="displayFormArray"></el-checkbox>
+                              <el-checkbox label="录像" name="displayFormArray"></el-checkbox>
+                              <el-checkbox label="样品(对于发明制作类)" name="displayFormArray"></el-checkbox>
+                            </el-checkbox-group>
+                          </el-form-item>
+
+                          <el-form-item label="调查方式" prop="surveyMethodArray">
+                            <el-checkbox-group v-model="formApplication.surveyMethodArray">
+                              <el-checkbox label="走访" name="surveyMethodArray"></el-checkbox>
+                              <el-checkbox label="问卷" name="surveyMethodArray"></el-checkbox>
+                              <el-checkbox label="现场采访" name="surveyMethodArray"></el-checkbox>
+                              <el-checkbox label="人员介绍" name="surveyMethodArray"></el-checkbox>
+                              <el-checkbox label="个别交谈" name="surveyMethodArray"></el-checkbox>
+                              <el-checkbox label="亲临实践" name="surveyMethodArray"></el-checkbox>
+                              <el-checkbox label="会议" name="surveyMethodArray"></el-checkbox>
+                              <el-checkbox label="图片、照片" name="surveyMethodArray"></el-checkbox>
+                              <el-checkbox label="书报刊物" name="surveyMethodArray"></el-checkbox>
+                              <el-checkbox label="统计报表" name="surveyMethodArray"></el-checkbox>
+                              <el-checkbox label="影视资料" name="surveyMethodArray"></el-checkbox>
+                              <el-checkbox label="文件" name="surveyMethodArray"></el-checkbox>
+                              <el-checkbox label="集体组织" name="surveyMethodArray"></el-checkbox>
+                              <el-checkbox label="自发" name="surveyMethodArray"></el-checkbox>
+                              <el-checkbox label="其它(对于调查报告和学术论文类)" name="surveyMethodArray"></el-checkbox>
+                            </el-checkbox-group>
+                          </el-form-item>
+
                           <el-form-item label="作品简介" prop="introduction">
                               <el-input v-model="formApplication.introduction" type="textarea" :autosize="{minRows: 5,maxRows: 10}" placeholder="请在此填写您的作品总体情况说明，不超过800字"></el-input>
                           </el-form-item>
@@ -259,7 +292,7 @@
                           </Center>
                       </div>
       
-                      <div v-if="current==4">
+                      <div v-show="current==4">
                           <el-form-item>
                             <el-row>
                                 <el-col :span="12" :offset="4">
@@ -312,10 +345,10 @@
             count: 0,
             visible: false, 
             formApplication: {
+                    matchId:1,
                     workName:'秀的一麻批',//作品名称
                     department:'计算机学院',//院系
                     appCategory:'A',//论文申请类别
-
                     name:'李华',//学生姓名
                     studentNumber:'16211000',//学号
                     birthday:'1998-04-20',//出生年月
@@ -325,39 +358,37 @@
                     address:'紫禁城',//通讯地址
                     phone:'13012345678',//手机号
                     email:'lihua@163.com',//邮箱
-
                     c1Name:'李华',
 					c1StudentNumber:'16211000',
                     c1eduBackground:'本科',
                     c1Phone:'13012345678',
                     c1Email:'lihua@163.com',
-
                     c2Name:'',
 					c2StudentNumber:'',
                     c2eduBackground:'',
                     c2Phone:'',
                     c2Email:'',
-
                     c3Name:'',
 					c3StudentNumber:'',
                     c3eduBackground:'',
                     c3Phone:'',
                     c3Email:'',
-
                     c4Name:'',
 					c4StudentNumber:'',
                     c4eduBackground:'',
                     c4Phone:'',
                     c4Email:'',
-
                     category:'A', //作品类别
                     introduction:'你说啥就是啥', //作品简介
                     innovation:'写不完了', //创新点
                     keyword:'没有keyword', //关键词
+                    displayFormArray:[],
+                    surveyMethodArray:[],
+                    displayForm:'',
+                    surveyMethod:'',
 					documentUrl: '',
 					imageUrl: '',
 					videoUrl: '',
-					
                 },
             ruleApplication: {
                     workName:[
@@ -369,7 +400,6 @@
                     appCategor:[
                         {required: true, message: '请选择论文类别！', trigger: 'change'}
                     ],
-
                     name:[
                         {required: true, message: '姓名不能为空！', trigger: 'blur'}
                     ],
@@ -377,7 +407,7 @@
                         {required: true, message: '学号不能为空！', trigger: 'blur'}
                     ],
                     birthday:[
-                        {required: true, type: 'date', message: '请选择出生年月！', trigger: 'change'}
+                        {required: true, type: 'string', message: '请选择出生年月！', trigger: 'change'}
                     ],
                     eduBackground:[
                         {required: true, message: '请选择学历！', trigger: 'change'}
@@ -386,7 +416,7 @@
                         {required: true, message: '专业不能为空！', trigger: 'blur'}
                     ],
                     enrollmentYear:[
-                        {required: true, message: '请选择入学年份！！', trigger: 'change'}
+                        {required: true, type:'string' ,message: '请选择入学年份！！', trigger: 'change'}
                     ],
                     address:[
                         {required: true, message: '通讯地址不能为空！', trigger: 'blur'}
@@ -414,7 +444,6 @@
                         {required: true, message: '邮箱不能为空！', trigger: 'blur'},
                         { type: 'email', message: '邮箱格式不正确！', trigger: 'blur' }
                     ],
-
                     category:[
                         {required: true, message: '请选择作品类别！', trigger: 'change'}
                     ], 
@@ -426,11 +455,16 @@
                     ],
                     keyword:[
                         {required: true, message: '关键词不能为空！', trigger: 'blur'}
+                    ],
+                    surveyMethodArray:[
+                        {type:'array', required: true, message: '请选择调查方式！', trigger: 'change'}
+                    ],
+                    displayFormArray:[
+                        {type:'array', required: true, message:'请选择作品展示方式！', trigger: 'change'}
                     ]
             },
                 }
         },
-
     methods:{
       next () {
         if (this.current == 4) {
@@ -443,7 +477,6 @@
 				this.update();
 			})
 		}
-		
       },
       prev (){
           this.current -= 1;
@@ -464,9 +497,11 @@
       },
       handleSubmit (name) {
           this.$refs[name].validate((valid) => {
+              //_self.displayForm=_self.displayFormArray.join(";");
+              //_self.surveyMethod=_self.surveyMethodArray.join(";");
               if (valid) {
                   this.upload();
-					this.submit();
+                  this.submit();
               } else {
                   _self.$message({
 					message: '提交失败，请检查信息填写是否正确',
@@ -479,7 +514,9 @@
       },
 	  submit(){
 			var _self=this;
-			console.log(_self.formApplication.name);
+            _self.formApplication.displayForm=_self.formApplication.displayFormArray.join(";");
+            _self.formApplication.surveyMethod=_self.formApplication.surveyMethodArray.join(";");
+			_self.formApplication.matchId=localStorage.getItem("selMatch");
 					
 			$.ajax({
 				url: "http://58.87.72.138:30000/submitApplication",
@@ -520,8 +557,8 @@
 					for(item in data.pictureUrl){
 						_self.formApplication.imageUrl += (data.pictureUrl[item] + ';');
 					}
-					_self.formApplication.imageUrl = _self.formApplication.imageUrl.substring(0, _self.formApplication.imageUrl.length - 1);  
-					console.log(_self.formApplication.imageUrl);
+					
+					
 					if(data.err == false){
 						_self.$message({
 							message: '申请提交成功',
@@ -530,7 +567,7 @@
 						});
 						
 						setTimeout(() => {
-							window.location.href="../index.html";
+							window.location.href="main.html";
 						}, 1000);
 					}
 					else{
@@ -555,4 +592,3 @@
     }
   })
 </script>
-
