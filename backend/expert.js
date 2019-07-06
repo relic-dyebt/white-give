@@ -21,9 +21,7 @@ module.exports.register = function(db, info, res) {
             res.send(JSON.stringify(ret));
         } else {
             //插入专家
-            var sql = 
-                'INSERT INTO Expert ' +
-                util.values(9);
+            var sql = 'INSERT INTO Expert ' + util.values(9);
             var sqlParams = [
                 0,
                 info.username,
@@ -35,7 +33,7 @@ module.exports.register = function(db, info, res) {
                 info.email,
                 info.category
             ];
-            db.query(sql, sqlParams, (err, data) => {
+            db.query(sql, sqlParams, err => {
                 if (err) {
                     console.log(err);
                     ret.err = true;
