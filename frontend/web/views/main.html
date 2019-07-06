@@ -92,6 +92,10 @@
                         <i class="el-icon-setting"></i>
                         <span slot="title">修改个人信息</span>
                     </el-menu-item>
+                    <el-menu-item index="5" @click="logout">
+                        <i class="el-icon-setting"></i>
+                        <span slot="title">登出</span>
+                    </el-menu-item>
                 </el-menu>
         </el-aside>
         <el-aside width="200px" style="background-color: rgb(238, 241, 246)" v-else-if="role=='团委'">
@@ -112,6 +116,10 @@
                     <el-menu-item index="4">
                         <i class="el-icon-user"></i>
                         <span slot="title">专家管理</span>
+                    </el-menu-item>
+                    <el-menu-item index="5" @click="logout">
+                        <i class="el-icon-setting"></i>
+                        <span slot="title">登出</span>
                     </el-menu-item>
                 </el-menu>
         </el-aside>
@@ -134,6 +142,10 @@
                         <i class="el-icon-setting"></i>
                         <span slot="title">修改个人信息</span>
                     </el-menu-item>
+                    <el-menu-item index="5" @click="logout">
+                        <i class="el-icon-setting"></i>
+                        <span slot="title">登出</span>
+                    </el-menu-item>
                 </el-menu>
         </el-aside>
 
@@ -150,7 +162,7 @@
                 </el-row>
             </el-header>
 
-                <!--专家评审作品-->
+            <!--专家评审作品-->
             <el-main v-if="sidebarIndex==2 && role=='专家'">
                 <el-table :data="auditData" border empty-text="您没有待评审作品">
                     <el-table-column width="45" type="selection" align="center"></el-table-column>
@@ -1643,6 +1655,9 @@
             },
             filterState(value, row, column) {
                 return row.state === value;
+            },
+            logout() {
+                window.location.href = 'login.html';
             }
         }
     })
