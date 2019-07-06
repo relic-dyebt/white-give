@@ -531,7 +531,6 @@
                     this.getMatchData();
                     break;
             }
-
         },
         methods: {
             //团委给被选中的专家发送邀请
@@ -548,7 +547,11 @@
                         dataType: 'json',
                         contentType:"application/json",
                         data: {
-                            info: JSON.stringify({ applicationId: applicationId,expertId:expertId,email:email }),
+                            info: JSON.stringify({
+                                applicationId: applicationId,
+                                expertId: expertId,
+                                email: email 
+                            }),
                         },
                         success: function(res){
                             console.log(res);
