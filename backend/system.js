@@ -286,7 +286,7 @@ module.exports.generatePdf = function (db, applicationId) {
             });
             doc.render();
             var buf = doc.getZip().generate({ type: 'nodebuffer' });
-            var url = '/var/ftp/pub/data/application/' + application.studentNumber + '_' + application.name + '_' + application.id + '.pdf';
+            var url = '/var/ftp/pub/data/application/' + application.studentNumber + '_' + application.id + '.pdf';
             
             toPdf(buf).then(pdfBuffer => {
                 fs.writeFileSync(url, pdfBuffer);
