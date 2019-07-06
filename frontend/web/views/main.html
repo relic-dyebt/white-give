@@ -160,9 +160,9 @@
 
                     <el-table-column label="预览操作" align="center" width="240" >
                         <template slot-scope="scope">
-                            <el-button type="primary" size="mini">图片</el-button>
-                            <el-button type="primary" size="mini">文件</el-button>
-                            <el-button type="primary" size="mini">视频</el-button>
+                            <el-button type="primary" size="mini" @click="previewImg(scope.$index)">图片</el-button>
+                            <el-button type="primary" size="mini" @click="previewDoc(scope.$index)">文件</el-button>
+                            <el-button type="primary" size="mini" @click="previewVid(scope.$index)">视频</el-button>
                         </template>
                     </el-table-column>
                     <el-table-column label="下载" align="center" width="108">
@@ -524,6 +524,7 @@
             return this.info;
         },
         methods: {
+
             joinMatch(id){
                 localStorage.setItem("selMatch",id);
                 window.open("apply.html");
@@ -631,6 +632,21 @@
             }
         },
         methods: {
+            //专家预览
+            previewImg(index){
+                var url = this.auditData[index].imgUrl;
+                localStorage.setItem("imgUrl",url);
+                window.open("preview.html");
+            },
+            previewVid(index){
+                var url = this.auditData[index].vidUrl;
+                localStorage.setItem("vidUrl",url);
+                window.open("previewVid.html");
+            },
+            previewDoc(index){
+                var url = this.auditData[index].docUrl;
+                window.open('http://ow365.cn/?i=19000&furl=http://58.87.72.138:30000/getFile?info={"url":"'+url+'"}');
+            },
             deleteMatch(index) {
                 var _self = this;
                 if (this.matchData[index].state == 'created') {
@@ -785,6 +801,9 @@
                                 id: count,
                                 workName: data[item].workName,
                                 name: data[item].name,
+                                imgUrl:data[item].imageUrl,
+                                vidUrl:data[item].videoUrl,
+                                docUrl:data[item].documentUrl,
                             }
                             console.log(ap);
                             _self.auditData.push(ap);
@@ -806,40 +825,7 @@
                     var expertId = this.expertTemp[this.addedExpertIndex[i]].id;
                     var email = this.expertTemp[this.addedExpertIndex[i]].email;
                     console.log("expert email: " + email);
-                    $.ajax({
-                        url: "http://58.87.72.138:30000/inviteExpert",
-                        type: "get",
-                        dataType: 'json',
-                        contentType:"application/json",
-                        data: {
-                            info: JSON.stringify({
-                                applicationId: applicationId,
-                                expertId: expertId,
-                                email: email 
-                            }),
-                        },
-                        success: function(res){
-                            console.log(res);
-                            if(res.err == false){
-                                _self.$notify({
-                                    message: '邀请成功',
-                                    type: 'success',
-                                    title:'成功'
-                                });
-                            }
-                            else{
-                                _self.$notify({
-                                    message: '邮件发送失败',
-                                    type: 'error',
-                                    title:'失败'
-                                });
-                            }
 
-                        },
-                        error: function(err){
-                            console.log(err);
-                        }
-                    });
                 }       
             },            
             //团委查找专家信息，以分配专家
