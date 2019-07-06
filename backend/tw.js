@@ -1,3 +1,5 @@
+var fs = require('fs');
+
 var util = require('./util');
 
 //校团委登录
@@ -60,7 +62,7 @@ module.exports.createMatch = function(db, info, res) {
 
     //插入比赛
     var ret = { err: null, msg: null };
-    var sql = 'INSERT INTO `Match` ' + util.values(9);
+    var sql = 'INSERT INTO `Match` ' + util.values(10);
     var sqlParams = [
         0,
         info.name,
@@ -70,7 +72,8 @@ module.exports.createMatch = function(db, info, res) {
         info.auditTime,
         info.scoreTime,
         info.endTime,
-        'created'
+        'created',
+        ''
     ];
     db.query(sql, sqlParams, (err, data) => {
         if (err) {
@@ -104,6 +107,28 @@ module.exports.deleteMatchById = function(db, info, res) {
         } else {
             ret.err = false;
             ret.msg = 'Delete match successfully.';
+            res.send(JSON.stringify(ret));
+        }
+    });
+}
+
+//根据ID设置比赛结果URL
+module.exports.setMatchResultUrlById = function(db, info, res) {
+    console.log('Tw - Set match result url by id\n' + util.getTime());
+
+    //更新比赛
+    var ret = { err: null, msg: null };
+    var sql = 'UPDATE `Match` SET resultUrl = ? WHERE id = ?'
+    var sqlParams = [ info.url, info.id ];
+    db.query(sql, sqlParams, err => {
+        if (err) {
+            console.log(err);
+            ret.err = true;
+            ret.msg = 'Database error(UPDATE).';
+            res.send(JSON.stringify(ret));
+        } else {
+            ret.err = false;
+            ret.msg = 'Set match result url successfully.';
             res.send(JSON.stringify(ret));
         }
     });
@@ -295,4 +320,25 @@ module.exports.getExpert = function(db, res) {
             res.send(JSON.stringify(ret));
         }
     });
+}
+
+//上传比赛结果
+module.exports.uploadMatchResult = function(files, res) {
+    console.log('System - Upload match result\n' + util.getTime());
+
+    console.log(files);
+
+    var ret = { err: null, msg: null, url: [] };
+
+    //移动并重命名文件
+    for (var i in files) {
+        var file = files[i];
+        var oldPath = file.path;
+        var newPath = file.path.replace('temp', 'work');
+        fs.rename(oldPath, newPath, err => err && console.log(err));
+        ret.url.push(newPath);
+    }
+    ret.err = false;
+    ret.msg = 'File upload accomplished.';
+    res.send(JSON.stringify(ret));
 }

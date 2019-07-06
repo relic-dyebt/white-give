@@ -157,48 +157,46 @@
                     <el-table-column label="序号" width="90"  align="center" prop="id"></el-table-column>
                     <el-table-column label="作品名称" width="400" prop="workName" align="center"></el-table-column>
                     <el-table-column label="第一作者" width="180" prop="name" align="center"></el-table-column>
-            
+
                     <el-table-column label="预览操作" align="center" width="240" >
-                      <template slot-scope="scope">
-                        <el-button type="primary" size="mini">图片</el-button>
-                        <el-button type="primary" size="mini">文件</el-button>
-                        <el-button type="primary" size="mini">视频</el-button>
-                      </template>
+                        <template slot-scope="scope">
+                            <el-button type="primary" size="mini" @click="previewImg(scope.$index)">图片</el-button>
+                            <el-button type="primary" size="mini" @click="previewDoc(scope.$index)">文件</el-button>
+                            <el-button type="primary" size="mini" @click="previewVid(scope.$index)">视频</el-button>
+                        </template>
                     </el-table-column>
                     <el-table-column label="下载" align="center" width="108">
                         <template slot-scope="scope">
-                          <el-button type="primary" size="mini" @click="download(scope.row)">下载<i class="el-icon-download"></i></el-button>
+                            <el-button type="primary" size="mini">下载<i class="el-icon-download"></i></el-button>
                         </template>
-                      </el-table-column>
+                    </el-table-column>
                     <el-table-column label="得分" width="150" prop="score" align="center">
-                      <template slot-scope="scope">
-                        <el-input placeholder="请在此处评分"  v-model.number="scope.row.score" suffix-icon="el-icon-edit"  ></el-input>
-                      </template>
+                        <template slot-scope="scope">
+                            <el-input placeholder="请在此处评分"  v-model.number="scope.row.score" suffix-icon="el-icon-edit"  ></el-input>
+                        </template>
                     </el-table-column>
                     <el-table-column label="评语" width="210" prop="comment" align="center">
                         <template slot-scope="scope">
-                          <el-button type="primary" size="mini" icon="el-icon-edit" @click="editCom(scope.row)" >填写评语</el-button>
-                          <el-button type="text" size="mini" icon="el-icon-search" @click="viewCom(scope.row)" >查看评语</el-button>
+                            <el-button type="primary" size="mini" icon="el-icon-edit" @click="editComment=true" >编辑评语</el-button>
+                            <el-button type="text" size="mini" icon="el-icon-search">查看评语</el-button>
                         </template>
                     </el-table-column>
-                  </el-table>
-            
-                  <el-button type="primary" @click="tablePost">一键提交</el-button>
-                  
-                  
-                  <el-dialog title="评语填写" :visible.sync="editComment" :close-on-click-modal="false">
-                    <el-form :model="editForm" label-position="top" label-width="80px" ref="editForm">
-                      <el-form-item label="填写评论" prop="comment"
-                      :rules="{required:true, message:'评论不能为空！',trigger:'blur'}" >
-                        <el-input type="textarea"  v-model="editForm.comment"></el-input>
-                      </el-form-item>
-                      <el-button type="primary" @click="handleComment('editForm')" >确定</el-button>
+                </el-table>
+
+
+                <el-dialog title="评语填写" :auditVisible.sync="editComment" :close-on-click-modal="false">
+                    <el-form :model="editAuditForm" label-position="top" label-width="80px" ref="editAuditForm">
+                        <el-form-item label="填写评论" prop="comment">
+                            <el-input type="textarea" v-model="editAuditForm.comment"></el-input>
+                        </el-form-item>
+                        <el-button type="primary">提交</el-button>
                     </el-form>
-                  </el-dialog>
-            
-                  <el-dialog title="评语查看" :visible.sync="viewComment" :close-on-click-modal="false">
-                    {{this.comment}}
-                  </el-dialog>
+                </el-dialog>
+
+                <el-dialog title="评语查看" :auditVisible.sync="viewComment" :close-on-click-modal="false">
+
+                </el-dialog>
+
             </el-main>
 
             <!-- 专家修改个人信息 -->
@@ -333,16 +331,16 @@
                 <el-row :gutter="12" style="margin-top: 10px">
                     <el-col :span="24">
                         <el-table :data="matchData" style="width: 100%">
-                            <el-table-column fixed width="150" prop="name" label="名称"></el-table-column>
-                            <el-table-column width="150" prop="introduction" label="简介"></el-table-column>
+                            <el-table-column fixed width="200" prop="name" label="名称"></el-table-column>
+                            <el-table-column width="200" prop="introduction" label="简介"></el-table-column>
                             <el-table-column width="100" prop="joinTime" label="报名时间"></el-table-column>
                             <el-table-column width="100" prop="auditTime" label="初审时间"></el-table-column>
                             <el-table-column width="100" prop="scoreTime" label="评审时间"></el-table-column>
                             <el-table-column width="100" prop="endTime" label="结束时间"></el-table-column>
-                            <el-table-column width="75" prop="state" label="状态"></el-table-column>
-                            <el-table-column width="200" label="操作" fixed="right" >
+                            <el-table-column width="100" prop="state" label="状态"></el-table-column>
+                            <el-table-column width="75" label="操作" fixed="right" >
                                 <template slot-scope="scope">
-                                    <el-button style="font-size: 12px" type="primary" size="mini" @click="resultMatch(scope.$index)">上传结果</el-button>
+                                    <el-button style="font-size: 12px" type="primary" size="mini" @click="matchResultDialogShow(scope.$index)">上传结果</el-button>
                                     <el-button style="font-size: 12px" type="danger" size="mini" @click="deleteMatch(scope.$index)">删除</el-button>
                                 </template>
                             </el-table-column>
@@ -390,8 +388,22 @@
                         </el-col>
                     </el-row>
                 </el-dialog>
+                <!-- 上传结果对话框 -->
+                <el-dialog title="上传比赛结果" :visible.sync="matchResultDialog">
+                    <el-form>
+                        <el-form-item label="比赛文件">
+                                <form id = "uploadFormResult" >
+                                    <div class="uploader blue">
+                                        <input type="text" class="filename" readonly/>
+                                        <input type="button" class="button" value="选择文件"/>
+                                        <input type="file" size="30" name="document"/>
+                                    </div>
+                                </form>
+                            </el-form-item>
+                            <el-button type="success" @click="submitMatchResult">上传比赛结果<i class="el-icon-upload"></i></el-button>
+                    </el-form>
+                </el-dialog>
             </el-main>
-
             <!-- 团委专家管理 -->
             <el-main v-else-if="sidebarIndex==4 && role=='团委'">
                 <el-row :gutter="12" style="margin-top: 0px">
@@ -568,6 +580,7 @@
             return this.info;
         },
         methods: {
+
             joinMatch(id){
                 localStorage.setItem("selMatch",id);
                 window.open("apply.html");
@@ -643,27 +656,22 @@
                 matchDialog: false,
                 expertDialog:false,
                 addExpert:{},
+                matchResultDialog: false,
                 createMatch: {},
+                matchResultIndex: 0,
 
-                expertId: 2,
                 id: 0,
-                visible: false,
+                auditVisible: false,
                 editComment:false,
                 viewComment:false,
-                auditData:[],
-                currEdit : 0,
-                tempRow:'',
-                editForm: {
-                comment: '',
+                auditData:[
+                ],
+                editAuditForm: {
+                    comment: '',
                 },
-                    info:{"expertId":"2","state":null},
-                comment: '',
-                updata:{},
+                info:{"expertId":"2","state":null},
             }
         },
-        mounted: function(){
-		this.get();
-	    }, 
         created(){
             var _self=this;
             this.getUserInfo();
@@ -684,8 +692,20 @@
             }
         },
         methods: {
-            resultMatch(index) {
-                
+            //专家预览
+            previewImg(index){
+                var url = this.auditData[index].imgUrl;
+                localStorage.setItem("imgUrl",url);
+                window.open("preview.html");
+            },
+            previewVid(index){
+                var url = this.auditData[index].vidUrl;
+                localStorage.setItem("vidUrl",url);
+                window.open("previewVid.html");
+            },
+            previewDoc(index){
+                var url = this.auditData[index].docUrl;
+                window.open('http://ow365.cn/?i=19000&furl=http://58.87.72.138:30000/getFile?info={"url":"'+url+'"}');
             },
             deleteMatch(index) {
                 var _self = this;
@@ -734,6 +754,16 @@
                 });
             },
             update: function(){
+                $("input[type=file]").change(function(){
+                    $(this).parents(".uploader").find(".filename").val($(this).val());
+                });
+                $("input[type=file]").each(function(){
+                    if($(this).val()=="") {
+                        $(this).parents(".uploader").find(".filename").val("请选择文件");
+                    }
+                });
+            },
+            updateResult: function(){
                 $("input[type=file]").change(function(){
                     $(this).parents(".uploader").find(".filename").val($(this).val());
                 });
@@ -794,12 +824,16 @@
                         console.log(err);
                     }
                 });
+            matchResultDialogShow(index) {
+                this.matchResultIndex = index;
+                this.matchResultDialog = true;
+                this.$nextTick(() => this.updateResult());
             },
             submitCreateMatch() {
                 var _self = this;
 			    var formData = new FormData($( "#uploadForm" )[0]);  
                 $.ajax({  
-                    url: 'http://58.87.72.138:30000/upload' ,  
+                    url: 'http://58.87.72.138:30000/upload',
                     type: 'POST',  
                     data: formData,  
                     async: false,  
@@ -865,142 +899,110 @@
                     }  
                 });
             },
+            submitMatchResult() {
+                var _self = this;
+                var index = this.matchResultIndex;
+                var formData = new FormData($( "#uploadFormResult" )[0]);  
+                $.ajax({  
+                    url: 'http://58.87.72.138:30000/uploadMatchResult' ,  
+                    type: 'POST',  
+                    data: formData,  
+                    async: false,  
+                    cache: false,  
+                    contentType: false,  
+                    processData: false,  
+                    success: function (res) {
+                        var data = JSON.parse(res);
+                        console.log(data);
+                        if(data.err == false){
+                            $.ajax({
+                                url: "http://58.87.72.138:30000/setMatchResultUrlById",
+                                type: "get",
+                                dataType: 'json',
+                                contentType:"application/json",
+                                data: {
+                                    info: JSON.stringify({
+                                        url: data.url[0],
+                                        id: _self.matchData[index].id
+                                    }),
+                                },
+                                success: function(res){
+                                    console.log(res);
+                                    if(res.err == false){
+                                        _self.$notify({
+                                            message: '上传比赛结果成功',
+                                            type: 'success',
+                                            title:'成功'
+                                        });
+                                        setTimeout(() => {
+                                            window.location.href="main.html";
+                                        }, 1000);
+                                    }
+                                    else{
+                                        _self.$notify({
+                                            message: '上传比赛结果失败',
+                                            type: 'error',
+                                            title:'失败'
+                                        });
+                                    }
+                                },
+                                error: function(err){
+                                    console.log(err);
+                                }
+                            });
+                        }
+                        else{
+                            _self.$message({
+                                message: '比赛文件上传失败',
+                                type: 'error',
+                                title:'失败'
+                            });
+                        }
+                    },  
+                    error: function (err) {  
+                        console.log(err);  
+                    }  
+                });
+            },
             //专家评分方法
-            editCom(row){
-      this.editComment=true;
-      this.tempRow = row.id - 1;
-    },
-    viewCom(row){
-      this.viewComment=true;
-      this.tempRow = row.id - 1;
-      //console.log(this.auditData[this.tempRow].comment);
-      this.comment = this.auditData[this.tempRow].comment;
-    },
-    handleComment(formName){
-      this.$refs[formName].validate((valid) => {
-        if(valid){
-          var self=this;
-          
-          self.auditData[self.tempRow].comment = self.editForm.comment;
-          self.editForm.comment  = '';
-          //console.log(self.auditData[self.tempRow].comment);
-          this.editComment=false;
-          self.$message({
-              message:'评论成功！',
-              type:'success'
-          });
-        }else{
-          alert('请您填写评语！');
-          return false;
-        }
-      });
-    },
-    download(row){
-      console.log(row);
-      var url = '';
-      if(row.pictureUrl !== null && row.pictureUrl !== undefined && row.pictureUrl !== '' && row.pictureUrl !== 'null'){
-        url += row.pictureUrl + ';';
-      }
-      if(row.documentUrl !== null && row.documentUrl !== undefined && row.documentUrl !== '' && row.documentUrl !== 'null'){
-        url += row.documentUrl + ';';
-      }
-      if(row.pdfUrl !== null && row.pdfUrl !== undefined && row.pdfUrl !== '' && row.pdfUrl !== 'null'){
-        url += row.pdfUrl + ';';
-      }
-      if(row.videoUrl !== null && row.videoUrl !== undefined && row.videoUrl !== '' && row.videoUrl !== 'null'){
-        url += row.videoUrl + ';';
-      }
-	  
-	  url = url.substring(0, url.length - 1);
-      console.log("url         " + url);
-	  var info= {"url": url};
-	  
-		const xhr = new XMLHttpRequest();
-		xhr.responseType = "arraybuffer";
-		var data = JSON.stringify(info);
-		console.log(data);
-		xhr.open("GET", "http://58.87.72.138:30000/download?info=" + JSON.stringify(info),true);
-		
-		xhr.onload = function(oEvent){
-			console.log("Blobing");
-			let res = xhr.response;
-			console.log(res);
-			var blob = new Blob([res],{type:"application/x-gzip"});
-			console.log(blob);
-			
-			var str = URL.createObjectURL(blob);
-			console.log(str);
-			window.location.href = str;
-			//window.open(str);
-		};
-		xhr.send();
-    },
-    get(){
-      var _self = this;
-      $.ajax({
-        url: "http://58.87.72.138:30000/expertGetApplicationByAssessmentState",
-        type: "get",
-        dataType: 'json',
-        contentType:"application/json",
-        data:{
-          info: JSON.stringify(_self.info),
-        },
-        success: function(res){
-          console.log(res);
-          data = res.data;
-          var count = 1;
-          for(item in data){
-            var ap = {
-              id: count,
-              workName: data[item].workName,
-              name: data[item].name,
-              score: '0',
-              comment:'',
-              pdfUrl: data[item].pdfUrl,
-              pictureUrl: data[item].imageUrl,
-              documentUrl: data[item].documentUrl,
-              videoUrl: data[item].documentUrl,
-              applicationId: data[item].id,
-            }
-            //console.log(ap);
-            _self.auditData.push(ap);
-            count += 1;
-          }
-        },
-        error: function(err){
-          console.log(err);
-        }
-      })
-    },
-    tablePost(){
-      var _self = this;
-      console.log(this.auditData);
-      for(item in this.auditData){
-        var ap = {
-          expertId: this.expertId.toString(),
-          applicationId: this.auditData[item].applicationId.toString(),
-          score: this.auditData[item].score,
-          comment:this.auditData[item].comment,
-        };
-        console.log(JSON.stringify(ap));
-        $.ajax({
-          url: "http://58.87.72.138:30000/expertSetAssessment",
-          type: "get",
-          dataType: 'json',
-          contentType:"application/json",
-          data:{
-            info: JSON.stringify(ap),
-          },
-          success: function(res){
-            console.log(res);
-          },
-          error: function(err){
-            console.log(err);
-          }
-        })
-        return; 
-      }
-    },
+            handleEdit(index, row){
+                this.editComment=true;
+                this.editAuditForm = Object.assign({},row.comment);
+            },
+            getApplicationByAssessmentState(){
+                var _self = this;
+                $.ajax({
+                    url: "http://58.87.72.138:30000/expertGetApplicationByAssessmentState",
+                    type: "get",
+                    dataType: 'json',
+                    contentType:"application/json",
+                    data:{
+                        info: JSON.stringify(_self.info),
+                    },
+                    success: function(res){
+                        console.log(res);
+                        data = res.data;
+                        var count = 1;
+                        for(item in data){
+                            var ap = {
+                                id: count,
+                                workName: data[item].workName,
+                                name: data[item].name,
+                                imgUrl:data[item].imageUrl,
+                                vidUrl:data[item].videoUrl,
+                                docUrl:data[item].documentUrl,
+                            }
+                            console.log(ap);
+                            _self.auditData.push(ap);
+                            count += 1;
+                        }
+                        console.log(_self.data);
+                    },
+                    error: function(err){
+                        console.log(err);
+                    }
+                })
+            },
 
             //团委给被选中的专家发送邀请
             sendInvite(index) {
@@ -1019,7 +1021,7 @@
                             info: JSON.stringify({
                                 applicationId: applicationId,
                                 expertId: expertId,
-                                email: email 
+                                email: email
                             }),
                         },
                         success: function(res){
@@ -1044,6 +1046,7 @@
                             console.log(err);
                         }
                     });
+
                 }       
             },            
             //团委查找专家信息，以分配专家
