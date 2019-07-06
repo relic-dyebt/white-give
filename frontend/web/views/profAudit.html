@@ -48,16 +48,16 @@
       </el-table>
 	  
 	  
-      <el-dialog title="评语填写" :visible.sync="editComment" :close-on-click-modal="false">
-        <el-form :model="editForm" label-position="top" label-width="80px" ref="editForm">
+      <el-dialog title="评语填写" :auditVisible.sync="editComment" :close-on-click-modal="false">
+        <el-form :model="editAuditForm" label-position="top" label-width="80px" ref="editAuditForm">
           <el-form-item label="填写评论" prop="comment">
-            <el-input type="textarea" v-model="editForm.comment"></el-input>
+            <el-input type="textarea" v-model="editAuditForm.comment"></el-input>
           </el-form-item>
           <el-button type="primary">提交</el-button>
         </el-form>
       </el-dialog>
 
-      <el-dialog title="评语查看" :visible.sync="viewComment" :close-on-click-modal="false">
+      <el-dialog title="评语查看" :auditVisible.sync="viewComment" :close-on-click-modal="false">
         
       </el-dialog>
   </div>
@@ -71,26 +71,26 @@ new Vue({
     data: function() {
     return { 
         id: 0,
-        visible: false,
+        auditVisible: false,
         editComment:false,
         viewComment:false,
         auditData:[
         ],
-        editForm: {
+        editAuditForm: {
           comment: '',
         },
 		info:{"expertId":"2","state":null},
     }
     },
 	mounted: function(){
-		this.get();
+		this.getApplicationByAssessmentState();
 	}, 
     methods:{
 		handleEdit(index, row){
 			this.editComment=true;
-			this.editForm = Object.assign({},row.comment);
+			this.editAuditForm = Object.assign({},row.comment);
 		},
-		get(){
+		getApplicationByAssessmentState(){
 			var _self = this;
 			$.ajax({
 				url: "http://58.87.72.138:30000/expertGetApplicationByAssessmentState",

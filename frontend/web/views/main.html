@@ -143,6 +143,55 @@
                 <el-avatar size="large"> {{userInfo.username}} </el-avatar>
             </el-header>
 
+                <!--专家评审作品-->
+            <el-main v-if="sidebarIndex==2 && role=='专家'">
+                <el-table :data="auditData" border empty-text="您没有待评审作品">
+                    <el-table-column width="45" type="selection" align="center"></el-table-column>
+                    <el-table-column label="序号" width="90"  align="center" prop="id"></el-table-column>
+                    <el-table-column label="作品名称" width="400" prop="workName" align="center"></el-table-column>
+                    <el-table-column label="第一作者" width="180" prop="name" align="center"></el-table-column>
+
+                    <el-table-column label="预览操作" align="center" width="240" >
+                        <template slot-scope="scope">
+                            <el-button type="primary" size="mini">图片</el-button>
+                            <el-button type="primary" size="mini">文件</el-button>
+                            <el-button type="primary" size="mini">视频</el-button>
+                        </template>
+                    </el-table-column>
+                    <el-table-column label="下载" align="center" width="108">
+                        <template slot-scope="scope">
+                            <el-button type="primary" size="mini">下载<i class="el-icon-download"></i></el-button>
+                        </template>
+                    </el-table-column>
+                    <el-table-column label="得分" width="150" prop="score" align="center">
+                        <template slot-scope="scope">
+                            <el-input placeholder="请在此处评分"  v-model.number="scope.row.score" suffix-icon="el-icon-edit"  ></el-input>
+                        </template>
+                    </el-table-column>
+                    <el-table-column label="评语" width="210" prop="comment" align="center">
+                        <template slot-scope="scope">
+                            <el-button type="primary" size="mini" icon="el-icon-edit" @click="editComment=true" >编辑评语</el-button>
+                            <el-button type="text" size="mini" icon="el-icon-search">查看评语</el-button>
+                        </template>
+                    </el-table-column>
+                </el-table>
+
+
+                <el-dialog title="评语填写" :auditVisible.sync="editComment" :close-on-click-modal="false">
+                    <el-form :model="editAuditForm" label-position="top" label-width="80px" ref="editAuditForm">
+                        <el-form-item label="填写评论" prop="comment">
+                            <el-input type="textarea" v-model="editAuditForm.comment"></el-input>
+                        </el-form-item>
+                        <el-button type="primary">提交</el-button>
+                    </el-form>
+                </el-dialog>
+
+                <el-dialog title="评语查看" :auditVisible.sync="viewComment" :close-on-click-modal="false">
+
+                </el-dialog>
+
+            </el-main>
+
             <!-- 专家修改个人信息 -->
             <el-main v-if="sidebarIndex==3 && role=='专家'">
                     <el-row :gutter="12" style="margin-top: 10px">
@@ -546,7 +595,18 @@
                     return item.label == query || query == '';
                 },
                 matchDialog: false,
-                createMatch: {}
+                createMatch: {},
+
+                id: 0,
+                auditVisible: false,
+                editComment:false,
+                viewComment:false,
+                auditData:[
+                ],
+                editAuditForm: {
+                    comment: '',
+                },
+                info:{"expertId":"2","state":null},
             }
         },
         created(){
@@ -564,12 +624,12 @@
                     break;
                 case '专家':
                     this.getMatchData();
+                    this.getApplicationByAssessmentState();
                     break;
             }
         },
         methods: {
             update: function(){
-                console.log("128037120938129038");
                 $("input[type=file]").change(function(){
                     $(this).parents(".uploader").find(".filename").val($(this).val());
                 });
@@ -653,6 +713,43 @@
                     }  
                 });
             },
+            //专家评分方法
+            handleEdit(index, row){
+                this.editComment=true;
+                this.editAuditForm = Object.assign({},row.comment);
+            },
+            getApplicationByAssessmentState(){
+                var _self = this;
+                $.ajax({
+                    url: "http://58.87.72.138:30000/expertGetApplicationByAssessmentState",
+                    type: "get",
+                    dataType: 'json',
+                    contentType:"application/json",
+                    data:{
+                        info: JSON.stringify(_self.info),
+                    },
+                    success: function(res){
+                        console.log(res);
+                        data = res.data;
+                        var count = 1;
+                        for(item in data){
+                            var ap = {
+                                id: count,
+                                workName: data[item].workName,
+                                name: data[item].name,
+                            }
+                            console.log(ap);
+                            _self.auditData.push(ap);
+                            count += 1;
+                        }
+                        console.log(_self.data);
+                    },
+                    error: function(err){
+                        console.log(err);
+                    }
+                })
+            },
+
             //团委给被选中的专家发送邀请
             sendInvite(index) {
                 var _self = this;
