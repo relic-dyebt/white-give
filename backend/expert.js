@@ -182,8 +182,6 @@ module.exports.expertGetApplication = function(db, info, res) {
 module.exports.expertSetAssessment = function(db, info, res) {
     console.log('Expert - Set assessment\n' + util.getTime());
 
-    console.log(info);
-
     //更新评审
     var ret = { err: null, msg: null };
     var sql = 'UPDATE Assessment SET score = ?, comment = ?, state = "scored" WHERE expertId = ? AND applicationId = ?';
