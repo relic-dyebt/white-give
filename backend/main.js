@@ -137,7 +137,7 @@ app.get('/expertSetAssessment', (req, res) => {
 });
 
 app.get('/expertAcceptAssessment', (req, res) => {
-    var info = JSON.parse(url.parse(req.url, true).query.info);
+    var info = url.parse(req.url, true).query;
     expert.expertAcceptAssessment(db, info, res);
 });
 

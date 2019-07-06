@@ -70,6 +70,8 @@ module.exports.scoreEnd = function(db) {
 module.exports.inviteExpert = function(db, info, res) {
     console.log('System - Invite expert\n' + util.getTime());
 
+    console.log(info);
+
     //搜索申请
     var ret = { err: null, msg: null };
     var sql = 'SELECT * FROM Application WHERE id = ?';
@@ -114,8 +116,8 @@ module.exports.inviteExpert = function(db, info, res) {
                             ret.msg = 'Database error(INSERT)';
                             res.send(JSON.stringify(ret));
                         } else {
-                            var acceptUrl = 'http://58.87.72.138:30000/expertAcceptAssessment?info={"expertId":"' + info.expertId + '","applicationId":"' + info.applicationId + '","accept":"' + true + '"}';
-                            var refuseUrl = 'http://58.87.72.138:30000/expertAcceptAssessment?info={"expertId":"' + info.expertId + '","applicationId":"' + info.applicationId + '","accept":"' + false + '"}';
+                            var acceptUrl = 'http://58.87.72.138:30000/expertAcceptAssessment?expertId=' + info.expertId + '&applicationId=' + info.applicationId + '&accept=true';
+                            var refuseUrl = 'http://58.87.72.138:30000/expertAcceptAssessment?expertId=' + info.expertId + '&applicationId=' + info.applicationId + '&accept=false';
                             
                             //邮件对象
                             var mail = {
@@ -124,10 +126,8 @@ module.exports.inviteExpert = function(db, info, res) {
                                 subject: '比赛《' + name + '》评审工作邀请',
                                 html:
                                 '<p>北航校团委邀请您参与评审工作！</p>' +
-                                '<p>接受：</p>' + 
-                                '<p>' + acceptUrl + '</p>' +
-                                '<p>拒绝：</p>' + 
-                                '<p>' + refuseUrl + '</p>'
+                                '<p><a href=' + acceptUrl + '>接受</a></p>' +
+                                '<p><a href=' + refuseUrl + '>拒绝</a></p>'
                             };
 
                             //发送邮件

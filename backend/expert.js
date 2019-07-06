@@ -236,15 +236,16 @@ module.exports.expertAcceptAssessment = function(db, info, res) {
             ret.msg = 'Unknown assessment.';
             res.send(JSON.stringify(ret));
         } else if (data[0].state != 'auditing') {
-            ret.err = true;
-            ret.msg = 'Assessment has already been accepted or refused.';
-            res.send(JSON.stringify(ret));
+            res.send(
+                '<p>请勿重复' + (info.accept == 'true' ? '接受' : '拒绝') + '评审邀请</p>' + 
+                '<a href="http://180.76.157.178/views/login.html">点此进行跳转</a>'
+            );
         } else {
 
             //更新评审
             var sql = 'UPDATE Assessment SET state = ? WHERE expertId = ? AND applicationId = ?';
             var sqlParams = [ info.accept == 'true' ? 'accepted' : 'refused', info.expertId, info.applicationId ];
-            db.query(sql, sqlParams, (err, data) => {
+            db.query(sql, sqlParams, err => {
                 if (err) {
                     console.log(err);
                     ret.err = true;
@@ -255,16 +256,17 @@ module.exports.expertAcceptAssessment = function(db, info, res) {
                     //更新申请
                     var sql = 'UPDATE Application SET state = "scoring" WHERE id = ?';
                     var sqlParams = [ info.applicationId ];
-                    db.query(sql, sqlParams, (err, data) => {
+                    db.query(sql, sqlParams, err => {
                         if (err) {
                             console.log(err);
                             ret.err = true;
                             ret.msg = 'Database error(UPDATE).';
                             res.send(JSON.stringify(ret));
                         } else {
-                            ret.err = false;
-                            ret.msg = (info.accept == 'true' ? 'Accept' : 'Refuse') + ' successfully.';
-                            res.send(JSON.stringify(ret));
+                            res.send(
+                                '<p>已成功' + (info.accept == 'true' ? '接受' : '拒绝') + '评审邀请</p>' + 
+                                '<a href="http://180.76.157.178/views/login.html">点此进行跳转</a>'
+                            );
                         }
                     });
                 }
