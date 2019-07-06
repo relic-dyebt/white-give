@@ -12,12 +12,6 @@
 	<!-- import JQuery -->
 	<script src="https://cdn.staticfile.org/jquery/3.1.1/jquery.min.js"></script>
 </head>
-
-
-<style>
-</style>
-
-
 <body>
   <div id="app">
       <el-row :gutter="20">
@@ -342,252 +336,197 @@
             current: 0,
             count: 0,
             visible: false, 
+            userInfo: null,
             formApplication: {
-                    matchId:1,
-                    workName:'',
-                    department:'',
-                    appCategory:'',
-                    name:'',
-                    studentNumber:'',
-                    birthday:'',
-                    eduBackground:'',
-                    major:'',
-                    enrollmentYear:'',
-                    address:'',
-                    phone:'',
-                    email:'',
-                    c1Name:'',
-					c1StudentNumber:'',
-                    c1eduBackground:'',
-                    c1Phone:'',
-                    c1Email:'',
-                    c2Name:'',
-					c2StudentNumber:'',
-                    c2eduBackground:'',
-                    c2Phone:'',
-                    c2Email:'',
-                    c3Name:'',
-					c3StudentNumber:'',
-                    c3eduBackground:'',
-                    c3Phone:'',
-                    c3Email:'',
-                    c4Name:'',
-					c4StudentNumber:'',
-                    c4eduBackground:'',
-                    c4Phone:'',
-                    c4Email:'',
-                    category:'',
-                    introduction:'',
-                    innovation:'',
-                    keyword:'',
-                    displayFormArray:[],
-                    surveyMethodArray:[],
-                    displayForm:'',
-                    surveyMethod:'',
-					documentUrl: '',
-					imageUrl: '',
-					videoUrl: '',
-                },
-            ruleApplication: {
-                    workName:[
-                        {required: true, message: '作品名称不能为空！', trigger: 'blur'}
-                    ],
-                    department:[
-                        {required: true, message: '院系名称不能为空！', trigger: 'blur'}
-                    ],
-                    appCategor:[
-                        {required: true, message: '请选择论文类别！', trigger: 'change'}
-                    ],
-                    name:[
-                        {required: true, message: '姓名不能为空！', trigger: 'blur'}
-                    ],
-                    studentNumber:[
-                        {required: true, message: '学号不能为空！', trigger: 'blur'}
-                    ],
-                    birthday:[
-                        {required: true, type: 'string', message: '请选择出生年月！', trigger: 'change'}
-                    ],
-                    eduBackground:[
-                        {required: true, message: '请选择学历！', trigger: 'change'}
-                    ],
-                    major:[
-                        {required: true, message: '专业不能为空！', trigger: 'blur'}
-                    ],
-                    enrollmentYear:[
-                        {required: true, type:'string' ,message: '请选择入学年份！！', trigger: 'change'}
-                    ],
-                    address:[
-                        {required: true, message: '通讯地址不能为空！', trigger: 'blur'}
-                    ],
-                    phone:[
-                        {required: true, message: '联系电话不能为空！', trigger: 'blur'}
-                    ],
-                    email:[
-                        {required: true, message: '邮箱不能为空！', trigger: 'blur'},
-                        { type: 'email', message: '邮箱格式不正确！', trigger: 'blur' }
-                    ],
-                    c1Email:[
-                        {required: true, message: '邮箱不能为空！', trigger: 'blur'},
-                        { type: 'email', message: '邮箱格式不正确！', trigger: 'blur' }
-                    ],
-                    c2Email:[
-                        {required: true, message: '邮箱不能为空！', trigger: 'blur'},
-                        { type: 'email', message: '邮箱格式不正确！', trigger: 'blur' }
-                    ],
-                    c3Email:[
-                        {required: true, message: '邮箱不能为空！', trigger: 'blur'},
-                        { type: 'email', message: '邮箱格式不正确！', trigger: 'blur' }
-                    ],
-                    c4Email:[
-                        {required: true, message: '邮箱不能为空！', trigger: 'blur'},
-                        { type: 'email', message: '邮箱格式不正确！', trigger: 'blur' }
-                    ],
-                    category:[
-                        {required: true, message: '请选择作品类别！', trigger: 'change'}
-                    ], 
-                    introduction:[
-                        {required: true, message: '作品简介不能为空！', trigger: 'blur'}
-                    ], 
-                    innovation:[
-                        {required: true, message: '创新点不能为空！', trigger: 'blur'}
-                    ],
-                    keyword:[
-                        {required: true, message: '关键词不能为空！', trigger: 'blur'}
-                    ],
-                    surveyMethodArray:[
-                        {type:'array', required: true, message: '请选择调查方式！', trigger: 'change'}
-                    ],
-                    displayFormArray:[
-                        {type:'array', required: true, message:'请选择作品展示方式！', trigger: 'change'}
-                    ]
+                matchId:1,
+                workName:'',
+                department: sessionStorage.getItem('department'),
+                appCategory:'',
+                name: sessionStorage.getItem('name'),
+                studentNumber: sessionStorage.getItem('studentNumber'),
+                birthday:'',
+                eduBackground:'',
+                major: sessionStorage.getItem('major'),
+                enrollmentYear: sessionStorage.getItem('enrollmentYear'),
+                address:'',
+                phone: sessionStorage.getItem('phone'),
+                email: sessionStorage.getItem('email'),
+                c1Name:'',
+                c1StudentNumber:'',
+                c1eduBackground:'',
+                c1Phone:'',
+                c1Email:'',
+                c2Name:'',
+                c2StudentNumber:'',
+                c2eduBackground:'',
+                c2Phone:'',
+                c2Email:'',
+                c3Name:'',
+                c3StudentNumber:'',
+                c3eduBackground:'',
+                c3Phone:'',
+                c3Email:'',
+                c4Name:'',
+                c4StudentNumber:'',
+                c4eduBackground:'',
+                c4Phone:'',
+                c4Email:'',
+                category:'',
+                introduction:'',
+                innovation:'',
+                keyword:'',
+                displayFormArray:[],
+                surveyMethodArray:[],
+                displayForm:'',
+                surveyMethod:'',
+                documentUrl: '',
+                imageUrl: '',
+                videoUrl: '',
             },
-                }
-        },
+            ruleApplication: {
+                workName:[ {required: true, message: '作品名称不能为空！', trigger: 'blur'} ],
+                department:[ {required: true, message: '院系名称不能为空！', trigger: 'blur'} ],
+                appCategor:[ {required: true, message: '请选择论文类别！', trigger: 'change'} ],
+                name:[ {required: true, message: '姓名不能为空！', trigger: 'blur'} ],
+                studentNumber:[ {required: true, message: '学号不能为空！', trigger: 'blur'} ],
+                birthday:[ {required: true, type: 'string', message: '请选择出生年月！', trigger: 'change'} ],
+                eduBackground:[ {required: true, message: '请选择学历！', trigger: 'change'} ],
+                major:[ {required: true, message: '专业不能为空！', trigger: 'blur'} ],
+                enrollmentYear:[ {required: true, type:'string' ,message: '请选择入学年份！！', trigger: 'change'} ],
+                address:[ {required: true, message: '通讯地址不能为空！', trigger: 'blur'} ],
+                phone:[ {required: true, message: '联系电话不能为空！', trigger: 'blur'} ],
+                email:[ {required: true, message: '邮箱不能为空！', trigger: 'blur'}, { type: 'email', message: '邮箱格式不正确！', trigger: 'blur' } ],
+                c1Email:[ {required: true, message: '邮箱不能为空！', trigger: 'blur'}, { type: 'email', message: '邮箱格式不正确！', trigger: 'blur' } ],
+                c2Email:[ {required: true, message: '邮箱不能为空！', trigger: 'blur'}, { type: 'email', message: '邮箱格式不正确！', trigger: 'blur' } ],
+                c3Email:[ {required: true, message: '邮箱不能为空！', trigger: 'blur'}, { type: 'email', message: '邮箱格式不正确！', trigger: 'blur' } ],
+                c4Email:[ {required: true, message: '邮箱不能为空！', trigger: 'blur'}, { type: 'email', message: '邮箱格式不正确！', trigger: 'blur' } ],
+                category:[ {required: true, message: '请选择作品类别！', trigger: 'change'} ], 
+                introduction:[ {required: true, message: '作品简介不能为空！', trigger: 'blur'} ], 
+                innovation:[ {required: true, message: '创新点不能为空！', trigger: 'blur'} ],
+                keyword:[ {required: true, message: '关键词不能为空！', trigger: 'blur'} ],
+                surveyMethodArray:[ {type:'array', required: true, message: '请选择调查方式！', trigger: 'change'} ],
+                displayFormArray:[ {type:'array', required: true, message:'请选择作品展示方式！', trigger: 'change'} ]
+            },
+        }
+    },
     methods:{
-      next () {
-        if (this.current == 4) {
-			this.current = 0;
-		  } else {
-			this.current += 1;
-		  }
-		if(this.current == 4){
-			this.$nextTick(()=>{
-				this.update();
-			})
-		}
-      },
-      prev (){
-          this.current -= 1;
-      },
-      handleAdd () {
-          if(this.count<=4){
-              this.count++;
-              if(this.count==5){
-                  alert("您最多只能添加四位合作者！");
-                  this.count--;
-              }
-          }
-      },
-      handleRemove () {
-          if(this.count>=1){
-              this.count--;
-          }
-      },
-      handleSubmit (name) {
-          this.$refs[name].validate((valid) => {
-              //_self.displayForm=_self.displayFormArray.join(";");
-              //_self.surveyMethod=_self.surveyMethodArray.join(";");
-              if (valid) {
-                  this.upload();
-                  this.submit();
-              } else {
-                  _self.$message({
-					message: '提交失败，请检查信息填写是否正确',
-					type: 'error',
-					center: true
-				});
-              }
-          });
-		  
-      },
-	  submit(){
-			var _self=this;
+        next () {
+            if (this.current == 4) {
+                this.current = 0;
+            } else {
+                this.current += 1;
+            }
+            if(this.current == 4){
+                this.$nextTick(()=>{
+                    this.update();
+                })
+            }
+        },
+        prev (){
+            this.current -= 1;
+        },
+        handleAdd () {
+            if(this.count<=4){
+                this.count++;
+                if(this.count==5){
+                    alert("您最多只能添加四位合作者！");
+                    this.count--;
+                }
+            }
+        },
+        handleRemove () {
+            if(this.count>=1){
+                this.count--;
+            }
+        },
+        handleSubmit (name) {
+            this.$refs[name].validate((valid) => {
+                //_self.displayForm=_self.displayFormArray.join(";");
+                //_self.surveyMethod=_self.surveyMethodArray.join(";");
+                if (valid) {
+                    this.upload();
+                } else {
+                    _self.$message({
+                        message: '提交失败，请检查信息填写是否正确',
+                        type: 'error',
+                        center: true
+                    });
+                }
+            });
+            
+        },
+        submit(){
+            var _self=this;
             _self.formApplication.displayForm=_self.formApplication.displayFormArray.join(";");
             _self.formApplication.surveyMethod=_self.formApplication.surveyMethodArray.join(";");
-			_self.formApplication.matchId=localStorage.getItem("selMatch");
-					
-			$.ajax({
-				url: "http://58.87.72.138:30000/submitApplication",
-				type: "get",
-				dataType: 'json',
-				contentType:"application/json",
-				data: {
-					info: JSON.stringify(_self.formApplication),
-				},
-				success: function(res){
-					console.log(res);
-					
-				
-				},
-				error: function(err){
-					console.log(err);
-				}
-				
-			})
-		},
-		upload: function(){
-			
-			var _self = this;
-			var formData = new FormData($( "#uploadForm" )[0]);  
-			$.ajax({  
-				url: 'http://58.87.72.138:30000/upload' ,  
-				type: 'POST',  
-				data: formData,  
-				async: false,  
-				cache: false,  
-				contentType: false,  
-				processData: false,  
-				success: function (res) {
-					var data = JSON.parse(res);
-					console.log(data);
-					_self.formApplication.documentUrl = data.documentUrl[0];
-					_self.formApplication.videoUrl = data.videoUrl[0];
-					for(item in data.pictureUrl){
-						_self.formApplication.imageUrl += (data.pictureUrl[item] + ';');
-					}
+            _self.formApplication.matchId=localStorage.getItem("selMatch");
+                    
+            $.ajax({
+                url: "http://58.87.72.138:30000/submitApplication",
+                type: "get",
+                dataType: 'json',
+                contentType:"application/json",
+                data: {
+                    info: JSON.stringify(_self.formApplication),
+                },
+                success: function(res){
+                    _self.$message({
+                        message: '申请提交成功',
+                        type: 'success',
+                        center: true
+                    });
+                    
+                    setTimeout(() => {
+                        window.location.href="main.html";
+                    }, 1000);
+                },
+                error: function(err){
+                    console.log(err);
+                }
+            })
+        },
+        upload: function(){
+            var _self = this;
+            var formData = new FormData($( "#uploadForm" )[0]);  
+            $.ajax({  
+                url: 'http://58.87.72.138:30000/upload' ,  
+                type: 'POST',  
+                data: formData,  
+                async: false,  
+                cache: false,  
+                contentType: false,  
+                processData: false,  
+                success: function (res) {
+                    var data = JSON.parse(res);
+                    console.log(data);
+                    _self.formApplication.documentUrl = data.documentUrl[0];
+                    _self.formApplication.videoUrl = data.videoUrl[0];
+                    for(item in data.pictureUrl){
+                        _self.formApplication.imageUrl += (data.pictureUrl[item] + ';');
+                    }
                     _self.formApplication.imageUrl = _self.formApplication.imageUrl.substring(0, _self.formApplication.imageUrl.length - 1);
-
-
                     if(data.err == false){
-						_self.$message({
-							message: '申请提交成功',
-							type: 'success',
-							center: true
-						});
-						
-						setTimeout(() => {
-							window.location.href="main.html";
-						}, 1000);
-					}
-					else{
-						_self.$message({
-							message: '申请失败',
-							type: 'error',
-							center: true
-						});
-					}
-					
-				},  
-				error: function (err) {  
-					console.log(err);  
-				}  
-		   });
-			
-		},
-		update: function(){
-			$("input[type=file]").change(function(){$(this).parents(".uploader").find(".filename").val($(this).val());});
-			$("input[type=file]").each(function(){if($(this).val()==""){$(this).parents(".uploader").find(".filename").val("请选择文件");}});
-		},
+                        this.submit();
+                    }
+                    else{
+                        _self.$message({
+                            message: '申请失败',
+                            type: 'error',
+                            center: true
+                        });
+                    }
+                    
+                },  
+                error: function (err) {  
+                    console.log(err);  
+                }  
+        });
+            
+        },
+        update: function(){
+            $("input[type=file]").change(function(){$(this).parents(".uploader").find(".filename").val($(this).val());});
+            $("input[type=file]").each(function(){if($(this).val()==""){$(this).parents(".uploader").find(".filename").val("请选择文件");}});
+        },
     }
-  })
+})
 </script>
