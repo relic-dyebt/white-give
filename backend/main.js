@@ -4,10 +4,10 @@ var url = require('url');
 var mysql = require('mysql');
 var mutipart = require('connect-multiparty');
 var fs = require('fs');
+var schedule = require('node-schedule');
 
 var CronJob = require('cron').CronJob;
 
-var genpdf = require('./genpdf');
 var util = require('./util');
 var common = require('./common');
 var student = require('./student');
@@ -228,7 +228,10 @@ app.get('/getFile', (req, res) => {
 });
 
 //定时检测
-new CronJob('*/1 * * * * *', system.joinTimeCheck(db), null, true);
-new CronJob('*/1 * * * * *', system.auditTimeCheck(db), null, true);
-new CronJob('*/1 * * * * *', system.scoreTimeCheck(db), null, true);
-new CronJob('*/1 * * * * *', system.endTimeCheck(db), null, true);
+function scheduleCronstyle() {
+    schedule.scheduleJob('* * * * * *', () => system.joinTimeCheck(db)); 
+    schedule.scheduleJob('* * * * * *', () => system.auditTimeCheck(db)); 
+    schedule.scheduleJob('* * * * * *', () => system.scoreTimeCheck(db)); 
+    schedule.scheduleJob('* * * * * *', () => system.endTimeCheck(db)); 
+}
+scheduleCronstyle();

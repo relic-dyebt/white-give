@@ -10,7 +10,7 @@ var util = require('./util');
 
 //学生报名开始
 module.exports.joinTimeCheck = function(db) {
-    console.log('System - Join time check\n' + util.getTime());
+    //console.log('System - Join time check\n' + util.getTime());
 
     //修改比赛
     sql = 'UPDATE `Match` SET state = "joining" WHERE state = "created" AND joinTime < ?';
@@ -20,7 +20,7 @@ module.exports.joinTimeCheck = function(db) {
 
 //学生报名结束、校团委初审开始
 module.exports.auditTimeCheck = function(db) {
-    console.log('System - Audit time check\n' + util.getTime());
+    //console.log('System - Audit time check\n' + util.getTime());
 
     //修改比赛
     sql = 'UPDATE `Match` SET state = "auditing" WHERE state = "joining" AND auditTime < ?';
@@ -35,7 +35,7 @@ module.exports.auditTimeCheck = function(db) {
 
 //校团委初审结束、专家审核开始
 module.exports.scoreTimeCheck = function(db) {
-    console.log('System - Score time check\n' + util.getTime());
+    //console.log('System - Score time check\n' + util.getTime());
     
     //修改比赛
     sql = 'UPDATE `Match` SET state = "scoring" WHERE state = "auditing" AND scoreTime < ?';
@@ -50,7 +50,7 @@ module.exports.scoreTimeCheck = function(db) {
 
 //专家审核结束
 module.exports.endTimeCheck = function(db) {
-    console.log('System - End time check\n' + util.getTime());
+    //console.log('System - End time check\n' + util.getTime());
 
     //修改比赛
     sql = 'UPDATE `Match` SET state = "scored" WHERE state = "scoring" AND endTime < ?';
