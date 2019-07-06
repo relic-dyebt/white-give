@@ -342,7 +342,7 @@
                             <el-table-column width="75" prop="state" label="状态"></el-table-column>
                             <el-table-column width="200" label="操作" fixed="right" >
                                 <template slot-scope="scope">
-                                    <el-button style="font-size: 12px" type="primary" size="mini" @click="resultMatch(scope.$index)">上传结果</el-button>
+                                    <el-button style="font-size: 12px" type="primary" size="mini" @click="matchResultDialogShow(scope.$index)">上传结果</el-button>
                                     <el-button style="font-size: 12px" type="danger" size="mini" @click="deleteMatch(scope.$index)">删除</el-button>
                                 </template>
                             </el-table-column>
@@ -382,8 +382,22 @@
                         <el-button type="success" @click="submitCreateMatch">创建比赛<i class="el-icon-upload"></i></el-button>
                     </el-form>
                 </el-dialog>
+                <!-- 上传结果对话框 -->
+                <el-dialog title="上传比赛结果" :visible.sync="matchResultDialog">
+                    <el-form>
+                        <el-form-item label="比赛文件">
+                                <form id = "uploadFormResult" >
+                                    <div class="uploader blue">
+                                        <input type="text" class="filename" readonly/>
+                                        <input type="button" class="button" value="选择文件"/>
+                                        <input type="file" size="30" name="document"/>
+                                    </div>
+                                </form>
+                            </el-form-item>
+                            <el-button type="success" @click="submitMatchResult">上传比赛结果<i class="el-icon-upload"></i></el-button>
+                    </el-form>
+                </el-dialog>
             </el-main>
-
             <!-- 团委专家管理 -->
             <el-main v-else-if="sidebarIndex==4 && role=='团委'">
                 <el-row :gutter="12" style="margin-top: 10px">
@@ -600,7 +614,9 @@
                     return item.label == query || query == '';
                 },
                 matchDialog: false,
+                matchResultDialog: false,
                 createMatch: {},
+                matchResultIndex: 0,
 
                 expertId: 2,
                 id: 0,
@@ -700,15 +716,30 @@
                     }
                 });
             },
+            updateResult: function(){
+                $("input[type=file]").change(function(){
+                    $(this).parents(".uploader").find(".filename").val($(this).val());
+                });
+                $("input[type=file]").each(function(){
+                    if($(this).val()=="") {
+                        $(this).parents(".uploader").find(".filename").val("请选择文件");
+                    }
+                });
+            },
             createMatchDialog() {
                 this.matchDialog = true;
                 this.$nextTick(() => this.update());
+            },
+            matchResultDialogShow(index) {
+                this.matchResultIndex = index;
+                this.matchResultDialog = true;
+                this.$nextTick(() => this.updateResult());
             },
             submitCreateMatch() {
                 var _self = this;
 			    var formData = new FormData($( "#uploadForm" )[0]);  
                 $.ajax({  
-                    url: 'http://58.87.72.138:30000/upload' ,  
+                    url: 'http://58.87.72.138:30000/upload',
                     type: 'POST',  
                     data: formData,  
                     async: false,  
@@ -751,6 +782,71 @@
                                     else{
                                         _self.$notify({
                                             message: '创建比赛失败',
+                                            type: 'error',
+                                            title:'失败'
+                                        });
+                                    }
+                                },
+                                error: function(err){
+                                    console.log(err);
+                                }
+                            });
+                        }
+                        else{
+                            _self.$message({
+                                message: '比赛文件上传失败',
+                                type: 'error',
+                                title:'失败'
+                            });
+                        }
+                    },  
+                    error: function (err) {  
+                        console.log(err);  
+                    }  
+                });
+            },
+            submitMatchResult() {
+                var _self = this;
+                var index = this.matchResultIndex;
+                var formData = new FormData($( "#uploadFormResult" )[0]);  
+                $.ajax({  
+                    url: 'http://58.87.72.138:30000/uploadMatchResult' ,  
+                    type: 'POST',  
+                    data: formData,  
+                    async: false,  
+                    cache: false,  
+                    contentType: false,  
+                    processData: false,  
+                    success: function (res) {
+                        var data = JSON.parse(res);
+                        console.log(data);
+                        if(data.err == false){
+                            $.ajax({
+                                url: "http://58.87.72.138:30000/setMatchResultUrlById",
+                                type: "get",
+                                dataType: 'json',
+                                contentType:"application/json",
+                                data: {
+                                    info: JSON.stringify({
+                                        url: data.url[0],
+                                        id: _self.matchData[index].id
+                                    }),
+                                },
+                                success: function(res){
+                                    console.log(res);
+                                    if(res.err == false){
+                                        _self.$notify({
+                                            message: '上传比赛结果成功',
+                                            type: 'success',
+                                            title:'成功'
+                                        });
+                                        setTimeout(() => {
+                                            window.location.href="main.html";
+                                        }, 1000);
+                                    }
+                                    else{
+                                        _self.$notify({
+                                            message: '上传比赛结果失败',
                                             type: 'error',
                                             title:'失败'
                                         });

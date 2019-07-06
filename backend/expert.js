@@ -23,7 +23,7 @@ module.exports.register = function(db, info, res) {
             //插入专家
             var sql = 
                 'INSERT INTO Expert ' +
-                util.values(8);
+                util.values(9);
             var sqlParams = [
                 0,
                 info.username,

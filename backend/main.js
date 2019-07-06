@@ -159,6 +159,11 @@ app.get('/deleteMatchById', (req, res) => {
     tw.deleteMatchById(db, info, res);
 });
 
+app.get('/setMatchResultUrlById', (req, res) => {
+    var info = JSON.parse(url.parse(req.url, true).query.info);
+    tw.setMatchResultUrlById(db, info, res);
+});
+
 app.get('/getApplicationByState', (req, res) => {
     var info = JSON.parse(url.parse(req.url, true).query.info);
     tw.getApplicationByState(db, info, res);
@@ -186,6 +191,10 @@ app.get('/getExpertByCategory', (req, res) => {
 
 app.get('/getExpert', (req, res) => {
     tw.getExpert(db, res);
+});
+
+app.post('/uploadMatchResult', mutipartMiddeware, (req, res) => {
+    tw.uploadMatchResult(req.files, res);
 });
 
 //系统
