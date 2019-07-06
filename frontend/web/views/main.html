@@ -825,6 +825,40 @@
                     var expertId = this.expertTemp[this.addedExpertIndex[i]].id;
                     var email = this.expertTemp[this.addedExpertIndex[i]].email;
                     console.log("expert email: " + email);
+                    $.ajax({
+                        url: "http://58.87.72.138:30000/inviteExpert",
+                        type: "get",
+                        dataType: 'json',
+                        contentType:"application/json",
+                        data: {
+                            info: JSON.stringify({
+                                applicationId: applicationId,
+                                expertId: expertId,
+                                email: email
+                            }),
+                        },
+                        success: function(res){
+                            console.log(res);
+                            if(res.err == false){
+                                _self.$notify({
+                                    message: '邀请成功',
+                                    type: 'success',
+                                    title:'成功'
+                                });
+                            }
+                            else{
+                                _self.$notify({
+                                    message: '邮件发送失败',
+                                    type: 'error',
+                                    title:'失败'
+                                });
+                            }
+
+                        },
+                        error: function(err){
+                            console.log(err);
+                        }
+                    });
 
                 }       
             },            
