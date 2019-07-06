@@ -17,12 +17,7 @@
     <div class="demo-image__lazy">
         <el-image v-for="url in urls" :key="url" :src="url" lazy></el-image>
     </div>
-
-
 </div>
-
-
-
 </body>
 <script>
     new Vue({
@@ -40,7 +35,7 @@
             }
         },
         mounted() {
-            this.urls = localStorage.getItem("imgUrl").split(';');
+            this.urls = localStorage.getItem("imageUrl").split(';');
             console.log("11111");
             console.log(this.urls);
             for (var i in this.urls) {

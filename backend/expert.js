@@ -159,11 +159,9 @@ module.exports.expertSetPassword = function(db, info, res) {
 module.exports.expertGetApplication = function(db, info, res) {
     console.log('Expert - Get application\n' + util.getTime());
 
-    console.log(info);
-
     //搜索申请
     var ret = { err: null, msg: null };
-    var sql = 'SELECT * FROM Application WHERE id IN(SELECT applicationId FROM Assessment WHERE expertId = ?)';
+    var sql = 'SELECT * FROM Application WHERE id IN(SELECT applicationId FROM Assessment WHERE expertId = ? AND state = "scoring")';
     var sqlParams = [ info.expertId ];
     db.query(sql, sqlParams, (err, data) => {
         if (err) {
@@ -183,6 +181,8 @@ module.exports.expertGetApplication = function(db, info, res) {
 //专家设置评审
 module.exports.expertSetAssessment = function(db, info, res) {
     console.log('Expert - Set assessment\n' + util.getTime());
+
+    console.log(info);
 
     //更新评审
     var ret = { err: null, msg: null };

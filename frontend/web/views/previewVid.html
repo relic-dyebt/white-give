@@ -14,23 +14,17 @@
 </head>
 <body>
 <div id = "preview">
-    <video width="320" height="240" controls="controls" id="vid" muted="muted" >
+    <video width="640" height="480" controls="controls" id="vid" muted="muted" >
         您的浏览器不支持Video标签。
     </video>
-
-
 </div>
-
-
-
 </body>
 <script>
     window.onload =function() {
         var vid=document.getElementById("vid");
-        var url = localStorage.getItem("vidUrl");
+        var url = localStorage.getItem("videoUrl");
         url='http://58.87.72.138:30000/getFile?info={"url":"'+url+'"}';
         vid.src=url;
     }
-
 </script>
 </html>
