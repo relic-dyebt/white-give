@@ -68,6 +68,9 @@
     .el-row {
         margin-top: 40px;
     }
+    .box-card {
+        width:100%;
+    }
 </style>
 
 <body>
@@ -598,7 +601,21 @@
                 window.open("apply.html");
             },
             downloadMatchDoc(url){
-
+                const xhr = new XMLHttpRequest();
+                xhr.responseType = "arraybuffer";
+                xhr.open("GET", "http://58.87.72.138:30000/download?info=" + JSON.stringify({url:url}),true);
+                xhr.onload = function(oEvent){
+                    console.log("Blobing");
+                    let res = xhr.response;
+                    console.log(res);
+                    var blob = new Blob([res],{type:"application/x-gzip"});
+                    console.log(blob);
+                    var str = URL.createObjectURL(blob);
+                    window.open(str);
+                };
+                xhr.send();
+            },
+            downloadMatchResult(url){
                 const xhr = new XMLHttpRequest();
                 xhr.responseType = "arraybuffer";
                 xhr.open("GET", "http://58.87.72.138:30000/download?info=" + JSON.stringify({url:url}),true);
@@ -643,7 +660,7 @@
             '                    <div class="text item">{{ "初审结束、评审开始时间： "+ info.scoreTime }}</div>\n' +
             '                    <div class="text item">{{ "评审结束时间： "+ info.endTime }}</div>\n' +
             '                    <el-button type="primary" plain @click="downloadMatchDoc(info.coverUrl)">下载附件</el-button>\n'+
-            '                    <el-button type="success" plain>查看结果</el-button>\n'+
+            '                    <el-button type="success" plain @click="downloadMatchResult(info.resultUrl)">查看结果</el-button>\n'+
             '                </el-card>\n' +
             '            </el-col>\n' +
             '        </el-row>',
