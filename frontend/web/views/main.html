@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <!-- import CSS -->
     <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
-
+	<link href="../css/apply.css" rel="stylesheet" media="screen">
     <!-- import Vue before Element -->
     <script src="https://unpkg.com/vue/dist/vue.js"></script>
     <!-- import JavaScript -->
@@ -115,8 +115,8 @@
                     </el-menu-item>
                 </el-menu>
         </el-aside>
-        <!-- 用户侧边栏 -->
-        <el-aside width="200px" style="background-color: rgb(238, 241, 246)" v-else >
+        <!-- 专家侧边栏 -->
+        <el-aside width="200px" style="background-color: rgb(238, 241, 246)" v-else-if="role=='专家'" >
                 <el-menu
                         default-active="1"
                         class="el-menu-vertical-demo"
@@ -142,7 +142,6 @@
             <el-header style="text-align: right; font-size: 10%;padding-top: 10px" >
                 <el-avatar size="large"> {{userInfo.username}} </el-avatar>
             </el-header>
-
 
             <!-- 专家修改个人信息 -->
             <el-main v-if="sidebarIndex==3 && role=='专家'">
@@ -179,21 +178,21 @@
                     </el-col>
                     </el-row>
                 </el-main>
-            <!--            ! 学生或专家查看比赛（并参赛）-->
-            <el-main v-if="sidebarIndex==1 &&role=='学生'" >
+            <!-- 学生或专家查看比赛（并参赛）-->
+            <el-main v-else-if="sidebarIndex==1 &&role=='学生'" >
                 <div v-for ="item in matchData">
                     <match-card v-bind:info="item"></match-card>
                 </div>
             </el-main>
 
-            <el-main v-if="sidebarIndex==1 &&role=='专家'" >
+            <el-main v-else-if="sidebarIndex==1 &&role=='专家'" >
                 <div v-for ="item in matchData">
                     <match-card v-bind:info="item"></match-card>
                 </div>
             </el-main>
 
             <!-- 学生查看已提交申请-->
-            <el-main v-if="sidebarIndex==2 && role=='学生'">
+            <el-main v-else-if="sidebarIndex==2 && role=='学生'">
                 <template>
                     <el-table
                             :data="stuApplyData"
@@ -233,7 +232,7 @@
 
             </el-main>
             <!-- 学生修改个人信息 -->
-            <el-main v-if="sidebarIndex==3 && role=='学生'">
+            <el-main v-else-if="sidebarIndex==3 && role=='学生'">
                 <el-row :gutter="12" style="margin-top: 10px">
                     <el-col :offset="6" :span="12">
                         <el-form label-width="80px" class="demo-ruleForm">
@@ -272,6 +271,7 @@
 
             <!-- 团委比赛管理 -->
             <el-main v-else-if="sidebarIndex==1 && role=='团委'">
+                <el-button @click="createMatchDialog">创建比赛</el-button>
                 <el-row :gutter="12" style="margin-top: 10px">
                     <el-col :span="24">
                         <el-table :data="matchData" style="width: 100%">
@@ -285,6 +285,39 @@
                         </el-table>
                     </el-col>
                 </el-row>
+                <!-- 创建比赛对话框 -->
+                <el-dialog title="创建比赛" :visible.sync="matchDialog">
+                    <el-form label-width="100px">
+                        <el-form-item label="比赛名称">
+                            <el-input v-model="createMatch.name"></el-input>
+                        </el-form-item>
+                        <el-form-item label="简介">
+                            <el-input v-model="createMatch.introduction"></el-input>
+                        </el-form-item>
+                        <el-form-item label="报名时间">
+                            <el-date-picker type="datetime" v-model="createMatch.joinTime" placeholder="请选择时间" value-format="yyyy-MM-dd HH:mm:SS"></el-date-picker>
+                        </el-form-item>
+                        <el-form-item label="初审时间">
+                            <el-date-picker type="datetime" v-model="createMatch.auditTime" placeholder="请选择时间" value-format="yyyy-MM-dd HH:mm:SS"></el-date-picker>
+                        </el-form-item>
+                        <el-form-item label="评审时间">
+                            <el-date-picker type="datetime" v-model="createMatch.scoreTime" placeholder="请选择时间" value-format="yyyy-MM-dd HH:mm:SS"></el-date-picker>
+                        </el-form-item>
+                        <el-form-item label="结束时间">
+                            <el-date-picker type="datetime" v-model="createMatch.endTime" placeholder="请选择时间" value-format="yyyy-MM-dd HH:mm:SS"></el-date-picker>
+                        </el-form-item>
+                        <el-form-item label="比赛文件">
+                            <form id = "uploadForm" >
+                                <div class="uploader blue">
+                                    <input type="text" class="filename" readonly/>
+                                    <input type="button" class="button" value="选择文件"/>
+                                    <input type="file" size="30" name="document"/>
+                                </div>
+                            </form>
+                        </el-form-item>
+                        <el-button type="success" @click="submitCreateMatch">创建比赛<i class="el-icon-upload"></i></el-button>
+                    </el-form>
+                </el-dialog>
             </el-main>
 
             <!-- 团委专家管理 -->
@@ -512,6 +545,8 @@
                 filterMethod(query, item) {
                     return item.label == query || query == '';
                 },
+                matchDialog: false,
+                createMatch: {}
             }
         },
         created(){
@@ -533,6 +568,91 @@
             }
         },
         methods: {
+            update: function(){
+                console.log("128037120938129038");
+                $("input[type=file]").change(function(){
+                    $(this).parents(".uploader").find(".filename").val($(this).val());
+                });
+                $("input[type=file]").each(function(){
+                    if($(this).val()=="") {
+                        $(this).parents(".uploader").find(".filename").val("请选择文件");
+                    }
+                });
+            },
+            createMatchDialog() {
+                this.matchDialog = true;
+                this.$nextTick(() => this.update());
+            },
+            submitCreateMatch() {
+                var _self = this;
+			    var formData = new FormData($( "#uploadForm" )[0]);  
+                $.ajax({  
+                    url: 'http://58.87.72.138:30000/upload' ,  
+                    type: 'POST',  
+                    data: formData,  
+                    async: false,  
+                    cache: false,  
+                    contentType: false,  
+                    processData: false,  
+                    success: function (res) {
+                        var data = JSON.parse(res);
+                        console.log(data);
+                        if(data.err == false){
+                            _self.createMatch.coverUrl = data.documentUrl[0];
+                            $.ajax({
+                                url: "http://58.87.72.138:30000/createMatch",
+                                type: "get",
+                                dataType: 'json',
+                                contentType:"application/json",
+                                data: {
+                                    info: JSON.stringify({
+                                        name: _self.createMatch.name,
+                                        introduction: _self.createMatch.introduction,
+                                        coverUrl: _self.createMatch.coverUrl,
+                                        joinTime: _self.createMatch.joinTime,
+                                        auditTime: _self.createMatch.auditTime,
+                                        scoreTime: _self.createMatch.scoreTime,
+                                        endTime: _self.createMatch.endTime,
+                                    }),
+                                },
+                                success: function(res){
+                                    console.log(res);
+                                    if(res.err == false){
+                                        _self.$notify({
+                                            message: '创建比赛成功',
+                                            type: 'success',
+                                            title:'成功'
+                                        });
+                                        setTimeout(() => {
+                                            window.location.href="main.html";
+                                        }, 1000);
+                                    }
+                                    else{
+                                        _self.$notify({
+                                            message: '创建比赛失败',
+                                            type: 'error',
+                                            title:'失败'
+                                        });
+                                    }
+                                },
+                                error: function(err){
+                                    console.log(err);
+                                }
+                            });
+                        }
+                        else{
+                            _self.$message({
+                                message: '比赛文件上传失败',
+                                type: 'error',
+                                center: true
+                            });
+                        }
+                    },  
+                    error: function (err) {  
+                        console.log(err);  
+                    }  
+                });
+            },
             //团委给被选中的专家发送邀请
             sendInvite(index) {
                 var _self = this;
