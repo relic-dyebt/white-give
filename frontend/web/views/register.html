@@ -59,74 +59,74 @@
 		</div>
 	</body>
 	<script>
-	new Vue({
-		el: '#register',
-		data: function() {
-			return {
-				info: {
-					studentNumber: '',
-					username: '',
-					password: '',
-					passwordConfirm: '',
-					name: '',
-					phone: '',
-					email: '',
-					department: '',
-					major: ''
-				}
-			}
-		},
-		methods: {
-			submit(){
-				var _self = this;
-				var complete = true;
-				for (var i in this.info) {
-					if (this.info[i] == '') {
-						console.log(i)
-						complete = false;
-						break;
+		new Vue({
+			el: '#register',
+			data: function() {
+				return {
+					info: {
+						studentNumber: '',
+						username: '',
+						password: '',
+						passwordConfirm: '',
+						name: '',
+						phone: '',
+						email: '',
+						department: '',
+						major: ''
 					}
 				}
-				if (!complete) {
-					_self.$message({
-						message: '请输入完整的信息',
-						type: 'error',
-						title: '失败'
-					});
-				} else if (this.info.password != this.info.passwordConfirm) {
-					_self.$message({
-						message: '请输入相同的密码和确认密码',
-						type: 'error',
-						title: '失败'
-					});
-				} else {
-					$.ajax({
-						url: "http://58.87.72.138:30000/studentRegister",
-						type: "get",
-						dataType: 'json',
-						contentType:"application/json",
-						data: { info: JSON.stringify(_self.info), },
-						success: res => {
-							if (res.err == false) {
-								_self.$message({
-									message: 'Hi	' + _self.info.username,
-									type: 'success',
-									center: true
-								});
-								setTimeout(() => { window.location.href="login.html"; }, 1000);
-							} else {
-								_self.$message({
-									message: '注册失败',
-									type: 'error',
-									title: '失败'
-								});
-							}
-						},
-						error: err => console.log(err)
-					});
-				}
 			},
-		}
-	})
+			methods: {
+				submit(){
+					var _self = this;
+					var complete = true;
+					for (var i in this.info) {
+						if (this.info[i] == '') {
+							console.log(i)
+							complete = false;
+							break;
+						}
+					}
+					if (!complete) {
+						_self.$message({
+							message: '请输入完整的信息',
+							type: 'error',
+							title: '失败'
+						});
+					} else if (this.info.password != this.info.passwordConfirm) {
+						_self.$message({
+							message: '请输入相同的密码和确认密码',
+							type: 'error',
+							title: '失败'
+						});
+					} else {
+						$.ajax({
+							url: "http://58.87.72.138:30000/studentRegister",
+							type: "get",
+							dataType: 'json',
+							contentType:"application/json",
+							data: { info: JSON.stringify(_self.info), },
+							success: res => {
+								if (res.err == false) {
+									_self.$message({
+										message: 'Hi	' + _self.info.username,
+										type: 'success',
+										center: true
+									});
+									setTimeout(() => { window.location.href="login.html"; }, 1000);
+								} else {
+									_self.$message({
+										message: '注册失败',
+										type: 'error',
+										title: '失败'
+									});
+								}
+							},
+							error: err => console.log(err)
+						});
+					}
+				},
+			}
+		});
 	</script>
 </html>
