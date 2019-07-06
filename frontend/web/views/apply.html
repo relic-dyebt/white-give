@@ -299,19 +299,19 @@
                                     <form id= "uploadForm" >
 										<div class="uploader blue">
                                             <input type="text" class="filename" readonly/>
-                                            <input type="button" class="button" value="选择文件"/>
+                                            <input type="button" class="button" value="选择文档"/>
                                             <input type="file" size="30" name="document"/>
 										</div>
 										<br/>
 										<div class="uploader blue">
 											<input type="text" class="filename"  readonly/>
-											<input type="button" class="button" value="选择文件"/>
+											<input type="button" class="button" value="选择图片"/>
 											<input type="file" size="30" name="image" multiple/>
 										</div>
 										<br/>
 										<div class="uploader blue">
 											<input type="text" class="filename"  readonly/>
-											<input type="button" class="button" value="选择文件"/>
+											<input type="button" class="button" value="选择视频"/>
 											<input type="file" size="30" name="video"/>
 										</div>
 									</form>
@@ -555,9 +555,10 @@
 					for(item in data.pictureUrl){
 						_self.formApplication.imageUrl += (data.pictureUrl[item] + ';');
 					}
-					
-					
-					if(data.err == false){
+                    _self.formApplication.imageUrl = _self.formApplication.imageUrl.substring(0, _self.formApplication.imageUrl.length - 1);
+
+
+                    if(data.err == false){
 						_self.$message({
 							message: '申请提交成功',
 							type: 'success',
