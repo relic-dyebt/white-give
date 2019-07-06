@@ -87,6 +87,28 @@ module.exports.createMatch = function(db, info, res) {
     });
 }
 
+//根据ID删除比赛
+module.exports.deleteMatchById = function(db, info, res) {
+    console.log('Tw - Delete match by id\n' + util.getTime());
+
+    //删除比赛
+    var ret = { err: null, msg: null };
+    var sql = 'DELETE FROM `Match` WHERE id = ?'
+    var sqlParams = [ info.id ];
+    db.query(sql, sqlParams, err => {
+        if (err) {
+            console.log(err);
+            ret.err = true;
+            ret.msg = 'Database error(DELETE).';
+            res.send(JSON.stringify(ret));
+        } else {
+            ret.err = false;
+            ret.msg = 'Delete match successfully.';
+            res.send(JSON.stringify(ret));
+        }
+    });
+}
+
 //根据审核状态获取申请
 module.exports.getApplicationByState = function(db, info, res) {
     console.log('Tw - Get application by state\n' + util.getTime());

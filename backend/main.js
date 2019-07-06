@@ -14,7 +14,6 @@ var student = require('./student');
 var tw = require('./tw');
 var expert = require('./expert');
 var system = require('./system');
-var test = require('./test');
 
 var app = express();
 var mutipartMiddeware = mutipart();
@@ -157,6 +156,11 @@ app.get('/createMatch', (req, res) => {
     tw.createMatch(db, info, res);
 });
 
+app.get('/deleteMatchById', (req, res) => {
+    var info = JSON.parse(url.parse(req.url, true).query.info);
+    tw.deleteMatchById(db, info, res);
+});
+
 app.get('/getApplicationByState', (req, res) => {
     var info = JSON.parse(url.parse(req.url, true).query.info);
     tw.getApplicationByState(db, info, res);
@@ -224,9 +228,7 @@ app.get('/getFile', (req, res) => {
 });
 
 //定时检测
-new CronJob('* * * * * *', system.joinEnd(db), null, true);
-new CronJob('* * * * * *', system.auditEnd(db), null, true);
-new CronJob('* * * * * *', system.scoreEnd(db), null, true);
-
-//测试
-//test.test();
+new CronJob('*/1 * * * * *', system.joinTimeCheck(db), null, true);
+new CronJob('*/1 * * * * *', system.auditTimeCheck(db), null, true);
+new CronJob('*/1 * * * * *', system.scoreTimeCheck(db), null, true);
+new CronJob('*/1 * * * * *', system.endTimeCheck(db), null, true);

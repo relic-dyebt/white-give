@@ -331,10 +331,15 @@
                             <el-table-column width="100" prop="scoreTime" label="评审时间"></el-table-column>
                             <el-table-column width="100" prop="endTime" label="结束时间"></el-table-column>
                             <el-table-column width="100" prop="state" label="状态"></el-table-column>
+                            <el-table-column width="75" label="操作" fixed="right" >
+                                <template slot-scope="scope">
+                                    <el-button style="font-size: 12px" type="danger" size="mini" @click="deleteMatch(scope.$index)">删除</el-button>
+                                </template>
+                            </el-table-column>
                         </el-table>
                     </el-col>
                 </el-row>
-                <!-- 创建比赛对话框 -->
+                <!-- 创建比赛对话框 --> 
                 <el-dialog title="创建比赛" :visible.sync="matchDialog">
                     <el-form label-width="100px">
                         <el-form-item label="比赛名称">
@@ -554,10 +559,10 @@
             '                        type="text" @click="joinMatch(info.id)">参加比赛</el-button>\n' +
             '                    </div>\n' +
             '                    <div class="text item">{{ "比赛简介： "+ info.introduction }}</div>\n' +
-            '                    <div class="text item">{{ "开始时间： "+ info.joinTime }}</div>\n' +
-            '                    <div class="text item">{{ "报名截止时间： "+ info.auditTime }}</div>\n' +
-            '                    <div class="text item">{{ "团委初审结束时间： "+ info.scoreTime }}</div>\n' +
-            '                    <div class="text item">{{ "专家评审结束时间： "+ info.endTime }}</div>\n' +
+            '                    <div class="text item">{{ "报名开始时间： "+ info.joinTime }}</div>\n' +
+            '                    <div class="text item">{{ "报名截止、初审开始时间： "+ info.auditTime }}</div>\n' +
+            '                    <div class="text item">{{ "初审结束、评审开始时间： "+ info.scoreTime }}</div>\n' +
+            '                    <div class="text item">{{ "评审结束时间： "+ info.endTime }}</div>\n' +
             '                    <el-button type="primary" plain @click="downloadMatchDoc(info.coverUrl)">下载附件</el-button>\n'+
             '                    <el-button type="success" plain>查看结果</el-button>\n'+
             '                </el-card>\n' +
@@ -629,7 +634,44 @@
             }
         },
         methods: {
-            update: function(){
+            deleteMatch(index) {
+                var _self = this;
+                if (this.matchData[index].state == 'created') {
+                    $.ajax({  
+                        url: 'http://58.87.72.138:30000/deleteMatchById' ,  
+                        type: 'get',
+                        dataType: 'json',
+                        contentType:"application/json",
+                        data: { info: JSON.stringify({ id: _self.matchData[index].id }) },
+                        success: res => {
+                            var data = res;
+                            console.log(data);
+                            if(data.err == false) {
+                                _self.$notify({
+                                    message: '删除比赛成功',
+                                    type: 'success',
+                                    title:'成功'
+                                });
+                                setTimeout(() => { window.location.href = "main.html"; }, 1000);
+                            } else{
+                                _self.$message({
+                                    message: '删除比赛失败',
+                                    type: 'error',
+                                    title:'失败',
+                                });
+                            }
+                        },  
+                        error: err => console.log(err)
+                    });
+                } else {
+                    _self.$notify({
+                        message: '比赛已经开始，无法删除',
+                        type: 'error',
+                        title:'失败'
+                    });
+                }
+            },
+            update() {
                 $("input[type=file]").change(function(){
                     $(this).parents(".uploader").find(".filename").val($(this).val());
                 });
@@ -704,7 +746,7 @@
                             _self.$message({
                                 message: '比赛文件上传失败',
                                 type: 'error',
-                                center: true
+                                title:'失败'
                             });
                         }
                     },  
@@ -1042,11 +1084,11 @@
                         console.log(res);
                         if(res.err == false) {
                             _self.twExpertData = res.data;
-                            _self.$message({
-                                message: '获取专家成功',
-                                type: 'success',
-                                center: true
-                            });
+                            // _self.$message({
+                            //     message: '获取专家成功',
+                            //     type: 'success',
+                            //     center: true
+                            // });
                         }
                         else{
                             _self.$message({
@@ -1098,12 +1140,11 @@
                                         break;
                                 }
                             }
-
-                            _self.$notify({
-                                message: '获取申请成功',
-                                type: 'success',
-                                title:'成功'
-                            });
+                            // _self.$notify({
+                            //     message: '获取申请成功',
+                            //     type: 'success',
+                            //     title:'成功'
+                            // });
                         }
                         else{
                             _self.$notify({
@@ -1162,12 +1203,11 @@
                                         break;
                                 }
                             }
-
-                            _self.$notify({
-                                message: '获取申请成功',
-                                type: 'success',
-                                title:'成功'
-                            });
+                            // _self.$notify({
+                            //     message: '获取申请成功',
+                            //     type: 'success',
+                            //     title:'成功'
+                            // });
                         }
                         else{
                             _self.$notify({
@@ -1197,12 +1237,11 @@
                             _self.matchData=res.data;
                             console.log(res.data);
                             console.log(_self.matchData);
-
-                            _self.$notify({
-                                message: '获取比赛成功',
-                                type: 'success',
-                                title:'成功'
-                            });
+                            // _self.$notify({
+                            //     message: '获取比赛成功',
+                            //     type: 'success',
+                            //     title:'成功'
+                            // });
                         }
                         else{
                             _self.$notify({
