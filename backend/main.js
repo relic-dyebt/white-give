@@ -6,8 +6,6 @@ var mutipart = require('connect-multiparty');
 var fs = require('fs');
 var schedule = require('node-schedule');
 
-var CronJob = require('cron').CronJob;
-
 var util = require('./util');
 var common = require('./common');
 var student = require('./student');
