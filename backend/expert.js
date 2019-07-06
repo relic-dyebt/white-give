@@ -156,13 +156,15 @@ module.exports.expertSetPassword = function(db, info, res) {
 }
 
 //专家根据评审审核状态获取申请
-module.exports.expertGetApplicationByAssessmentState = function(db, info, res) {
-    console.log('Expert - Get application by assessment state\n' + util.getTime());
+module.exports.expertGetApplication = function(db, info, res) {
+    console.log('Expert - Get application\n' + util.getTime());
+
+    console.log(info);
 
     //搜索申请
     var ret = { err: null, msg: null };
-    var sql = 'SELECT * FROM Application WHERE id IN(SELECT applicationId FROM Assessment WHERE expertId = ?' + (info.state ? ' AND state = ?)' : ')');
-    var sqlParams = [ info.expertId, info.state ];
+    var sql = 'SELECT * FROM Application WHERE id IN(SELECT applicationId FROM Assessment WHERE expertId = ?)';
+    var sqlParams = [ info.expertId ];
     db.query(sql, sqlParams, (err, data) => {
         if (err) {
             console.log(err);

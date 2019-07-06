@@ -143,6 +143,7 @@
 						success: res => {
 							if(res.err == false){
 								sessionStorage.setItem('role', _self.role);
+								sessionStorage.setItem('id',res.data.id);
 								sessionStorage.setItem('username',res.data.username);
 								sessionStorage.setItem('name',res.data.name);
 								sessionStorage.setItem('introduction',res.data.introduction);

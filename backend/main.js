@@ -123,9 +123,9 @@ app.get('/expertSetPassword', (req, res) => {
     expert.expertSetPassword(db, info, res);
 });
 
-app.get('/expertGetApplicationByAssessmentState', (req, res) => {
+app.get('/expertGetApplication', (req, res) => {
     var info = JSON.parse(url.parse(req.url, true).query.info);
-    expert.expertGetApplicationByAssessmentState(db, info, res);
+    expert.expertGetApplication(db, info, res);
 });
 
 app.get('/expertSetAssessment', (req, res) => {

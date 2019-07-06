@@ -265,42 +265,18 @@
             <!-- 学生查看已提交申请-->
             <el-main v-else-if="sidebarIndex==2 && role=='学生'">
                 <template>
-                    <el-table
-                            :data="stuApplyData"
-                            style="width: 100%">
-                        <el-table-column
-                                prop="workName"
-                                label="作品名称"
-                                width="180">
-                        </el-table-column>
-                        <el-table-column
-                                prop="category"
-                                label="分类"
-                                width="180">
-                        </el-table-column>
-                        <el-table-column
-                                prop="appCategory"
-                                label="申请类型"
-                                width="180">
-                        </el-table-column>
-                        <el-table-column
-                                prop="state"
-                                label="作品状态"
-                                wideth="180">
-                        </el-table-column>
-                        <el-table-column
-                            label="操作"
-                            wideth="180">
+                    <el-table :data="stuApplyData" style="width: 100%">
+                        <el-table-column prop="workName" label="作品名称" width="180"></el-table-column>
+                        <el-table-column prop="category" label="分类" width="180"></el-table-column>
+                        <el-table-column prop="appCategory" label="申请类型" width="180"></el-table-column>
+                        <el-table-column prop="state" label="作品状态"  wideth="180"></el-table-column>
+                        <el-table-column label="操作" wideth="180">
                             <template slot-scope="scope">
                                 <el-button type="text" size="mini" @click="downloadPdf(scope.$index)">下载pdf</el-button>
-                                <el-button type="text" size="mini">补充提交</el-button>
                             </template>
-                    </el-table-column>
-
-
+                        </el-table-column>
                     </el-table>
                 </template>
-
             </el-main>
             <!-- 学生修改个人信息 -->
             <el-main v-else-if="sidebarIndex==3 && role=='学生'">
@@ -641,8 +617,7 @@
                 ],
                 editAuditForm: {
                     comment: '',
-                },
-                info:{"expertId":"2","state":null},
+                }
             }
         },
         created(){
@@ -966,16 +941,16 @@
             getApplicationByAssessmentState(){
                 var _self = this;
                 $.ajax({
-                    url: "http://58.87.72.138:30000/expertGetApplicationByAssessmentState",
+                    url: "http://58.87.72.138:30000/expertGetApplication",
                     type: "get",
                     dataType: 'json',
                     contentType:"application/json",
                     data:{
-                        info: JSON.stringify(_self.info),
+                        info: JSON.stringify({ expertId: _self.userInfo.id }),
                     },
                     success: function(res){
                         console.log(res);
-                        data = res.data;
+                        var data = res.data;
                         var count = 1;
                         for(item in data){
                             var ap = {
@@ -1488,6 +1463,7 @@
                         break;
                     case "专家":
                         this.userInfo = {
+                            id: sessionStorage.getItem("id"),
                             username: sessionStorage.getItem("username"),
                             name: sessionStorage.getItem('name'),
                             introduction: sessionStorage.getItem('introduction'),
