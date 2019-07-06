@@ -872,8 +872,29 @@
                 this.matchResultDialog = true;
                 this.$nextTick(() => this.updateResult());
             },
+            getTime() {                var date = new Date();                var year = date.getFullYear();                var month= date.getMonth() + 1 < 10 ? "0" + (date.getMonth() + 1) : date.getMonth() + 1;                var day = date.getDate() < 10 ? "0" + date.getDate() : date.getDate();                var hours = date.getHours() < 10 ? "0" + date.getHours() : date.getHours();                var minutes = date.getMinutes() < 10 ? "0" + date.getMinutes() : date.getMinutes();                var seconds = date.getSeconds() < 10 ? "0" + date.getSeconds() : date.getSeconds();                return year + "-" + month + "-" + day + " " + hours + ":" + minutes + ":" + seconds;            },
+			judgeMatch(){
+				console.log("judge");
+				console.log(this.createMatch);
+				var time = this.getTime();
+				if(time >= this.createMatch.joinTime ||this.createMatch.joinTime >= this.createMatch.auditTime || this.createMatch.auditTime >= this.createMatch.scoreTime || this.createMatch.scoreTime >= this.createMatch.endTime){
+					this.flag = false;
+				}
+				else{
+					this.flag = true;
+				}
+			},
             submitCreateMatch() {
-                var _self = this;
+				var _self = this;
+				_self.judgeMatch();
+                if(_self.flag == false){
+					_self.$notify({
+                        message: '时间设置不正确，创建失败',
+                        type: 'error',
+                        title:'失败'
+                });
+				return;
+				}
 			    var formData = new FormData($( "#uploadForm" )[0]);  
                 $.ajax({  
                     url: 'http://58.87.72.138:30000/upload',
@@ -912,7 +933,9 @@
                                             type: 'success',
                                             title:'成功'
                                         });
-                                        this.getMatchData();
+                                        setTimeout(() => {
+                                            window.location.href="main.html";
+                                        }, 1000);
                                     }
                                     else{
                                         _self.$notify({
