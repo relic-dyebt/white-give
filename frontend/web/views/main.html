@@ -327,7 +327,7 @@
 
             <!-- 团委比赛管理 -->
             <el-main v-else-if="sidebarIndex==1 && role=='团委'">
-                <el-button @click="createMatchDialog">创建比赛</el-button>
+                <el-button type="primary" plain  @click="createMatchDialog"><i class="el-icon-upload"></i>创建比赛</el-button>
                 <el-row :gutter="12" style="margin-top: 10px">
                     <el-col :span="24">
                         <el-table :data="matchData" style="width: 100%">
@@ -348,37 +348,45 @@
                     </el-col>
                 </el-row>
                 <!-- 创建比赛对话框 --> 
+                
                 <el-dialog title="创建比赛" :visible.sync="matchDialog">
-                    <el-form label-width="100px">
-                        <el-form-item label="比赛名称">
-                            <el-input v-model="createMatch.name"></el-input>
-                        </el-form-item>
-                        <el-form-item label="简介">
-                            <el-input v-model="createMatch.introduction"></el-input>
-                        </el-form-item>
-                        <el-form-item label="报名时间">
-                            <el-date-picker type="datetime" v-model="createMatch.joinTime" placeholder="请选择时间" value-format="yyyy-MM-dd HH:mm:SS"></el-date-picker>
-                        </el-form-item>
-                        <el-form-item label="初审时间">
-                            <el-date-picker type="datetime" v-model="createMatch.auditTime" placeholder="请选择时间" value-format="yyyy-MM-dd HH:mm:SS"></el-date-picker>
-                        </el-form-item>
-                        <el-form-item label="评审时间">
-                            <el-date-picker type="datetime" v-model="createMatch.scoreTime" placeholder="请选择时间" value-format="yyyy-MM-dd HH:mm:SS"></el-date-picker>
-                        </el-form-item>
-                        <el-form-item label="结束时间">
-                            <el-date-picker type="datetime" v-model="createMatch.endTime" placeholder="请选择时间" value-format="yyyy-MM-dd HH:mm:SS"></el-date-picker>
-                        </el-form-item>
-                        <el-form-item label="比赛文件">
-                            <form id = "uploadForm" >
-                                <div class="uploader blue">
-                                    <input type="text" class="filename" readonly/>
-                                    <input type="button" class="button" value="选择文件"/>
-                                    <input type="file" size="30" name="document"/>
-                                </div>
-                            </form>
-                        </el-form-item>
-                        <el-button type="success" @click="submitCreateMatch">创建比赛<i class="el-icon-upload"></i></el-button>
-                    </el-form>
+                    <el-row :gutter="12" style="margin-top: 10px">
+                        <el-col :span="24">
+                            <el-form label-width="100px">
+                                <el-form-item label="比赛名称">
+                                    <el-input v-model="createMatch.name"></el-input>
+                                </el-form-item>
+                                <el-form-item label="简介">
+                                    <el-input v-model="createMatch.introduction"></el-input>
+                                </el-form-item>
+                                <el-form-item label="报名时间">
+                                    <el-date-picker type="datetime" v-model="createMatch.joinTime" placeholder="请选择时间" value-format="yyyy-MM-dd HH:mm:SS"></el-date-picker>
+                                </el-form-item>
+                                <el-form-item label="初审时间">
+                                    <el-date-picker type="datetime" v-model="createMatch.auditTime" placeholder="请选择时间" value-format="yyyy-MM-dd HH:mm:SS"></el-date-picker>
+                                </el-form-item>
+                                <el-form-item label="评审时间">
+                                    <el-date-picker type="datetime" v-model="createMatch.scoreTime" placeholder="请选择时间" value-format="yyyy-MM-dd HH:mm:SS"></el-date-picker>
+                                </el-form-item>
+                                <el-form-item label="结束时间">
+                                    <el-date-picker type="datetime" v-model="createMatch.endTime" placeholder="请选择时间" value-format="yyyy-MM-dd HH:mm:SS"></el-date-picker>
+                                </el-form-item>
+                                <el-form-item label="比赛文件">
+                                    <form id = "uploadForm" >
+                                        <div class="uploader blue">
+                                            <input type="text" class="filename" readonly/>
+                                            <input type="button" class="button" value="选择文件"/>
+                                            <input type="file" size="30" name="document"/>
+                                        </div>
+                                    </form>
+                                </el-form-item>
+                            </el-form>
+                        </el-col>
+                        <el-col :offset="18" :span="6">
+                            <el-button style="font-size: 14px" type="primary" @click="submitCreateMatch">确定</el-button>
+                            <el-button style="font-size: 14px" type="info" @click="cancelCreateMatch">取消</el-button>
+                        </el-col>
+                    </el-row>
                 </el-dialog>
                 <!-- 上传结果对话框 -->
                 <el-dialog title="上传比赛结果" :visible.sync="matchResultDialog">
@@ -398,6 +406,11 @@
             </el-main>
             <!-- 团委专家管理 -->
             <el-main v-else-if="sidebarIndex==4 && role=='团委'">
+                <el-row :gutter="12" style="margin-top: 0px">
+                        <el-col >
+                            <el-button style="font-size: 14px" type="primary" plain @click="twAddExpertDialog"><i class="el-icon-plus"></i>新增专家</el-button>
+                        </el-col>
+                </el-row>
                 <el-row :gutter="12" style="margin-top: 10px">
                     <el-col :span="24">
                         <el-table :data="twExpertData" style="width: 100%">
@@ -405,9 +418,37 @@
                             <el-table-column width="100" prop="name" label="姓名" ></el-table-column>
                             <el-table-column width="200" prop="introduction" label="简介"></el-table-column>
                             <el-table-column width="100" prop="phone" label="电话"></el-table-column>
+                            <el-table-column label="操作" fixed="right" width="320">
+                                <template slot-scope="scope">
+                                    <el-button style="font-size: 12px" type="primary" size="mini" @click="twDeleteExpert(scope.$index)"></el-button>
+                                </template>
+                            </el-table-column>
                         </el-table>
                     </el-col>
                 </el-row>
+
+                <!-- 新增专家对话框 -->
+                <el-dialog title="新增专家" :visible.sync="expertDialog">
+                    <el-row :gutter="12" style="margin-top: 10px">
+                        <el-col :span="24">
+                            <el-form label-width="100px">
+                                <el-form-item label="姓名">
+                                    <el-input v-model="addExpert.name"></el-input>
+                                </el-form-item>
+                                <el-form-item label="邮箱">
+                                    <el-input v-model="addExpert.email"></el-input>
+                                </el-form-item>
+                                <el-form-item label="初始密码">
+                                    <el-input v-model="addExpert.password"></el-input>
+                                </el-form-item>
+                            </el-form>
+                        </el-col>
+                        <el-col :offset="18" :span="6">
+                            <el-button style="font-size: 14px" type="primary" @click="twSubmitNewExpert">确定</el-button>
+                            <el-button style="font-size: 14px" type="info" @click="twCancelNewExpert">取消</el-button>
+                        </el-col>
+                    </el-row>
+                </el-dialog>
             </el-main>
 
             <!-- 团委申请管理 -->
@@ -416,7 +457,7 @@
                         <el-col >
                             <el-button style="font-size: 14px" type="primary" plain @click="resetDateFilter">清除日期过滤器</el-button>
                             <el-button style="font-size: 14px" type="success" plain @click="resetStateFilter">清除状态过滤器</el-button>
-                            <el-button style="font-size: 14px" type="warning" plain @click="resetMatchIdFilter">清除比赛ID过滤器</el-button>
+                            <el-button style="font-size: 14px" type="warning" plain @click="resetMatchIdFilter">清除比赛名称过滤器</el-button>
                             <el-button style="font-size: 14px" type="danger" plain @click="clearFilter">清除所有过滤器</el-button>
                         </el-col>
                 </el-row>
@@ -613,6 +654,8 @@
                     return item.label == query || query == '';
                 },
                 matchDialog: false,
+                expertDialog:false,
+                addExpert:{},
                 matchResultDialog: false,
                 createMatch: {},
                 matchResultIndex: 0,
@@ -684,7 +727,7 @@
                                 });
                                 setTimeout(() => { window.location.href = "main.html"; }, 1000);
                             } else{
-                                _self.$message({
+                                _self.$notify({
                                     message: '删除比赛失败',
                                     type: 'error',
                                     title:'失败',
@@ -733,6 +776,54 @@
             createMatchDialog() {
                 this.matchDialog = true;
                 this.$nextTick(() => this.update());
+            },
+            cancelCreateMatch() {
+                this.matchDialog = false;
+            },
+            //团委新增专家 对话框
+            twAddExpertDialog() {
+                this.expertDialog = true;
+            },
+            twCancelNewExpert() {
+                this.expertDialog = false;
+            },
+            twSubmitNewExpert() {
+                var _self = this;
+                $.ajax({
+                    url: "http://58.87.72.138:30000/expertRegister",
+                    type: "get",
+                    dataType: 'json',
+                    contentType:"application/json",
+                    data: {
+                        info: JSON.stringify({
+                            name: _self.addExpert.name,
+                            email: _self.addExpert.email,
+                            password: _self.addExpert.password,
+                        }),
+                    },
+                    success: function(res){
+                        console.log(res);
+                        if(res.err == false){
+                            _self.$notify({
+                                message: '新增专家成功',
+                                type: 'success',
+                                title:'成功'
+                            });
+                            _self.getTwExpert();
+                            _self.expertDialog = false;
+                        }
+                        else{
+                            _self.$notify({
+                                message: '新增专家失败',
+                                type: 'error',
+                                title:'失败'
+                            });
+                        }
+                    },
+                    error: function(err){
+                        console.log(err);
+                    }
+                });
             },
             matchResultDialogShow(index) {
                 this.matchResultIndex = index;
