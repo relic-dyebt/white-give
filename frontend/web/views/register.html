@@ -1,162 +1,132 @@
 <!DOCTYPE html>
 <html>
-<head>
-	<meta charset="UTF-8">
-	<!-- import CSS -->
-	<link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
-	<link rel="stylesheet" href="../css/register.css">
-	<!-- import Vue before Element -->
-	<script src="https://unpkg.com/vue/dist/vue.js"></script>
-	<!-- import JavaScript -->
-	<script src="https://unpkg.com/element-ui/lib/index.js"></script>
-	<!-- import JQuery -->
-	<script src="https://cdn.staticfile.org/jquery/3.1.1/jquery.min.js"></script>
-</head>
-
-
-<style>
-  
-  
-</style>
-
-<body>
-<div class="register" id="register">
-	<el-card class="box-card">
-		<h3 style="color: black">统一身份认证中心</h3>
-		<el-form label-width="25%" :model="info" size="mini" style="margin-top: 10%">
-		<el-form-item label="用户名">
-			<el-input
-			  placeholder="请输入用户名"
-			  v-model="info.username"
-			  :disabled="false" style="width: 100%">
-			<i slot="prefix" class="el-input__icon el-icon-user-solid"></i>
-		</el-form-item>
-		<el-form-item label="密码">
-			<el-input
-			  placeholder="请输入密码"
-			  v-model="info.password"
-			  :disabled="false" show-password style="width: 100%">
-			<i slot="prefix" class="el-input__icon el-icon-s-home"></i>
-		</el-form-item>
-		<el-form-item label="再次确认">
-			<el-input
-			  placeholder="请输入密码"
-			  v-model="info.password"
-			  :disabled="false" show-password style="width: 100%">
-			<i slot="prefix" class="el-input__icon el-icon-s-home"></i>
-		</el-form-item>
-		<el-form-item label="姓名">
-			<el-input
-			  placeholder="请输入姓名"
-			  v-model="info.name"
-			  :disabled="false" style="width: 100%">
-			<i slot="prefix" class="el-input__icon el-icon-s-home"></i>
-		</el-form-item>
-		<el-form-item label="学号">
-			<el-input
-			  placeholder="请输入学号"
-			  v-model="info.studentNumber"
-			  :disabled="false" style="width: 100%">
-			<i slot="prefix" class="el-input__icon el-icon-s-home"></i>
-		</el-form-item>
-		<el-form-item label="院系">
-			<el-input
-			  placeholder="请输入院系"
-			  v-model="info.department"
-			  :disabled="false" style="width: 100%">
-			<i slot="prefix" class="el-input__icon el-icon-s-home"></i>
-		</el-form-item>
-		<el-form-item label="专业">
-			<el-input
-			  placeholder="请输入专业"
-			  v-model="info.major"
-			  :disabled="false" style="width: 100%">
-			<i slot="prefix" class="el-input__icon el-icon-s-home"></i>
-		</el-form-item>
-		<el-form-item label="邮箱">
-			<el-input
-			  placeholder="请输入邮箱"
-			  v-model="info.email"
-			  :disabled="false" style="width: 100%">
-			<i slot="prefix" class="el-input__icon el-icon-s-home"></i>
-		</el-form-item>
-		<el-button type="primary" @click="submit">登录</el-button>
-		</el-form>
-	</el-card>
-
-</div>
-</body>
-
-
-
-
-
-<script>
-  new Vue({
-    el: '#register',
-    data: function() {
-		return {
-			info: {
-				studentNumber: '16211000',//学号
-                username:'Tom',//用户名
-                password:'root1234',//密码
-                passwdCheck:'root1234',//密码验证
-                name: '李华',//姓名
-                introduction: 'Hello World',
-				profileUrl: 'lihua.rar',
-				phone: '13012345678',//联系电话
-				email: 'lihua@163.com', //电子邮件
-                department: '软件学院',//院系
-                major: '软件工程',//专业
-                enrollmentYear: '2016',//入学年份
-				workList: '',
-					
-            }
-		}
-    },
-	methods: {
-		submit(){
-			var _self=this;
-			console.log(_self.info.password);
-					
-			$.ajax({
-				url: "http://58.87.72.138:30000/studentRegister",
-				type: "get",
-				dataType: 'json',
-				contentType:"application/json",
-				data: {
-					info: JSON.stringify(_self.info),
-				},
-				success: function(res){
-					console.log(res);
-					if(res.err == false){
-						_self.$message({
-							message: 'Hi	' + _self.info.username,
-							type: 'success',
-							center: true
-						});
-						
-						setTimeout(() => {
-							window.location.href="../index.html";
-						}, 1000);
-					}
-					else{
-						_self.$message({
-							message: '注册失败',
-							type: 'fail',
-							center: true
-						});
-					}
-					
-					
-				},
-				error: function(err){
-					console.log(err);
+	<head>
+		<meta charset="UTF-8">
+		<!-- import CSS -->
+		<link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
+		<link rel="stylesheet" href="../css/register.css">
+		<!-- import Vue before Element -->
+		<script src="https://unpkg.com/vue/dist/vue.js"></script>
+		<!-- import JavaScript -->
+		<script src="https://unpkg.com/element-ui/lib/index.js"></script>
+		<!-- import JQuery -->
+		<script src="https://cdn.staticfile.org/jquery/3.1.1/jquery.min.js"></script>
+	</head>
+	<body>
+		<div class="register" id="register">
+			<el-card class="box-card">
+				<h3 style="color: black">统一身份认证中心</h3>
+				<el-form label-width="25%" :model="info" size="mini" style="margin-top: 10%">
+				<el-form-item label="用户名">
+					<el-input placeholder="请输入用户名" v-model="info.username" :disabled="false" style="width: 100%">
+					<i slot="prefix" class="el-input__icon el-icon-user-solid"></i>
+				</el-form-item>
+				<el-form-item label="密码">
+					<el-input placeholder="请输入密码" v-model="info.password" :disabled="false" show-password style="width: 100%">
+					<i slot="prefix" class="el-input__icon el-icon-s-home"></i>
+				</el-form-item>
+				<el-form-item label="确认密码">
+					<el-input placeholder="请再次输入密码" v-model="info.passwordConfirm" :disabled="false" show-password style="width: 100%">
+					<i slot="prefix" class="el-input__icon el-icon-s-home"></i>
+				</el-form-item>
+				<el-form-item label="姓名">
+					<el-input placeholder="请输入姓名" v-model="info.name" :disabled="false" style="width: 100%">
+					<i slot="prefix" class="el-input__icon el-icon-s-home"></i>
+				</el-form-item>
+				<el-form-item label="学号">
+					<el-input placeholder="请输入学号" v-model="info.studentNumber" :disabled="false" style="width: 100%">
+					<i slot="prefix" class="el-input__icon el-icon-s-home"></i>
+				</el-form-item>
+				<el-form-item label="院系">
+					<el-input placeholder="请输入院系" v-model="info.department" :disabled="false" style="width: 100%">
+					<i slot="prefix" class="el-input__icon el-icon-s-home"></i>
+				</el-form-item>
+				<el-form-item label="专业">
+					<el-input placeholder="请输入专业" v-model="info.major" :disabled="false" style="width: 100%">
+					<i slot="prefix" class="el-input__icon el-icon-s-home"></i>
+				</el-form-item>
+				<el-form-item label="电话">
+						<el-input placeholder="请输入电话" v-model="info.phone" :disabled="false" style="width: 100%">
+						<i slot="prefix" class="el-input__icon el-icon-s-home"></i>
+					</el-form-item>
+				<el-form-item label="邮箱">
+					<el-input placeholder="请输入邮箱" v-model="info.email" :disabled="false" style="width: 100%">
+					<i slot="prefix" class="el-input__icon el-icon-s-home"></i>
+				</el-form-item>
+				<el-button type="primary" @click="submit">提交</el-button>
+				</el-form>
+			</el-card>
+		</div>
+	</body>
+	<script>
+	new Vue({
+		el: '#register',
+		data: function() {
+			return {
+				info: {
+					studentNumber: '',
+					username: '',
+					password: '',
+					passwordConfirm: '',
+					name: '',
+					phone: '',
+					email: '',
+					department: '',
+					major: ''
 				}
-				
-			})
+			}
 		},
-	}
-  })
-</script>
+		methods: {
+			submit(){
+				var _self = this;
+				var complete = true;
+				for (var i in this.info) {
+					if (this.info[i] == '') {
+						console.log(i)
+						complete = false;
+						break;
+					}
+				}
+				if (!complete) {
+					_self.$message({
+						message: '请输入完整的信息',
+						type: 'error',
+						title: '失败'
+					});
+				} else if (this.info.password != this.info.passwordConfirm) {
+					_self.$message({
+						message: '请输入相同的密码和确认密码',
+						type: 'error',
+						title: '失败'
+					});
+				} else {
+					$.ajax({
+						url: "http://58.87.72.138:30000/studentRegister",
+						type: "get",
+						dataType: 'json',
+						contentType:"application/json",
+						data: { info: JSON.stringify(_self.info), },
+						success: res => {
+							if (res.err == false) {
+								_self.$message({
+									message: 'Hi	' + _self.info.username,
+									type: 'success',
+									center: true
+								});
+								setTimeout(() => { window.location.href="login.html"; }, 1000);
+							} else {
+								_self.$message({
+									message: '注册失败',
+									type: 'error',
+									title: '失败'
+								});
+							}
+						},
+						error: err => console.log(err)
+					});
+				}
+			},
+		}
+	})
+	</script>
 </html>
