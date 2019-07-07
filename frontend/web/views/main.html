@@ -751,31 +751,41 @@
                         score: this.auditData[item].score,
                         comment:this.auditData[item].comment,
                     };
-                    console.log(JSON.stringify(ap));
-                    $.ajax({
-                        url: "http://58.87.72.138:30000/expertSetAssessment",
-                        type: "get",
-                        dataType: 'json',
-                        contentType:"application/json",
-                        data:{ info: JSON.stringify(ap), },
-                        success: function(res){
-                            console.log(res);
-                            _self.$notify({
-                                message: '提交成功',
-                                type: 'success',
-                                title:'成功'
-                            });
-                            setTimeout(() => { window.location.href = "main.html"; }, 1000);
-                        },
-                        error: function(err){
-                            _self.$notify({
-                                message: '提交失败',
-                                type: 'error',
-                                title:'失败'
-                            });
-                            console.log(err);
-                        }
-                    })
+                    if(ap.score>100||ap.score<0){
+                        _self.$notify({
+                            message: '提交失败 分数应该在0-100',
+                            type: 'error',
+                            title:'失败'
+                        });
+                    }else{
+                        console.log(JSON.stringify(ap));
+                        $.ajax({
+                            url: "http://58.87.72.138:30000/expertSetAssessment",
+                            type: "get",
+                            dataType: 'json',
+                            contentType:"application/json",
+                            data:{ info: JSON.stringify(ap), },
+                            success: function(res){
+                                console.log(res);
+                                _self.$notify({
+                                    message: '提交成功',
+                                    type: 'success',
+                                    title:'成功'
+                                });
+                                setTimeout(() => { window.location.href = "main.html"; }, 1000);
+                            },
+                            error: function(err){
+                                _self.$notify({
+                                    message: '提交失败',
+                                    type: 'error',
+                                    title:'失败'
+                                });
+                                console.log(err);
+                            }
+                        })
+                        return;
+                    }
+
                     return; 
                 }
             },
