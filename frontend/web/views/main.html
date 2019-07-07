@@ -445,7 +445,7 @@
                         <el-col >
                             <el-button style="font-size: 14px" type="primary" plain @click="resetDateFilter">清除日期过滤器</el-button>
                             <el-button style="font-size: 14px" type="success" plain @click="resetStateFilter">清除状态过滤器</el-button>
-                            <el-button style="font-size: 14px" type="warning" plain @click="resetMatchIdFilter">清除比赛名称过滤器</el-button>
+                            <!-- <el-button style="font-size: 14px" type="warning" plain @click="resetMatchIdFilter">清除比赛名称过滤器</el-button> -->
                             <el-button style="font-size: 14px" type="danger" plain @click="clearFilter">清除所有过滤器</el-button>
                         </el-col>
                 </el-row>
@@ -462,11 +462,11 @@
                                     {{scope.row.state}}
                                 </template>
                             </el-table-column>
-                            <el-table-column width="100" prop="name" label="比赛名称" :filters="[{ text: '冯如杯', value: '冯如杯' }, { text: '软件', value: '软件' }, { text: '机器人', value: '机器人' }, { text: '人工智能', value: '人工智能' },{ text: '创业', value: '创业' }]" :filter-method="filterMatchName" filter-placement="bottom-end">
+                            <!-- <el-table-column width="100" prop="name" label="比赛名称" :filters="[{ text: '冯如杯', value: '冯如杯' }, { text: '软件', value: '软件' }, { text: '机器人', value: '机器人' }, { text: '人工智能', value: '人工智能' },{ text: '创业', value: '创业' }]" :filter-method="filterMatchName" filter-placement="bottom-end">
                             <template slot-scope="scope">
                                 {{scope.row.name}}
                             </template>
-                            </el-table-column>
+                            </el-table-column> -->
                             <el-table-column label="操作" fixed="right" width="320">
                                 <template slot-scope="scope">
                                     <el-button style="font-size: 12px" type="primary" size="mini" @click="twPreviewApply(scope.$index)">预览</el-button>
